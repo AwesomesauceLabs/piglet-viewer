@@ -67,7 +67,9 @@ namespace Sketchfab
 		// so initialize API before Logger
 		public static void Initialize()
 		{
+#if comment
 			_ui = new SketchfabUI();
+#endif
 			_api = new SketchfabAPI();
 			_logger = new SketchfabLogger();
 			checkUpdates();
@@ -94,7 +96,10 @@ namespace Sketchfab
 
 		public static void checkValidity()
 		{
+#if comment
 			if(_ui == null || _logger == null || _api == null || DEFAULT_AVATAR == null)
+#endif
+			if(_logger == null || _api == null || DEFAULT_AVATAR == null)
 			{
 				Initialize();
 			}
