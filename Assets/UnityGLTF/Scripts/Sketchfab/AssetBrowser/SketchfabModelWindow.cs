@@ -65,14 +65,15 @@ namespace Sketchfab
 				GUILayout.BeginVertical();
 				_ui.displayModelName(model.name);
 				_ui.displayContent("by " + model.author);
-				GUILayout.EndVertical();
-
-				GUILayout.FlexibleSpace();
-				if (GUILayout.Button("View on Sketchfab"))
+				GUILayout.BeginHorizontal();
+				GUIContent viewSkfb = new GUIContent("View on Sketchfab", _ui.SKETCHFAB_ICON);
+				if (GUILayout.Button(viewSkfb, GUILayout.Height(24), GUILayout.Width(140)))
 				{
 					Application.OpenURL(SketchfabPlugin.Urls.modelUrl + "/" + _currentModel.uid);
 				}
-
+				GUILayout.FlexibleSpace();
+				GUILayout.EndHorizontal();
+				GUILayout.EndVertical();
 				GUILayout.EndHorizontal();
 
 
@@ -81,17 +82,9 @@ namespace Sketchfab
 
 				GUILayout.BeginHorizontal(blackGround);
 				GUILayout.FlexibleSpace();
-				if(PlayerSettings.colorSpace == ColorSpace.Linear)
-				{
-					bool backup = GL.sRGBWrite;
-					GL.sRGBWrite = true;
-					GUILayout.Label(model._preview);
-					GL.sRGBWrite = backup;
-				}
-				else
-				{
-					GUILayout.Label(model._preview);
-				}
+
+				GUILayout.Label(model._preview);
+
 				GUILayout.FlexibleSpace();
 				GUILayout.EndHorizontal();
 
@@ -111,10 +104,15 @@ namespace Sketchfab
 
 				GUILayout.BeginVertical(GUILayout.Width(300));
 				_ui.displayTitle("LICENSE");
-				if(model.licenseJson != null)
+				if(model.licenseJson != null && model.licenseJson["fullName"] != null)
 				{
 					_ui.displayContent(model.licenseJson["fullName"]);
 					_ui.displaySubContent(model.licenseJson["requirements"]);
+				}
+				else if(model.vertexCount != 0)
+				{
+					_ui.displayContent("Personal");
+					_ui.displaySubContent("You own this model");
 				}
 				else
 				{
@@ -129,6 +127,8 @@ namespace Sketchfab
 
 		void displayImportSettings()
 		{
+			bool modelIsAvailable = _currentModel.archiveSize > 0;
+			GUI.enabled = modelIsAvailable;
 			GUILayout.BeginVertical("Box");
 			_ui.displayContent("Import into");
 			GUILayout.BeginHorizontal();
@@ -164,19 +164,29 @@ namespace Sketchfab
 			Color old = GUI.color;
 			GUI.color = SketchfabUI.SKFB_BLUE;
 			GUI.contentColor = Color.white;
+			GUILayout.FlexibleSpace();
 			string buttonCaption = "";
+
+			
 			if (!_window._logger.isUserLogged())
 			{
-				buttonCaption = "You need to be logged in to download and import assets";
+				buttonCaption = "You need to be logged in to download assets";
 				GUI.enabled = false;
+			}
+			else if(modelIsAvailable)
+			{
+				buttonCaption = "<b>Download model</b> (" + Utils.humanifyFileSize(_currentModel.archiveSize) + ")";
 			}
 			else
 			{
-				buttonCaption = "Download model (" + Utils.humanifyFileSize(_currentModel.archiveSize) + ")";
+				buttonCaption = "Model not yet available";
 			}
-			if (GUILayout.Button(buttonCaption))
-			{
+			
+			buttonCaption = "<color=" + Color.white + ">" + buttonCaption + "</color>";
+			
 
+			if (GUILayout.Button(buttonCaption, _ui.getSketchfabBigButton(), GUILayout.Height(64), GUILayout.Width(450)))
+			{
 				if (!assetAlreadyExists() || EditorUtility.DisplayDialog("Override asset", "The asset " + _prefabName + " already exists in project. Do you want to override it ?", "Override", "Cancel"))
 				{
 					// Reuse if still valid
@@ -190,6 +200,9 @@ namespace Sketchfab
 					}
 				}
 			}
+
+			GUI.enabled = true;
+			GUILayout.FlexibleSpace();
 			GUI.color = old;
 			GUI.enabled = true;
 			GUILayout.EndHorizontal();
@@ -312,7 +325,8 @@ namespace Sketchfab
 
 		private void OnDestroy()
 		{
-			_window.closeModelPage();
+			if(_window != null)
+				_window.closeModelPage();
 		}
 	}
 }
