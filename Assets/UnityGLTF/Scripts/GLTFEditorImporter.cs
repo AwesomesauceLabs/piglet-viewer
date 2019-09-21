@@ -16,7 +16,7 @@ namespace UnityGLTF
 	/// Editor windows to load a GLTF scene in editor
 	/// </summary>
 	///
-	public class GLTFEditorImporter
+	public class GLTFEditorImporter : GLTFRuntimeImporter
 	{
 		public bool _useGLTFMaterial = false;
 		bool _isDone = false;
