@@ -185,5 +185,17 @@ namespace UnityGLTF
 			if (_finishCallback != null)
 				_finishCallback();
 		}
+
+		/// <summary>
+		/// Call this to abort current import
+		/// </summary>
+		public void abortImport()
+		{
+			if (!_isDone)
+			{
+				_userStopped = true;
+			}
+		}
+
     }
 }

@@ -991,17 +991,6 @@ namespace UnityGLTF
 		}
 
 		/// <summary>
-		/// Call this to abort current import
-		/// </summary>
-		public void abortImport()
-		{
-			if (!_isDone)
-			{
-				_userStopped = true;
-			}
-		}
-
-		/// <summary>
 		/// Cleans all generated files and structures
 		/// </summary>
 		///
