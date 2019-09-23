@@ -56,15 +56,6 @@ namespace UnityGLTF
 			_addToCurrentScene = addScene;
 		}
 
-		public void Load(bool useGLTFMaterial=false)
-		{
-			_isDone = false;
-			_userStopped = false;
-			_useGLTFMaterial = useGLTFMaterial;
-			LoadFile();
-			LoadGLTFScene();
-		}
-
 		// Private
 		private void checkValidity()
 		{
@@ -74,95 +65,7 @@ namespace UnityGLTF
 			}
 		}
 
-		private void LoadFile(int sceneIndex = -1)
-		{
-			_glTFData = File.ReadAllBytes(_glTFPath);
-			_root = GLTFParser.ParseJson(_glTFData);
-		}
-
-		private void LoadGLTFScene(int sceneIndex = -1)
-		{
-			Scene scene;
-			if (sceneIndex >= 0 && sceneIndex < _root.Scenes.Count)
-			{
-				scene = _root.Scenes[sceneIndex];
-			}
-			else
-			{
-				scene = _root.GetDefaultScene();
-			}
-
-			if (scene == null)
-			{
-				throw new Exception("No default scene in gltf file.");
-			}
-
-			_assetCache = new AssetCache(
-				_root.Images != null ? _root.Images.Count : 0,
-				_root.Textures != null ? _root.Textures.Count : 0,
-				_root.Materials != null ? _root.Materials.Count : 0,
-				_root.Buffers != null ? _root.Buffers.Count : 0,
-				_root.Meshes != null ? _root.Meshes.Count : 0
-			);
-
-			// Load dependencies
-			LoadBuffersEnum();
-			if (_root.Images != null)
-				LoadImagesEnum();
-			if (_root.Textures != null)
-				SetupTexturesEnum();
-			if (_root.Materials != null)
-				LoadMaterialsEnum();
-			LoadMeshesEnum();
-			LoadSceneEnum();
-
-			if (_root.Animations != null && _root.Animations.Count > 0)
-				LoadAnimationsEnum();
-
-			if (_root.Skins != null && _root.Skins.Count > 0)
-				LoadSkinsEnum();
-		}
-
-		private void LoadBuffersEnum()
-		{
-			_taskManager.addTask(LoadBuffers());
-		}
-
-		private void LoadImagesEnum()
-		{
-			_taskManager.addTask(LoadImages());
-		}
-
-		private void SetupTexturesEnum()
-		{
-			_taskManager.addTask(SetupTextures());
-		}
-
-		private void LoadMaterialsEnum()
-		{
-			_taskManager.addTask(LoadMaterials());
-		}
-
-		private void LoadMeshesEnum()
-		{
-			_taskManager.addTask(LoadMeshes());
-		}
-
-		private void LoadSceneEnum()
-		{
-			_taskManager.addTask(LoadScene());
-		}
-		private void LoadAnimationsEnum()
-		{
-			_taskManager.addTask(LoadAnimations());
-		}
-
-		private void LoadSkinsEnum()
-		{
-			_taskManager.addTask(LoadSkins());
-		}
-
-		private IEnumerator LoadBuffers()
+		override protected IEnumerator LoadBuffers()
 		{
 			if (_root.Buffers != null)
 			{
@@ -199,7 +102,7 @@ namespace UnityGLTF
 			}
 		}
 
-		private IEnumerator LoadImages()
+		override protected IEnumerator LoadImages()
 		{
 			for (int i = 0; i < _root.Images.Count; ++i)
 			{
@@ -251,7 +154,7 @@ namespace UnityGLTF
 			}
 		}
 
-		private IEnumerator SetupTextures()
+		override protected IEnumerator SetupTextures()
 		{
 			for(int i = 0; i < _root.Textures.Count; ++i)
 			{
@@ -299,7 +202,7 @@ namespace UnityGLTF
 			_assetManager.registerTexture(source);
 		}
 
-		private IEnumerator LoadMaterials()
+		override protected IEnumerator LoadMaterials()
 		{
 			for(int i = 0; i < _root.Materials.Count; ++i)
 			{
@@ -503,7 +406,7 @@ namespace UnityGLTF
 			return _assetManager.getMaterial(index);
 		}
 
-		private IEnumerator LoadMeshes()
+		override protected IEnumerator LoadMeshes()
 		{
 			for(int i = 0; i < _root.Meshes.Count; ++i)
 			{
@@ -674,7 +577,7 @@ namespace UnityGLTF
 			return attributeAccessors;
 		}
 
-		private IEnumerator LoadScene(int sceneIndex = -1)
+		override protected IEnumerator LoadScene(int sceneIndex = -1)
 		{
 			Scene scene;
 			_nbParsedNodes = 0;
@@ -703,7 +606,7 @@ namespace UnityGLTF
 			yield return null;
 		}
 
-		private IEnumerator LoadAnimations()
+		override protected IEnumerator LoadAnimations()
 		{
 			for (int i = 0; i < _root.Animations.Count; ++i)
 			{
@@ -794,7 +697,7 @@ namespace UnityGLTF
 				_progressCallback(step, current, total);
 		}
 
-		private IEnumerator LoadSkins()
+		override protected IEnumerator LoadSkins()
 		{
 			setProgress(IMPORT_STEP.SKIN, 0, _root.Skins.Count);
 			for (int i = 0; i < _root.Skins.Count; ++i)

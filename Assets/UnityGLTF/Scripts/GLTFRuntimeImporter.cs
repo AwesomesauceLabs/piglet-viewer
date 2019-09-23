@@ -1,4 +1,7 @@
+using GLTF;
 using GLTF.Schema;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -204,6 +207,120 @@ namespace UnityGLTF
 				_userStopped = true;
 			}
 		}
+
+		/// <summary>
+		/// Start the import process.
+		/// </summary>
+		/// <param name="useGLTFMaterial"></param>
+		public void Load(bool useGLTFMaterial=false)
+		{
+			_isDone = false;
+			_userStopped = false;
+			_useGLTFMaterial = useGLTFMaterial;
+			LoadFile();
+			LoadGLTFScene();
+		}
+
+		/// <summary>
+		/// Load contents of main GLTF file into memory.
+		/// </summary>
+		/// <param name="sceneIndex"></param>
+		protected void LoadFile(int sceneIndex = -1)
+		{
+			_glTFData = File.ReadAllBytes(_glTFPath);
+			_root = GLTFParser.ParseJson(_glTFData);
+		}
+
+		protected void LoadGLTFScene(int sceneIndex = -1)
+		{
+			Scene scene;
+			if (sceneIndex >= 0 && sceneIndex < _root.Scenes.Count)
+			{
+				scene = _root.Scenes[sceneIndex];
+			}
+			else
+			{
+				scene = _root.GetDefaultScene();
+			}
+
+			if (scene == null)
+			{
+				throw new Exception("No default scene in gltf file.");
+			}
+
+			_assetCache = new AssetCache(
+				_root.Images != null ? _root.Images.Count : 0,
+				_root.Textures != null ? _root.Textures.Count : 0,
+				_root.Materials != null ? _root.Materials.Count : 0,
+				_root.Buffers != null ? _root.Buffers.Count : 0,
+				_root.Meshes != null ? _root.Meshes.Count : 0
+			);
+
+			// Load dependencies
+			LoadBuffersEnum();
+			if (_root.Images != null)
+				LoadImagesEnum();
+			if (_root.Textures != null)
+				SetupTexturesEnum();
+			if (_root.Materials != null)
+				LoadMaterialsEnum();
+			LoadMeshesEnum();
+			LoadSceneEnum();
+
+			if (_root.Animations != null && _root.Animations.Count > 0)
+				LoadAnimationsEnum();
+
+			if (_root.Skins != null && _root.Skins.Count > 0)
+				LoadSkinsEnum();
+		}
+
+		protected void LoadBuffersEnum()
+		{
+			_taskManager.addTask(LoadBuffers());
+		}
+
+		protected void LoadImagesEnum()
+		{
+			_taskManager.addTask(LoadImages());
+		}
+
+		protected void SetupTexturesEnum()
+		{
+			_taskManager.addTask(SetupTextures());
+		}
+
+		protected void LoadMaterialsEnum()
+		{
+			_taskManager.addTask(LoadMaterials());
+		}
+
+		protected void LoadMeshesEnum()
+		{
+			_taskManager.addTask(LoadMeshes());
+		}
+
+		protected void LoadSceneEnum()
+		{
+			_taskManager.addTask(LoadScene());
+		}
+		protected void LoadAnimationsEnum()
+		{
+			_taskManager.addTask(LoadAnimations());
+		}
+
+		protected void LoadSkinsEnum()
+		{
+			_taskManager.addTask(LoadSkins());
+		}
+
+		virtual protected IEnumerator LoadBuffers() { yield break; }
+		virtual protected IEnumerator LoadImages() { yield break; }
+		virtual protected IEnumerator SetupTextures() { yield break; }
+		virtual protected IEnumerator LoadMaterials() { yield break; }
+		virtual protected IEnumerator LoadMeshes() { yield break; }
+		virtual protected IEnumerator LoadScene(int sceneIndex = -1) { yield break; }
+		virtual protected IEnumerator LoadAnimations() { yield break; }
+		virtual protected IEnumerator LoadSkins() { yield break; }
 
     }
 }
