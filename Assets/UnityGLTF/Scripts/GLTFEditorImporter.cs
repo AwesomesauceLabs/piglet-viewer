@@ -19,84 +19,31 @@ namespace UnityGLTF
 	public class GLTFEditorImporter : GLTFRuntimeImporter
 	{
 		public bool _useGLTFMaterial = false;
-		bool _isDone = false;
 
 		// Import paths and options
+		/// <summary>
+		/// Parent directory of directory where importer will
+		/// create Unity prefab and associated files
+		/// (e.g. meshes, materials). Must be located inside Unity
+		/// project folder.
+		/// </summary>
 		private string _projectDirectoryPath;
-		private string _gltfDirectoryPath;
-		private string _glTFPath = "";
+		/// <summary>
+		/// If true, the generated model prefab is automatically
+		/// to the current Unity scene.
+		/// </summary>
 		private bool _addToCurrentScene;
 
-		// GLTF data
-		private byte[] _glTFData;
-		protected GLTFRoot _root;
 		AssetManager _assetManager;
-		private int _nbParsedNodes;
-		private GameObject _sceneObject;
-		public UnityEngine.Material defaultMaterial;
 
 		protected AssetCache _assetCache;
-		private TaskManager _taskManager;
-		private bool _userStopped = false;
-		private string _currentSampleName = "";
-
-		private List<string> _assetsToRemove;
-		Dictionary<int, GameObject> _importedObjects;
-		Dictionary<int, List<SkinnedMeshRenderer>>_skinIndexToGameObjects;
-
-		// Import Progress
-		public enum IMPORT_STEP
-		{
-			READ_FILE,
-			BUFFER,
-			IMAGE,
-			TEXTURE,
-			MATERIAL,
-			MESH,
-			NODE,
-			ANIMATION,
-			SKIN
-		}
-
-		public delegate void RefreshWindow();
-		public delegate void ProgressCallback(IMPORT_STEP step, int current, int total);
-
-		private RefreshWindow _finishCallback;
-		private ProgressCallback _progressCallback;
-
-		protected const string Base64StringInitializer = "^data:[a-z-]+/[a-z-]+;base64,";
-
-		/// <summary>
-		/// Constructor
-		/// </summary>
-		public GLTFEditorImporter()
-		{
-			Initialize();
-		}
 
 		/// <summary>
 		/// Constructors setting the delegate function to call after each iteration
 		/// </summary>
 		/// <param name="delegateFunction">The function to call after each iteration (usually Repaint())</param>
 		public GLTFEditorImporter(ProgressCallback progressCallback, RefreshWindow finish=null)
-		{
-			_progressCallback = progressCallback;
-			_finishCallback = finish;
-			Initialize();
-		}
-
-		/// <summary>
-		/// Initializes all the structures and objects
-		/// </summary>
-		public void Initialize()
-		{
-			_importedObjects = new Dictionary<int, GameObject>();
-			_skinIndexToGameObjects = new Dictionary<int, List<SkinnedMeshRenderer>>();
-			_isDone = true;
-			_taskManager = new TaskManager();
-			_assetsToRemove = new List<string>();
-			defaultMaterial = new UnityEngine.Material(Shader.Find("Standard"));
-		}
+			: base(progressCallback, finish) {}
 
 		/// <summary>
 		/// Setup importer for an import
@@ -106,14 +53,11 @@ namespace UnityGLTF
 		/// <param name="modelName">Name of the model prefab to create<param>
 		public void setupForPath(string gltfPath, string importPath, string modelName, bool addScene=false)
 		{
-			_glTFPath = gltfPath;
-			_gltfDirectoryPath = Path.GetDirectoryName(_glTFPath);
-			_currentSampleName = modelName.Length > 0 ? modelName : "GLTFScene";
+			base.setupForPath(gltfPath, modelName);
+
 			_projectDirectoryPath = importPath;
 			_assetManager = new AssetManager(_projectDirectoryPath, _currentSampleName);
-			_importedObjects.Clear();
 			_addToCurrentScene = addScene;
-			_skinIndexToGameObjects.Clear();
 		}
 
 		public void Update()
