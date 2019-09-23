@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityGLTF.Cache;
 
@@ -356,7 +357,63 @@ namespace UnityGLTF
 			}
 		}
 
-		virtual protected IEnumerator LoadImages() { yield break; }
+		protected IEnumerator LoadImages()
+		{
+			for (int i = 0; i < _root.Images.Count; ++i)
+			{
+				Image image = _root.Images[i];
+				_assetCache.ImageCache[i] = LoadImage(_gltfDirectoryPath, image, i);
+				setProgress(IMPORT_STEP.IMAGE, (i + 1), _root.Images.Count);
+				yield return null;
+			}
+		}
+
+		virtual protected Texture2D LoadImage(string rootPath, Image image, int imageID)
+		{
+			if (_assetCache.ImageCache[imageID] != null)
+				return _assetCache.ImageCache[imageID];
+
+			var texture = new Texture2D(4, 4);
+			if (image.Uri != null)
+			{
+				// Is base64 uri ?
+				var uri = image.Uri;
+
+				Regex regex = new Regex(Base64StringInitializer);
+				Match match = regex.Match(uri);
+				if (match.Success)
+				{
+					var base64Data = uri.Substring(match.Length);
+					var textureData = Convert.FromBase64String(base64Data);
+					texture.LoadImage(textureData);
+					return texture;
+				}
+				else if(File.Exists(Path.Combine(rootPath, uri))) // File is a real file
+				{
+					string imagePath = Path.Combine(rootPath, uri);
+					var textureData = File.ReadAllBytes(imagePath);
+					texture.LoadImage(textureData);
+					return texture;
+				}
+				else
+				{
+					Debug.Log("Image not found / Unknown image buffer");
+					return null;
+				}
+			}
+			else
+			{
+				var bufferView = image.BufferView.Value;
+				var buffer = bufferView.Buffer.Value;
+				var data = new byte[bufferView.ByteLength];
+
+				var bufferContents = _assetCache.BufferCache[bufferView.Buffer.Id];
+				System.Buffer.BlockCopy(bufferContents, bufferView.ByteOffset, data, 0, data.Length);
+				texture.LoadImage(data);
+				return texture;
+			}
+		}
+
 		virtual protected IEnumerator SetupTextures() { yield break; }
 		virtual protected IEnumerator LoadMaterials() { yield break; }
 		virtual protected IEnumerator LoadMeshes() { yield break; }

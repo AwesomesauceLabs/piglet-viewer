@@ -65,56 +65,14 @@ namespace UnityGLTF
 			}
 		}
 
-		override protected IEnumerator LoadImages()
+		override protected Texture2D LoadImage(string rootPath, Image image, int imageID)
 		{
-			for (int i = 0; i < _root.Images.Count; ++i)
-			{
-				Image image = _root.Images[i];
-				LoadImage(_gltfDirectoryPath, image, i);
-				setProgress(IMPORT_STEP.IMAGE, (i + 1), _root.Images.Count);
-				yield return null;
+			Texture2D texture = base.LoadImage(rootPath, image, imageID);
+			if (texture != null) {
+				_assetManager.saveTexture(
+					GLTFTextureUtils.flipTexture(texture), imageID);
 			}
-		}
-
-		private void LoadImage(string rootPath, Image image, int imageID)
-		{
-			if (_assetCache.ImageCache[imageID] == null)
-			{
-				if (image.Uri != null)
-				{
-					// Is base64 uri ?
-					var uri = image.Uri;
-
-					Regex regex = new Regex(Base64StringInitializer);
-					Match match = regex.Match(uri);
-					if (match.Success)
-					{
-						var base64Data = uri.Substring(match.Length);
-						var textureData = Convert.FromBase64String(base64Data);
-
-						_assetManager.registerImageFromData(textureData, imageID);
-					}
-					else if(File.Exists(Path.Combine(rootPath, uri))) // File is a real file
-					{
-						string imagePath = Path.Combine(rootPath, uri);
-						_assetManager.copyAndRegisterImageInProject(imagePath, imageID);
-					}
-					else
-					{
-						Debug.Log("Image not found / Unknown image buffer");
-					}
-				}
-				else
-				{
-					var bufferView = image.BufferView.Value;
-					var buffer = bufferView.Buffer.Value;
-					var data = new byte[bufferView.ByteLength];
-
-					var bufferContents = _assetCache.BufferCache[bufferView.Buffer.Id];
-					System.Buffer.BlockCopy(bufferContents, bufferView.ByteOffset, data, 0, data.Length);
-					_assetManager.registerImageFromData(data, imageID);
-				}
-			}
+			return texture;
 		}
 
 		override protected IEnumerator SetupTextures()
