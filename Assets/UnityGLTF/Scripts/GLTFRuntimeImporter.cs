@@ -140,5 +140,50 @@ namespace UnityGLTF
 			_importedObjects.Clear();
 			_skinIndexToGameObjects.Clear();
 		}
+
+		/// <summary>
+		/// Pump import tasks and check status of GLTF import.
+		/// </summary>
+		public void Update()
+		{
+			if(!_isDone)
+			{
+				if (_userStopped)
+				{
+					_userStopped = false;
+					Clear();
+					_isDone = true;
+				}
+				else
+				{
+					if (_taskManager != null && _taskManager.play())
+					{
+						// Do stuff
+					}
+					else
+					{
+						_isDone = true;
+						finishImport();
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Abort all currently running import tasks (coroutines).
+		/// </summary>
+		virtual public void Clear()
+		{
+			_taskManager.clear();
+		}
+
+		/// <summary>
+		/// Run user-specified callback after finishing GLTF import.
+		/// </summary>
+		virtual protected void finishImport()
+		{
+			if (_finishCallback != null)
+				_finishCallback();
+		}
     }
 }

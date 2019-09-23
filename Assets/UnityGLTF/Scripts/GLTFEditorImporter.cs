@@ -60,31 +60,6 @@ namespace UnityGLTF
 			_addToCurrentScene = addScene;
 		}
 
-		public void Update()
-		{
-			if(!_isDone)
-			{
-				if (_userStopped)
-				{
-					_userStopped = false;
-					Clear();
-					_isDone = true;
-				}
-				else
-				{
-					if (_taskManager != null && _taskManager.play())
-					{
-						// Do stuff
-					}
-					else
-					{
-						_isDone = true;
-						finishImport();
-					}
-				}
-			}
-		}
-
 		public void Load(bool useGLTFMaterial=false)
 		{
 			_isDone = false;
@@ -995,11 +970,10 @@ namespace UnityGLTF
 			return glTFSkin.Joints.Count > 0 && glTFSkin.Joints.Count == glTFSkin.InverseBindMatrices.Value.Count;
 		}
 
-		private void finishImport()
+		override protected void finishImport()
 		{
 			GameObject prefab = _assetManager.savePrefab(_sceneObject, _projectDirectoryPath, _addToCurrentScene);
-			if (_finishCallback != null)
-				_finishCallback();
+			base.finishImport();
 
 			Clear();
 
@@ -1040,12 +1014,13 @@ namespace UnityGLTF
 			Resources.UnloadUnusedAssets();
 		}
 
-		public void Clear()
+		override public void Clear()
 		{
+			base.Clear();
+
 			if (_assetManager != null)
 				_assetManager.softClean();
 
-			_taskManager.clear();
 			Resources.UnloadUnusedAssets();
 		}
 
