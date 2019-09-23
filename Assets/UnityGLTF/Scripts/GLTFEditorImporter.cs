@@ -18,8 +18,6 @@ namespace UnityGLTF
 	///
 	public class GLTFEditorImporter : GLTFRuntimeImporter
 	{
-		public bool _useGLTFMaterial = false;
-
 		// Import paths and options
 		/// <summary>
 		/// Parent directory of directory where importer will
@@ -35,8 +33,6 @@ namespace UnityGLTF
 		private bool _addToCurrentScene;
 
 		AssetManager _assetManager;
-
-		protected AssetCache _assetCache;
 
 		/// <summary>
 		/// Constructors setting the delegate function to call after each iteration

@@ -2,11 +2,14 @@ using GLTF.Schema;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityGLTF.Cache;
 
 namespace UnityGLTF
 {
     public class GLTFRuntimeImporter
     {
+		public bool _useGLTFMaterial = false;
+
         /// <summary>
         /// Set to true when import has finished or
         /// has been aborted by the user.
@@ -57,6 +60,11 @@ namespace UnityGLTF
         /// (import images, import meshes, etc.).
         /// </summary>
         protected TaskManager _taskManager;
+		/// <summary>
+		/// Caches data (e.g. buffers) in memory during import.
+		/// </summary>
+		protected AssetCache _assetCache;
+
 
 		/// <summary>
         /// Describes current stage of GLTF import process.
