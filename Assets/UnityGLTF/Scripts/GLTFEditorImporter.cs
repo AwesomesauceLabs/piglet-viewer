@@ -65,43 +65,6 @@ namespace UnityGLTF
 			}
 		}
 
-		override protected IEnumerator LoadBuffers()
-		{
-			if (_root.Buffers != null)
-			{
-				// todo add fuzzing to verify that buffers are before uri
-				setProgress(IMPORT_STEP.BUFFER, 0, _root.Buffers.Count);
-				for (int i = 0; i < _root.Buffers.Count; ++i)
-				{
-					GLTF.Schema.Buffer buffer = _root.Buffers[i];
-					if (buffer.Uri != null)
-					{
-						LoadBuffer(_gltfDirectoryPath, buffer, i);
-					}
-					else //null buffer uri indicates GLB buffer loading
-					{
-						byte[] glbBuffer;
-						GLTFParser.ExtractBinaryChunk(_glTFData, i, out glbBuffer);
-						_assetCache.BufferCache[i] = glbBuffer;
-					}
-					setProgress(IMPORT_STEP.BUFFER, (i + 1), _root.Buffers.Count);
-					yield return null;
-				}
-			}
-		}
-
-		protected virtual void LoadBuffer(string sourceUri, GLTF.Schema.Buffer buffer, int bufferIndex)
-		{
-			if (buffer.Uri != null)
-			{
-				byte[] bufferData = null;
-				var uri = buffer.Uri;
-				var bufferPath = Path.Combine(sourceUri, uri);
-				bufferData = File.ReadAllBytes(bufferPath);
-				_assetCache.BufferCache[bufferIndex] = bufferData;
-			}
-		}
-
 		override protected IEnumerator LoadImages()
 		{
 			for (int i = 0; i < _root.Images.Count; ++i)
@@ -689,12 +652,6 @@ namespace UnityGLTF
 			{
 				Debug.Log("Unsupported animation channel target: " + channel.Target.Path);
 			}
-		}
-
-		private void setProgress(IMPORT_STEP step, int current, int total)
-		{
-			if (_progressCallback != null)
-				_progressCallback(step, current, total);
 		}
 
 		override protected IEnumerator LoadSkins()
