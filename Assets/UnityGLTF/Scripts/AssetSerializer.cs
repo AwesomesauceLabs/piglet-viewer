@@ -176,6 +176,11 @@ public class AssetManager
 		}
 	}
 
+	public void registerImage(Texture2D image)
+	{
+		_parsedImages.Add(image);
+	}
+
 	public void registerTexture(Texture2D texture)
 	{
 		_parsedTextures.Add(texture);
@@ -192,7 +197,8 @@ public class AssetManager
 		texture.name = imageName;
 		texture.LoadImage(imageData);
 		GL.sRGBWrite = true;
-		saveTexture(GLTFTextureUtils.flipTexture(texture), imageID);
+		Texture2D image = saveTexture(GLTFTextureUtils.flipTexture(texture), imageID);
+		registerImage(image);
 	}
 
 	public void copyAndRegisterImageInProject(string inputImage, int imageID)
@@ -227,7 +233,6 @@ public class AssetManager
 		// Reload as asset
 		string projectPath = GLTFUtils.getPathProjectFromAbsolute(newAssetPath);
 		Texture2D tex = (Texture2D)AssetDatabase.LoadAssetAtPath(projectPath, typeof(Texture2D));
-		_parsedImages.Add(tex);
 		return tex;
 	}
 
