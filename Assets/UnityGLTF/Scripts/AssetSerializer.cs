@@ -186,6 +186,11 @@ public class AssetManager
 		_parsedTextures.Add(texture);
 	}
 
+	public void registerMaterial(UnityEngine.Material material)
+	{
+		_parsedMaterials.Add(material);
+	}
+
 	public string generateName(string name, int index)
 	{
 		return GLTFUtils.cleanName(name + "_" + index).Replace(":", "_");
