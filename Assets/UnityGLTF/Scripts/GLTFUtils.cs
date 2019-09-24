@@ -18,14 +18,6 @@ public class GLTFUtils
 		Dielectric
 	}
 
-	public enum BlendMode
-	{
-		Opaque,
-		Cutout,
-		Fade,   // Old school alpha-blending mode, fresnel does not affect amount of transparency
-		Transparent // Physically plausible transparency mode, implemented as alpha pre-multiply
-	}
-
 	public enum SmoothnessMapChannel
 	{
 		SpecularMetallicAlpha,
@@ -257,53 +249,6 @@ public class GLTFUtils
 
 		return true;
 	}
-	public static void SetupMaterialWithBlendMode(Material material, BlendMode blendMode)
-	{
-		switch (blendMode)
-		{
-			case BlendMode.Opaque:
-				material.SetOverrideTag("RenderType", "");
-				material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
-				material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
-				material.SetInt("_ZWrite", 1);
-				material.DisableKeyword("_ALPHATEST_ON");
-				material.DisableKeyword("_ALPHABLEND_ON");
-				material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-				material.renderQueue = -1;
-				break;
-			case BlendMode.Cutout:
-				material.SetOverrideTag("RenderType", "TransparentCutout");
-				material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
-				material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
-				material.SetInt("_ZWrite", 1);
-				material.EnableKeyword("_ALPHATEST_ON");
-				material.DisableKeyword("_ALPHABLEND_ON");
-				material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-				material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.AlphaTest;
-				break;
-			case BlendMode.Fade:
-				material.SetOverrideTag("RenderType", "Transparent");
-				material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-				material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-				material.SetInt("_ZWrite", 0);
-				material.DisableKeyword("_ALPHATEST_ON");
-				material.EnableKeyword("_ALPHABLEND_ON");
-				material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-				material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
-				break;
-			case BlendMode.Transparent:
-				material.SetOverrideTag("RenderType", "Transparent");
-				material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
-				material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-				material.SetInt("_ZWrite", 0);
-				material.DisableKeyword("_ALPHATEST_ON");
-				material.DisableKeyword("_ALPHABLEND_ON");
-				material.EnableKeyword("_ALPHAPREMULTIPLY_ON");
-				material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
-				break;
-		}
-	}
-
 	public static SmoothnessMapChannel GetSmoothnessMapChannel(Material material)
 	{
 		int ch = (int)material.GetFloat("_SmoothnessTextureChannel");
@@ -340,7 +285,7 @@ public class GLTFUtils
 
 	public static void MaterialChanged(Material material, WorkflowMode workflowMode)
 	{
-		SetupMaterialWithBlendMode(material, (BlendMode)material.GetFloat("_Mode"));
+		GLTFRuntimeUtils.SetupMaterialWithBlendMode(material, (GLTFRuntimeUtils.BlendMode)material.GetFloat("_Mode"));
 
 		SetMaterialKeywords(material, workflowMode);
 	}

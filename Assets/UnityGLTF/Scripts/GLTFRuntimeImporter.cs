@@ -7,6 +7,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityGLTF.Cache;
+using UnityGLTF.Extensions;
 
 namespace UnityGLTF
 {
@@ -481,7 +482,202 @@ namespace UnityGLTF
 			return texture;
 		}
 
-		virtual protected IEnumerator LoadMaterials() { yield break; }
+		virtual protected Texture2D getTexture(int index)
+		{
+			return _assetCache.TextureCache[index];
+		}
+
+		protected IEnumerator LoadMaterials()
+		{
+			for(int i = 0; i < _root.Materials.Count; ++i)
+			{
+				// TODO: I don't understand the reason for the `MaterialCacheData` datatype
+				// (as opposed to just caching the Unity Material directly).
+
+				_assetCache.MaterialCache[i] = new MaterialCacheData {
+					UnityMaterial = CreateUnityMaterial(_root.Materials[i], i),
+					UnityMaterialWithVertexColor = null,
+					GLTFMaterial = _root.Materials[i]
+				};
+
+				setProgress(IMPORT_STEP.MATERIAL, (i + 1), _root.Materials.Count);
+				yield return null;
+			}
+		}
+
+		virtual protected UnityEngine.Material CreateUnityMaterial(GLTF.Schema.Material def, int materialIndex)
+		{
+			Extension specularGlossinessExtension = null;
+			bool isSpecularPBR = def.Extensions != null && def.Extensions.TryGetValue("KHR_materials_pbrSpecularGlossiness", out specularGlossinessExtension);
+
+			Shader shader = isSpecularPBR ? Shader.Find("Standard (Specular setup)") : Shader.Find("Standard");
+
+			var material = new UnityEngine.Material(shader);
+			material.hideFlags = HideFlags.DontUnloadUnusedAsset; // Avoid material to be deleted while being built
+			material.name = def.Name;
+
+			//Transparency
+			if (def.AlphaMode == AlphaMode.MASK)
+			{
+				GLTFRuntimeUtils.SetupMaterialWithBlendMode(material, GLTFRuntimeUtils.BlendMode.Cutout);
+				material.SetFloat("_Mode", 1);
+				material.SetFloat("_Cutoff", (float)def.AlphaCutoff);
+			}
+			else if (def.AlphaMode == AlphaMode.BLEND)
+			{
+				GLTFRuntimeUtils.SetupMaterialWithBlendMode(material, GLTFRuntimeUtils.BlendMode.Fade);
+				material.SetFloat("_Mode", 3);
+			}
+
+			if (def.NormalTexture != null)
+			{
+				var texture = def.NormalTexture.Index.Id;
+				Texture2D normalTexture = getTexture(texture) as Texture2D;
+				material.EnableKeyword("_NORMALMAP");
+				material.SetTexture("_BumpMap", getTexture(texture));
+				material.SetFloat("_BumpScale", (float)def.NormalTexture.Scale);
+			}
+
+			if (def.EmissiveTexture != null)
+			{
+				material.EnableKeyword("EMISSION_MAP_ON");
+				var texture = def.EmissiveTexture.Index.Id;
+				material.SetTexture("_EmissionMap", getTexture(texture));
+				material.SetInt("_EmissionUV", def.EmissiveTexture.TexCoord);
+			}
+
+			// PBR channels
+			if (specularGlossinessExtension != null)
+			{
+				KHR_materials_pbrSpecularGlossinessExtension pbr = (KHR_materials_pbrSpecularGlossinessExtension)specularGlossinessExtension;
+				material.SetColor("_Color", pbr.DiffuseFactor.ToUnityColor().gamma);
+				if (pbr.DiffuseTexture != null)
+				{
+					var texture = pbr.DiffuseTexture.Index.Id;
+					material.SetTexture("_MainTex", getTexture(texture));
+				}
+
+				if (pbr.SpecularGlossinessTexture != null)
+				{
+					var texture = pbr.SpecularGlossinessTexture.Index.Id;
+					material.SetTexture("_SpecGlossMap", getTexture(texture));
+					material.SetFloat("_GlossMapScale", (float)pbr.GlossinessFactor);
+					material.SetFloat("_Glossiness", (float)pbr.GlossinessFactor);
+				}
+				else
+				{
+					material.SetFloat("_Glossiness", (float)pbr.GlossinessFactor);
+				}
+
+				Vector3 specularVec3 = pbr.SpecularFactor.ToUnityVector3();
+				material.SetColor("_SpecColor", new Color(specularVec3.x, specularVec3.y, specularVec3.z, 1.0f));
+
+				if (def.OcclusionTexture != null)
+				{
+					var texture = def.OcclusionTexture.Index.Id;
+					material.SetFloat("_OcclusionStrength", (float)def.OcclusionTexture.Strength);
+					material.SetTexture("_OcclusionMap", getTexture(texture));
+				}
+
+				GLTFUtils.SetMaterialKeywords(material, GLTFUtils.WorkflowMode.Specular);
+			}
+			else if (def.PbrMetallicRoughness != null)
+			{
+				var pbr = def.PbrMetallicRoughness;
+
+				material.SetColor("_Color", pbr.BaseColorFactor.ToUnityColor().gamma);
+				if (pbr.BaseColorTexture != null)
+				{
+					var texture = pbr.BaseColorTexture.Index.Id;
+					material.SetTexture("_MainTex", getTexture(texture));
+				}
+
+				material.SetFloat("_Metallic", (float)pbr.MetallicFactor);
+				material.SetFloat("_Glossiness", 1.0f - (float)pbr.RoughnessFactor);
+
+				if (pbr.MetallicRoughnessTexture != null)
+				{
+					var texture = pbr.MetallicRoughnessTexture.Index.Id;
+					UnityEngine.Texture2D inputTexture = getTexture(texture) as Texture2D;
+					List<Texture2D> splitTextures = splitMetalRoughTexture(inputTexture, def.OcclusionTexture != null, (float)pbr.MetallicFactor, (float)pbr.RoughnessFactor);
+					material.SetTexture("_MetallicGlossMap", splitTextures[0]);
+
+					if (def.OcclusionTexture != null)
+					{
+						material.SetFloat("_OcclusionStrength", (float)def.OcclusionTexture.Strength);
+						material.SetTexture("_OcclusionMap", splitTextures[1]);
+					}
+				}
+
+				GLTFUtils.SetMaterialKeywords(material, GLTFUtils.WorkflowMode.Metallic);
+			}
+
+			material.SetColor("_EmissionColor", def.EmissiveFactor.ToUnityColor().gamma);
+			material.hideFlags = HideFlags.None;
+
+			return material;
+		}
+
+
+		/// <summary>
+		/// Extract separate metallic and occlusion textures from
+		/// the channels of a combined metal-roughness texture,
+		/// where metal/roughness/occlusion values are stored on
+		/// different RGBA channels.
+		/// </summary>
+		/// <param name="inputTexture"></param>
+		/// <param name="hasOcclusion"></param>
+		/// <param name="metallicFactor"></param>
+		/// <param name="roughnessFactor"></param>
+		/// <returns></returns>
+		virtual public List<UnityEngine.Texture2D> splitMetalRoughTexture(
+			Texture2D inputTexture, bool hasOcclusion, float metallicFactor, float roughnessFactor)
+		{
+			List<UnityEngine.Texture2D> outputs = new List<UnityEngine.Texture2D>();
+
+			int width = inputTexture.width;
+			int height = inputTexture.height;
+
+			Color[] occlusion = new Color[width * height];
+			Color[] metalRough = new Color[width * height];
+			Color[] textureColors = new Color[width * height];
+
+			// TODO: replace this with non-Editor version
+			GLTFUtils.getPixelsFromTexture(ref inputTexture, out textureColors);
+
+			for (int i = 0; i < height; ++i)
+			{
+				for (int j = 0; j < width; ++j)
+				{
+					float occ = textureColors[i * width + j].r;
+					float rough = textureColors[i * width + j].g;
+					float met = textureColors[i * width + j].b;
+
+					occlusion[i * width + j] = new Color(occ, occ, occ, 1.0f);
+					metalRough[i * width + j] = new Color(met * metallicFactor, met * metallicFactor, met * metallicFactor, (1.0f - rough) * roughnessFactor);
+				}
+			}
+
+			Texture2D metalRoughTexture = new Texture2D(width, height, TextureFormat.ARGB32, true);
+			metalRoughTexture.name = inputTexture.name + "_metal";
+			metalRoughTexture.SetPixels(metalRough);
+			metalRoughTexture.Apply();
+
+			outputs.Add(metalRoughTexture);
+
+			if (hasOcclusion)
+			{
+				Texture2D occlusionTexture = new Texture2D(width, height);
+				occlusionTexture.name = inputTexture.name + "_occlusion";
+				occlusionTexture.SetPixels(occlusion);
+				occlusionTexture.Apply();
+
+				outputs.Add(occlusionTexture);
+			}
+
+			return outputs;
+		}
+
 		virtual protected IEnumerator LoadMeshes() { yield break; }
 		virtual protected IEnumerator LoadScene(int sceneIndex = -1) { yield break; }
 		virtual protected IEnumerator LoadAnimations() { yield break; }

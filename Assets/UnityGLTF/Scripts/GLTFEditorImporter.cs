@@ -102,201 +102,22 @@ namespace UnityGLTF
 			return texture;
 		}
 
-		override protected IEnumerator LoadMaterials()
+		override protected UnityEngine.Material
+		CreateUnityMaterial(GLTF.Schema.Material def, int materialIndex)
 		{
-			for(int i = 0; i < _root.Materials.Count; ++i)
-			{
-				CreateUnityMaterial(_root.Materials[i], i);
-				setProgress(IMPORT_STEP.MATERIAL, (i + 1), _root.Materials.Count);
-				yield return null;
+			UnityEngine.Material material = base.CreateUnityMaterial(def, materialIndex);
+
+			// write material to an `.asset` file
+			if (material != null) {
+				UnityEngine.Material materialAsset =
+					_assetManager.saveMaterial(material, materialIndex);
+				_assetManager.registerMaterial(materialAsset);
 			}
+
+			return material;
 		}
 
-		protected virtual void CreateUnityMaterial(GLTF.Schema.Material def, int materialIndex)
-		{
-			Extension specularGlossinessExtension = null;
-			bool isSpecularPBR = def.Extensions != null && def.Extensions.TryGetValue("KHR_materials_pbrSpecularGlossiness", out specularGlossinessExtension);
-
-			Shader shader = isSpecularPBR ? Shader.Find("Standard (Specular setup)") : Shader.Find("Standard");
-
-			var material = new UnityEngine.Material(shader);
-			material.hideFlags = HideFlags.DontUnloadUnusedAsset; // Avoid material to be deleted while being built
-			material.name = def.Name;
-
-			//Transparency
-			if (def.AlphaMode == AlphaMode.MASK)
-			{
-				GLTFUtils.SetupMaterialWithBlendMode(material, GLTFUtils.BlendMode.Cutout);
-				material.SetFloat("_Mode", 1);
-				material.SetFloat("_Cutoff", (float)def.AlphaCutoff);
-			}
-			else if (def.AlphaMode == AlphaMode.BLEND)
-			{
-				GLTFUtils.SetupMaterialWithBlendMode(material, GLTFUtils.BlendMode.Fade);
-				material.SetFloat("_Mode", 3);
-			}
-
-			if (def.NormalTexture != null)
-			{
-				var texture = def.NormalTexture.Index.Id;
-				Texture2D normalTexture = getTexture(texture) as Texture2D;
-
-				//Automatically set it to normal map
-				TextureImporter im = AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(normalTexture)) as TextureImporter;
-				im.textureType = TextureImporterType.NormalMap;
-				im.SaveAndReimport();
-				material.SetTexture("_BumpMap", getTexture(texture));
-				material.SetFloat("_BumpScale", (float)def.NormalTexture.Scale);
-			}
-
-			if (def.EmissiveTexture != null)
-			{
-				material.EnableKeyword("EMISSION_MAP_ON");
-				var texture = def.EmissiveTexture.Index.Id;
-				material.SetTexture("_EmissionMap", getTexture(texture));
-				material.SetInt("_EmissionUV", def.EmissiveTexture.TexCoord);
-			}
-
-			// PBR channels
-			if (specularGlossinessExtension != null)
-			{
-				KHR_materials_pbrSpecularGlossinessExtension pbr = (KHR_materials_pbrSpecularGlossinessExtension)specularGlossinessExtension;
-				material.SetColor("_Color", pbr.DiffuseFactor.ToUnityColor().gamma);
-				if (pbr.DiffuseTexture != null)
-				{
-					var texture = pbr.DiffuseTexture.Index.Id;
-					material.SetTexture("_MainTex", getTexture(texture));
-				}
-
-				if (pbr.SpecularGlossinessTexture != null)
-				{
-					var texture = pbr.SpecularGlossinessTexture.Index.Id;
-					material.SetTexture("_SpecGlossMap", getTexture(texture));
-					material.SetFloat("_GlossMapScale", (float)pbr.GlossinessFactor);
-					material.SetFloat("_Glossiness", (float)pbr.GlossinessFactor);
-				}
-				else
-				{
-					material.SetFloat("_Glossiness", (float)pbr.GlossinessFactor);
-				}
-
-				Vector3 specularVec3 = pbr.SpecularFactor.ToUnityVector3();
-				material.SetColor("_SpecColor", new Color(specularVec3.x, specularVec3.y, specularVec3.z, 1.0f));
-
-				if (def.OcclusionTexture != null)
-				{
-					var texture = def.OcclusionTexture.Index.Id;
-					material.SetFloat("_OcclusionStrength", (float)def.OcclusionTexture.Strength);
-					material.SetTexture("_OcclusionMap", getTexture(texture));
-				}
-
-				GLTFUtils.SetMaterialKeywords(material, GLTFUtils.WorkflowMode.Specular);
-			}
-			else if (def.PbrMetallicRoughness != null)
-			{
-				var pbr = def.PbrMetallicRoughness;
-
-				material.SetColor("_Color", pbr.BaseColorFactor.ToUnityColor().gamma);
-				if (pbr.BaseColorTexture != null)
-				{
-					var texture = pbr.BaseColorTexture.Index.Id;
-					material.SetTexture("_MainTex", getTexture(texture));
-				}
-
-				material.SetFloat("_Metallic", (float)pbr.MetallicFactor);
-				material.SetFloat("_Glossiness", 1.0f - (float)pbr.RoughnessFactor);
-
-				if (pbr.MetallicRoughnessTexture != null)
-				{
-					var texture = pbr.MetallicRoughnessTexture.Index.Id;
-					UnityEngine.Texture2D inputTexture = getTexture(texture) as Texture2D;
-					List<Texture2D> splitTextures = splitMetalRoughTexture(inputTexture, def.OcclusionTexture != null, (float)pbr.MetallicFactor, (float)pbr.RoughnessFactor);
-					material.SetTexture("_MetallicGlossMap", splitTextures[0]);
-
-					if (def.OcclusionTexture != null)
-					{
-						material.SetFloat("_OcclusionStrength", (float)def.OcclusionTexture.Strength);
-						material.SetTexture("_OcclusionMap", splitTextures[1]);
-					}
-				}
-
-				GLTFUtils.SetMaterialKeywords(material, GLTFUtils.WorkflowMode.Metallic);
-			}
-
-			material.SetColor("_EmissionColor", def.EmissiveFactor.ToUnityColor().gamma);
-			material = _assetManager.saveMaterial(material, materialIndex);
-			_assetManager._parsedMaterials.Add(material);
-			material.hideFlags = HideFlags.None;
-		}
-
-		public List<UnityEngine.Texture2D> splitMetalRoughTexture(Texture2D inputTexture, bool hasOcclusion, float metallicFactor, float roughnessFactor)
-		{
-			string inputTexturePath = AssetDatabase.GetAssetPath(inputTexture);
-			if (!_assetsToRemove.Contains(inputTexturePath))
-			{
-				_assetsToRemove.Add(inputTexturePath);
-			}
-
-			List<UnityEngine.Texture2D> outputs = new List<UnityEngine.Texture2D>();
-#if true
-			int width = inputTexture.width;
-			int height = inputTexture.height;
-
-			Color[] occlusion = new Color[width * height];
-			Color[] metalRough = new Color[width * height];
-			Color[] textureColors = new Color[width * height];
-
-			GLTFUtils.getPixelsFromTexture(ref inputTexture, out textureColors);
-
-			for (int i = 0; i < height; ++i)
-			{
-				for (int j = 0; j < width; ++j)
-				{
-					float occ = textureColors[i * width + j].r;
-					float rough = textureColors[i * width + j].g;
-					float met = textureColors[i * width + j].b;
-
-					occlusion[i * width + j] = new Color(occ, occ, occ, 1.0f);
-					metalRough[i * width + j] = new Color(met * metallicFactor, met * metallicFactor, met * metallicFactor, (1.0f - rough) * roughnessFactor);
-				}
-			}
-
-			Texture2D metalRoughTexture = new Texture2D(width, height, TextureFormat.ARGB32, true);
-			metalRoughTexture.name = Path.GetFileNameWithoutExtension(inputTexturePath) + "_metal";
-			metalRoughTexture.SetPixels(metalRough);
-			metalRoughTexture.Apply();
-
-			outputs.Add(_assetManager.saveTexture(metalRoughTexture));
-
-			if (hasOcclusion)
-			{
-				Texture2D occlusionTexture = new Texture2D(width, height);
-				occlusionTexture.name = Path.GetFileNameWithoutExtension(inputTexturePath) + "_occlusion";
-				occlusionTexture.SetPixels(occlusion);
-				occlusionTexture.Apply();
-
-				outputs.Add(_assetManager.saveTexture(occlusionTexture));
-			}
-
-			// Delete original texture
-			AssetDatabase.Refresh();
-#else
-			string inputTextureName = Path.GetFileNameWithoutExtension(inputTexturePath);
-			string metalRoughPath = Path.Combine(_assetManager.getImportTextureDir(), inputTextureName + "_metal.png");
-			GLTFTextureUtils.extractMetalRough(inputTexture, metalRoughPath);
-			outputs.Add(AssetDatabase.LoadAssetAtPath<Texture2D>(GLTFUtils.getPathProjectFromAbsolute(metalRoughPath)));
-			if (hasOcclusion)
-			{
-				string occlusionPath = Path.Combine(_assetManager.getImportTextureDir(), inputTextureName + "_occlusion.png");
-				GLTFTextureUtils.extractOcclusion(inputTexture, occlusionPath);
-				outputs.Add(AssetDatabase.LoadAssetAtPath<Texture2D>(GLTFUtils.getPathProjectFromAbsolute(occlusionPath)));
-			}
-#endif
-
-			return outputs;
-		}
-
-		private Texture2D getTexture(int index)
+		override protected Texture2D getTexture(int index)
 		{
 			return _assetManager.getTexture(index);
 		}
@@ -304,6 +125,26 @@ namespace UnityGLTF
 		private UnityEngine.Material getMaterial(int index)
 		{
 			return _assetManager.getMaterial(index);
+		}
+
+		override public List<UnityEngine.Texture2D> splitMetalRoughTexture(
+			Texture2D inputTexture, bool hasOcclusion, float metallicFactor, float roughnessFactor)
+		{
+			List<UnityEngine.Texture2D> splitTextures
+				= base.splitMetalRoughTexture(
+					inputTexture, hasOcclusion, metallicFactor, roughnessFactor);
+
+			if (splitTextures.Count >= 1) {
+				splitTextures[0] = _assetManager.saveTexture(
+					splitTextures[0], -1, inputTexture.name + "_metal");
+			}
+
+			if (splitTextures.Count >= 2) {
+				splitTextures[1] = _assetManager.saveTexture(
+					splitTextures[1], -1, inputTexture.name + "_occlusion");
+			}
+
+			return splitTextures;
 		}
 
 		override protected IEnumerator LoadMeshes()
