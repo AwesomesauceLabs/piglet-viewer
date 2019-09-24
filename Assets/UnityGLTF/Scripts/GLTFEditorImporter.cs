@@ -68,59 +68,38 @@ namespace UnityGLTF
 		override protected Texture2D LoadImage(string rootPath, Image image, int imageID)
 		{
 			Texture2D texture = base.LoadImage(rootPath, image, imageID);
+
+			// write texture to an `.asset` file
 			if (texture != null) {
-				_assetManager.saveTexture(
-					GLTFTextureUtils.flipTexture(texture), imageID);
+				Texture2D textureAsset = _assetManager.saveTexture(
+					GLTFTextureUtils.flipTexture(texture), imageID, "image");
+				_assetManager.registerImage(textureAsset);
 			}
+
+			// Note: This method should always return the texture that was
+			// returned by `base.LoadImage`, without modification. Unity
+			// texture functions are complex/fragile and modifying texture
+			// parameters can have many unexpected side effects.
 			return texture;
 		}
 
-		override protected IEnumerator SetupTextures()
+
+		override protected Texture2D SetupTexture(GLTF.Schema.Texture def, int textureIndex)
 		{
-			for(int i = 0; i < _root.Textures.Count; ++i)
-			{
-				SetupTexture(_root.Textures[i], i);
-				setProgress(IMPORT_STEP.TEXTURE, (i + 1), _root.Textures.Count);
-				yield return null;
-			}
-		}
+			Texture2D texture = base.SetupTexture(def, textureIndex);
 
-		private void SetupTexture(GLTF.Schema.Texture def, int textureIndex)
-		{
-			Texture2D source = _assetManager.getOrCreateTexture(def.Source.Id, textureIndex);
-			// Default values
-			var desiredFilterMode = FilterMode.Bilinear;
-			var desiredWrapMode = UnityEngine.TextureWrapMode.Repeat;
-
-			if (def.Sampler != null)
-			{
-				var sampler = def.Sampler.Value;
-				switch (sampler.MinFilter)
-				{
-					case MinFilterMode.Nearest:
-						desiredFilterMode = FilterMode.Point;
-						break;
-					case MinFilterMode.Linear:
-					default:
-						desiredFilterMode = FilterMode.Bilinear;
-						break;
-				}
-
-				switch (sampler.WrapS)
-				{
-					case GLTF.Schema.WrapMode.ClampToEdge:
-						desiredWrapMode = UnityEngine.TextureWrapMode.Clamp;
-						break;
-					case GLTF.Schema.WrapMode.Repeat:
-					default:
-						desiredWrapMode = UnityEngine.TextureWrapMode.Repeat;
-						break;
-				}
+			// write texture to an `.asset` file
+			if (texture != null) {
+				Texture2D textureAsset = _assetManager.saveTexture(
+					GLTFTextureUtils.flipTexture(texture), textureIndex, "texture");
+				_assetManager.registerTexture(textureAsset);
 			}
 
-			source.filterMode = desiredFilterMode;
-			source.wrapMode = desiredWrapMode;
-			_assetManager.registerTexture(source);
+			// Note: This method should always return the texture that was
+			// returned by `base.SetupTexture`, without modification. Unity
+			// texture functions are complex/fragile and modifying the texture
+			// parameters can have many unexpected side effects.
+			return texture;
 		}
 
 		override protected IEnumerator LoadMaterials()

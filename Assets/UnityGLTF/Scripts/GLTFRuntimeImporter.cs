@@ -377,7 +377,10 @@ namespace UnityGLTF
 			if (_assetCache.ImageCache[imageID] != null)
 				return _assetCache.ImageCache[imageID];
 
-			var texture = new Texture2D(4, 4);
+			// Note: Initial texture size does not matter
+			// -- the size will be updated by Texture2D.LoadImage().
+			var texture = new Texture2D(1, 1);
+
 			if (image.Uri != null)
 			{
 				// Is base64 uri ?
@@ -418,7 +421,66 @@ namespace UnityGLTF
 			}
 		}
 
-		virtual protected IEnumerator SetupTextures() { yield break; }
+		protected IEnumerator SetupTextures()
+		{
+			for(int i = 0; i < _root.Textures.Count; ++i)
+			{
+				_assetCache.TextureCache[i] = SetupTexture(_root.Textures[i], i);
+				setProgress(IMPORT_STEP.TEXTURE, (i + 1), _root.Textures.Count);
+				yield return null;
+			}
+		}
+
+		virtual protected Texture2D SetupTexture(GLTF.Schema.Texture def, int textureIndex)
+		{
+			if (_assetCache.TextureCache[textureIndex] != null)
+				return _assetCache.TextureCache[textureIndex];
+
+			Texture2D image = _assetCache.ImageCache[def.Source.Id];
+			if (image == null) {
+				Debug.LogErrorFormat("failed to load texture {0}: "
+				 + "failed to load source image {1}", textureIndex, def.Source.Id);
+				return null;
+			}
+
+			Texture2D texture = TextureUtil.DuplicateTexture(image);
+
+			// Default values
+			var desiredFilterMode = FilterMode.Bilinear;
+			var desiredWrapMode = UnityEngine.TextureWrapMode.Repeat;
+
+			if (def.Sampler != null)
+			{
+				var sampler = def.Sampler.Value;
+				switch (sampler.MinFilter)
+				{
+					case MinFilterMode.Nearest:
+						desiredFilterMode = FilterMode.Point;
+						break;
+					case MinFilterMode.Linear:
+					default:
+						desiredFilterMode = FilterMode.Bilinear;
+						break;
+				}
+
+				switch (sampler.WrapS)
+				{
+					case GLTF.Schema.WrapMode.ClampToEdge:
+						desiredWrapMode = UnityEngine.TextureWrapMode.Clamp;
+						break;
+					case GLTF.Schema.WrapMode.Repeat:
+					default:
+						desiredWrapMode = UnityEngine.TextureWrapMode.Repeat;
+						break;
+				}
+			}
+
+			texture.filterMode = desiredFilterMode;
+			texture.wrapMode = desiredWrapMode;
+
+			return texture;
+		}
+
 		virtual protected IEnumerator LoadMaterials() { yield break; }
 		virtual protected IEnumerator LoadMeshes() { yield break; }
 		virtual protected IEnumerator LoadScene(int sceneIndex = -1) { yield break; }
