@@ -224,7 +224,7 @@ public class AssetManager
 
 	public Texture2D saveTexture(Texture2D texture, int index = -1, string imageName = "")
 	{
-		string basename = GLTFUtils.cleanName(texture.name + (index >= 0 ? "_" + index.ToString() : "") + ".png"); // Extension will be overridden
+		string basename = GLTFUtils.cleanName(imageName + (index >= 0 ? "_" + index.ToString() : "") + ".png"); // Extension will be overridden
 		string fullPath = Path.Combine(_importTexturesDirectory, basename);
 
 		// Write texture
