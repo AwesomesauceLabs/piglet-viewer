@@ -17,7 +17,7 @@ namespace UnityGLTF.Cache
 		/// <summary>
 		/// Textures to be used for assets. Textures from image cache with samplers applied
 		/// </summary>
-		public Texture[] TextureCache { get; private set; }
+		public Texture2D[] TextureCache { get; private set; }
 
 		/// <summary>
 		/// Cache for materials to be applied to the meshes
@@ -47,7 +47,7 @@ namespace UnityGLTF.Cache
 		{
 			// todo: add optimization to set size to be the JSON size
 			ImageCache = new Texture2D[imageCacheSize];
-			TextureCache = new Texture[textureCacheSize];
+			TextureCache = new Texture2D[textureCacheSize];
 			MaterialCache = new MaterialCacheData[materialCacheSize];
 			BufferCache = new Dictionary<int, byte[]>(bufferCacheSize);
 			MeshCache = new List<MeshCacheData[]>(meshCacheSize);
