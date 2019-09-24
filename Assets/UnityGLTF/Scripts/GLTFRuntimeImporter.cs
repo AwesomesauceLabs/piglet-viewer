@@ -232,6 +232,10 @@ namespace UnityGLTF
 			_root = GLTFParser.ParseJson(_glTFData);
 		}
 
+		/// <summary>
+		/// Import a scene from the GLTF file.
+		/// </summary>
+		/// <param name="sceneIndex"></param>
 		protected void LoadGLTFScene(int sceneIndex = -1)
 		{
 			Scene scene;
