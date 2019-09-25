@@ -130,6 +130,16 @@ namespace UnityGLTF
 			return _assetManager.getMaterial(index);
 		}
 
+		/// <summary>
+		/// Get RGBA color values from a texture.
+		/// </summary>
+		override protected Color[] GetPixelsFromTexture(Texture2D texture)
+		{
+			Color[] colors = new Color[texture.width * texture.height];
+			GLTFUtils.getPixelsFromTexture(ref texture, out colors);
+			return colors;
+		}
+
 		override public List<UnityEngine.Texture2D> splitMetalRoughTexture(
 			Texture2D inputTexture, bool hasOcclusion, float metallicFactor, float roughnessFactor)
 		{

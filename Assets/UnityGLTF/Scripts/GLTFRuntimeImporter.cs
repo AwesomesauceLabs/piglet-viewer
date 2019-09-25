@@ -618,6 +618,13 @@ namespace UnityGLTF
 			return material;
 		}
 
+		/// <summary>
+		/// Get RGBA color values from a texture.
+		/// </summary>
+		virtual protected Color[] GetPixelsFromTexture(Texture2D texture)
+		{
+			return texture.GetPixels();
+		}
 
 		/// <summary>
 		/// Extract separate metallic and occlusion textures from
@@ -640,10 +647,7 @@ namespace UnityGLTF
 
 			Color[] occlusion = new Color[width * height];
 			Color[] metalRough = new Color[width * height];
-			Color[] textureColors = new Color[width * height];
-
-			// TODO: replace this with non-Editor version
-			GLTFUtils.getPixelsFromTexture(ref inputTexture, out textureColors);
+			Color[] textureColors = GetPixelsFromTexture(inputTexture);
 
 			for (int i = 0; i < height; ++i)
 			{
