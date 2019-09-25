@@ -137,6 +137,8 @@ namespace UnityGLTF
 				= base.splitMetalRoughTexture(
 					inputTexture, hasOcclusion, metallicFactor, roughnessFactor);
 
+			// save extracted textures as `.asset` files
+
 			if (splitTextures.Count >= 1) {
 				splitTextures[0] = _assetManager.saveTexture(
 					splitTextures[0], -1, inputTexture.name + "_metal");
