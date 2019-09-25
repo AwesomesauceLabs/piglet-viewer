@@ -31,7 +31,10 @@ namespace UnityGLTF
 		/// to the current Unity scene.
 		/// </summary>
 		private bool _addToCurrentScene;
-
+		/// <summary>
+		/// Writes GLTF objects (images, textures, meshes, etc.) to
+		/// disk as Unity assets.
+		/// </summary>
 		AssetManager _assetManager;
 
 		/// <summary>
