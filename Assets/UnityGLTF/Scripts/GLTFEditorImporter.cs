@@ -244,12 +244,12 @@ namespace UnityGLTF
 
 			bool isStepInterpolation = channel.Sampler.Value.Interpolation != InterpolationType.LINEAR;
 
-			byte[] timeBufferData = _assetCache.BufferCache[channel.Sampler.Value.Output.Value.BufferView.Value.Buffer.Id];
+			byte[] timeBufferData = _assetCache.Buffers[channel.Sampler.Value.Output.Value.BufferView.Value.Buffer.Id];
 			float[] times = GLTFHelpers.ParseKeyframeTimes(channel.Sampler.Value.Input.Value, timeBufferData);
 
 			if (channel.Target.Path == GLTFAnimationChannelPath.translation || channel.Target.Path == GLTFAnimationChannelPath.scale)
 			{
-				byte[] bufferData = _assetCache.BufferCache[channel.Sampler.Value.Output.Value.BufferView.Value.Buffer.Id];
+				byte[] bufferData = _assetCache.Buffers[channel.Sampler.Value.Output.Value.BufferView.Value.Buffer.Id];
 				GLTF.Math.Vector3[] keyValues = GLTFHelpers.ParseVector3Keyframes(channel.Sampler.Value.Output.Value, bufferData);
 				if (keyValues == null)
 					return;
@@ -264,7 +264,7 @@ namespace UnityGLTF
 			}
 			else if (channel.Target.Path == GLTFAnimationChannelPath.rotation)
 			{
-				byte[] bufferData = _assetCache.BufferCache[channel.Sampler.Value.Output.Value.BufferView.Value.Buffer.Id];
+				byte[] bufferData = _assetCache.Buffers[channel.Sampler.Value.Output.Value.BufferView.Value.Buffer.Id];
 				Vector4[] values = GLTFHelpers.ParseRotationKeyframes(channel.Sampler.Value.Output.Value, bufferData).ToUnityVector4();
 				AnimationCurve[] rotationCurves = GLTFUtils.createCurvesFromArrays(times, values, isStepInterpolation);
 
@@ -279,7 +279,7 @@ namespace UnityGLTF
 					morphTargets.Add(GLTFUtils.buildBlendShapeName(meshIndex, i));
 				}
 
-				byte[] bufferData = _assetCache.BufferCache[channel.Sampler.Value.Output.Value.BufferView.Value.Buffer.Id];
+				byte[] bufferData = _assetCache.Buffers[channel.Sampler.Value.Output.Value.BufferView.Value.Buffer.Id];
 				float[] values = GLTFHelpers.ParseKeyframeTimes(channel.Sampler.Value.Output.Value, bufferData);
 				AnimationCurve[] morphCurves = GLTFUtils.buildMorphAnimationCurves(times, values, morphTargets.Count);
 
@@ -325,7 +325,7 @@ namespace UnityGLTF
 			skinMesh.sharedMesh = _assetManager.getMesh(meshIndex, primitiveIndex);
 			skinMesh.sharedMaterial = _assetManager.getMaterial(meshIndex, primitiveIndex);
 
-			byte[] bufferData = _assetCache.BufferCache[skin.InverseBindMatrices.Value.BufferView.Value.Buffer.Id];
+			byte[] bufferData = _assetCache.Buffers[skin.InverseBindMatrices.Value.BufferView.Value.Buffer.Id];
 			NumericArray content = new NumericArray();
 			List<Matrix4x4> bindPoseMatrices = new List<Matrix4x4>();
 			GLTF.Math.Matrix4x4[] inverseBindMatrices = skin.InverseBindMatrices.Value.AsMatrixArray(ref content, bufferData);

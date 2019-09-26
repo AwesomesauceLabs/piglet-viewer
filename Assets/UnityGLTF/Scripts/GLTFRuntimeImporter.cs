@@ -68,7 +68,7 @@ namespace UnityGLTF
 		/// <summary>
 		/// Caches data (e.g. buffers) in memory during import.
 		/// </summary>
-		protected AssetCache _assetCache;
+		protected GLTFRuntimeImporterCache _assetCache;
 
 
 		/// <summary>
@@ -254,13 +254,7 @@ namespace UnityGLTF
 				throw new Exception("No default scene in gltf file.");
 			}
 
-			_assetCache = new AssetCache(
-				_root.Images != null ? _root.Images.Count : 0,
-				_root.Textures != null ? _root.Textures.Count : 0,
-				_root.Materials != null ? _root.Materials.Count : 0,
-				_root.Buffers != null ? _root.Buffers.Count : 0,
-				_root.Meshes != null ? _root.Meshes.Count : 0
-			);
+			_assetCache = new GLTFRuntimeImporterCache();
 
 			// Load dependencies
 			LoadBuffersEnum();
@@ -336,13 +330,13 @@ namespace UnityGLTF
 					GLTF.Schema.Buffer buffer = _root.Buffers[i];
 					if (buffer.Uri != null)
 					{
-						LoadBuffer(_gltfDirectoryPath, buffer, i);
+						_assetCache.Buffers.Add(LoadBuffer(_gltfDirectoryPath, buffer, i));
 					}
 					else //null buffer uri indicates GLB buffer loading
 					{
 						byte[] glbBuffer;
 						GLTFParser.ExtractBinaryChunk(_glTFData, i, out glbBuffer);
-						_assetCache.BufferCache[i] = glbBuffer;
+						_assetCache.Buffers.Add(glbBuffer);
 					}
 					setProgress(IMPORT_STEP.BUFFER, (i + 1), _root.Buffers.Count);
 					yield return null;
@@ -350,24 +344,23 @@ namespace UnityGLTF
 			}
 		}
 
-		protected void LoadBuffer(string sourceUri, GLTF.Schema.Buffer buffer, int bufferIndex)
+		protected byte[] LoadBuffer(string sourceUri, GLTF.Schema.Buffer buffer, int bufferIndex)
 		{
-			if (buffer.Uri != null)
-			{
-				byte[] bufferData = null;
-				var uri = buffer.Uri;
-				var bufferPath = Path.Combine(sourceUri, uri);
-				bufferData = File.ReadAllBytes(bufferPath);
-				_assetCache.BufferCache[bufferIndex] = bufferData;
-			}
+			if (buffer.Uri == null)
+				return null;
+
+			var uri = buffer.Uri;
+			var bufferPath = Path.Combine(sourceUri, uri);
+			return File.ReadAllBytes(bufferPath);
 		}
 
 		protected IEnumerator LoadImages()
 		{
 			for (int i = 0; i < _root.Images.Count; ++i)
 			{
-				Image image = _root.Images[i];
-				_assetCache.ImageCache[i] = LoadImage(_gltfDirectoryPath, image, i);
+				Image gltfImage = _root.Images[i];
+				Texture2D image = LoadImage(_gltfDirectoryPath, gltfImage, i);
+				_assetCache.Images.Add(image);
 				setProgress(IMPORT_STEP.IMAGE, (i + 1), _root.Images.Count);
 				yield return null;
 			}
@@ -375,8 +368,8 @@ namespace UnityGLTF
 
 		virtual protected Texture2D LoadImage(string rootPath, Image image, int imageID)
 		{
-			if (_assetCache.ImageCache[imageID] != null)
-				return _assetCache.ImageCache[imageID];
+			if (_assetCache.Images.Count > imageID)
+				return _assetCache.Images[imageID];
 
 			// Note: Initial texture size does not matter
 			// -- the size will be updated by Texture2D.LoadImage().
@@ -415,7 +408,7 @@ namespace UnityGLTF
 				var buffer = bufferView.Buffer.Value;
 				var data = new byte[bufferView.ByteLength];
 
-				var bufferContents = _assetCache.BufferCache[bufferView.Buffer.Id];
+				var bufferContents = _assetCache.Buffers[bufferView.Buffer.Id];
 				System.Buffer.BlockCopy(bufferContents, bufferView.ByteOffset, data, 0, data.Length);
 				texture.LoadImage(data);
 				return texture;
@@ -426,7 +419,8 @@ namespace UnityGLTF
 		{
 			for(int i = 0; i < _root.Textures.Count; ++i)
 			{
-				_assetCache.TextureCache[i] = SetupTexture(_root.Textures[i], i);
+				Texture2D texture = SetupTexture(_root.Textures[i], i);
+				_assetCache.Textures.Add(texture);
 				setProgress(IMPORT_STEP.TEXTURE, (i + 1), _root.Textures.Count);
 				yield return null;
 			}
@@ -434,10 +428,10 @@ namespace UnityGLTF
 
 		virtual protected Texture2D SetupTexture(GLTF.Schema.Texture def, int textureIndex)
 		{
-			if (_assetCache.TextureCache[textureIndex] != null)
-				return _assetCache.TextureCache[textureIndex];
+			if (_assetCache.Textures.Count > textureIndex)
+				return _assetCache.Textures[textureIndex];
 
-			Texture2D image = _assetCache.ImageCache[def.Source.Id];
+			Texture2D image = _assetCache.Images[def.Source.Id];
 			if (image == null) {
 				Debug.LogErrorFormat("failed to load texture {0}: "
 				 + "failed to load source image {1}", textureIndex, def.Source.Id);
@@ -484,27 +478,20 @@ namespace UnityGLTF
 
 		virtual protected Texture2D getTexture(int index)
 		{
-			return _assetCache.TextureCache[index];
+			return _assetCache.Textures[index];
 		}
 
 		virtual protected UnityEngine.Material getMaterial(int index)
 		{
-			return _assetCache.MaterialCache[index].UnityMaterial;
+			return _assetCache.Materials[index];
 		}
 
 		protected IEnumerator LoadMaterials()
 		{
 			for(int i = 0; i < _root.Materials.Count; ++i)
 			{
-				// TODO: I don't understand the reason for the `MaterialCacheData` datatype
-				// (as opposed to just caching the Unity Material directly).
-
-				_assetCache.MaterialCache[i] = new MaterialCacheData {
-					UnityMaterial = CreateUnityMaterial(_root.Materials[i], i),
-					UnityMaterialWithVertexColor = null,
-					GLTFMaterial = _root.Materials[i]
-				};
-
+				UnityEngine.Material material = CreateUnityMaterial(_root.Materials[i], i);
+				_assetCache.Materials.Add(material);
 				setProgress(IMPORT_STEP.MATERIAL, (i + 1), _root.Materials.Count);
 				yield return null;
 			}
@@ -809,12 +796,12 @@ namespace UnityGLTF
 					if(primitive.Targets[b].ContainsKey("POSITION"))
 					{
 						NumericArray num = new NumericArray();
-						deltaVertices = primitive.Targets[b]["POSITION"].Value.AsVector3Array(ref num, _assetCache.BufferCache[0], false).ToUnityVector3(true);
+						deltaVertices = primitive.Targets[b]["POSITION"].Value.AsVector3Array(ref num, _assetCache.Buffers[0], false).ToUnityVector3(true);
 					}
 					if (primitive.Targets[b].ContainsKey("NORMAL"))
 					{
 						NumericArray num = new NumericArray();
-						deltaNormals = primitive.Targets[b]["NORMAL"].Value.AsVector3Array(ref num, _assetCache.BufferCache[0], true).ToUnityVector3(true);
+						deltaNormals = primitive.Targets[b]["NORMAL"].Value.AsVector3Array(ref num, _assetCache.Buffers[0], true).ToUnityVector3(true);
 					}
 					//if (primitive.Targets[b].ContainsKey("TANGENT"))
 					//{
@@ -839,7 +826,7 @@ namespace UnityGLTF
 				AttributeAccessor AttributeAccessor = new AttributeAccessor()
 				{
 					AccessorId = attributePair.Value,
-					Buffer = _assetCache.BufferCache[attributePair.Value.Value.BufferView.Value.Buffer.Id]
+					Buffer = _assetCache.Buffers[attributePair.Value.Value.BufferView.Value.Buffer.Id]
 				};
 
 				attributeAccessors[attributePair.Key] = AttributeAccessor;
@@ -850,7 +837,7 @@ namespace UnityGLTF
 				AttributeAccessor indexBuilder = new AttributeAccessor()
 				{
 					AccessorId = primitive.Indices,
-					Buffer = _assetCache.BufferCache[primitive.Indices.Value.BufferView.Value.Buffer.Id]
+					Buffer = _assetCache.Buffers[primitive.Indices.Value.BufferView.Value.Buffer.Id]
 				};
 
 				attributeAccessors[SemanticProperties.INDICES] = indexBuilder;
@@ -876,7 +863,7 @@ namespace UnityGLTF
 
 		private void parseAttribute(ref GLTF.Schema.MeshPrimitive prim, string property, ref Vector4[] values)
 		{
-			byte[] bufferData = _assetCache.BufferCache[prim.Attributes[property].Value.BufferView.Value.Buffer.Id];
+			byte[] bufferData = _assetCache.Buffers[prim.Attributes[property].Value.BufferView.Value.Buffer.Id];
 			NumericArray num = new NumericArray();
 			GLTF.Math.Vector4[] gltfValues = prim.Attributes[property].Value.AsVector4Array(ref num, bufferData);
 			values = new Vector4[gltfValues.Length];
