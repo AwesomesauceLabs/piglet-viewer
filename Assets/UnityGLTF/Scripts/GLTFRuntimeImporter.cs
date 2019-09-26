@@ -319,6 +319,36 @@ namespace UnityGLTF
 				_progressCallback(step, current, total);
 		}
 
+		virtual protected void AddImage(Texture2D image)
+		{
+			_assetCache.Images.Add(image);
+		}
+
+		virtual protected void AddTexture(Texture2D image)
+		{
+			_assetCache.Textures.Add(image);
+		}
+
+		virtual protected void AddMaterial(UnityEngine.Material material)
+		{
+			_assetCache.Materials.Add(material);
+		}
+
+		virtual protected void AddMesh()
+		{
+			_assetCache.Meshes.Add(new List<KeyValuePair<UnityEngine.Mesh, UnityEngine.Material>>());
+		}
+
+		virtual protected void AddMeshPrimitive(
+			UnityEngine.Mesh primitive, UnityEngine.Material material)
+		{
+			List<KeyValuePair<UnityEngine.Mesh, UnityEngine.Material>>
+				mesh = _assetCache.Meshes[_assetCache.Meshes.Count - 1];
+
+			mesh.Add(new KeyValuePair<UnityEngine.Mesh, UnityEngine.Material>(
+				primitive, material));
+		}
+
 		protected IEnumerator LoadBuffers()
 		{
 			if (_root.Buffers != null)
@@ -360,19 +390,16 @@ namespace UnityGLTF
 			{
 				Image gltfImage = _root.Images[i];
 				Texture2D image = LoadImage(_gltfDirectoryPath, gltfImage, i);
-				_assetCache.Images.Add(image);
+				AddImage(image);
 				setProgress(IMPORT_STEP.IMAGE, (i + 1), _root.Images.Count);
 				yield return null;
 			}
 		}
 
-		virtual protected Texture2D LoadImage(string rootPath, Image image, int imageID)
+		protected Texture2D LoadImage(string rootPath, Image image, int imageID)
 		{
-			if (_assetCache.Images.Count > imageID)
-				return _assetCache.Images[imageID];
-
-			// Note: Initial texture size does not matter
-			// -- the size will be updated by Texture2D.LoadImage().
+			// Note: Initial texture size does not matter,
+			// as the size will be updated by Texture2D.LoadImage().
 			var texture = new Texture2D(1, 1);
 
 			if (image.Uri != null)
@@ -420,24 +447,15 @@ namespace UnityGLTF
 			for(int i = 0; i < _root.Textures.Count; ++i)
 			{
 				Texture2D texture = SetupTexture(_root.Textures[i], i);
-				_assetCache.Textures.Add(texture);
+				AddTexture(texture);
 				setProgress(IMPORT_STEP.TEXTURE, (i + 1), _root.Textures.Count);
 				yield return null;
 			}
 		}
 
-		virtual protected Texture2D SetupTexture(GLTF.Schema.Texture def, int textureIndex)
+		protected Texture2D SetupTexture(GLTF.Schema.Texture def, int textureIndex)
 		{
-			if (_assetCache.Textures.Count > textureIndex)
-				return _assetCache.Textures[textureIndex];
-
-			Texture2D image = _assetCache.Images[def.Source.Id];
-			if (image == null) {
-				Debug.LogErrorFormat("failed to load texture {0}: "
-				 + "failed to load source image {1}", textureIndex, def.Source.Id);
-				return null;
-			}
-
+			Texture2D image = getImage(def.Source.Id);
 			Texture2D texture = TextureUtil.DuplicateTexture(image);
 
 			// Default values
@@ -476,6 +494,11 @@ namespace UnityGLTF
 			return texture;
 		}
 
+		virtual protected Texture2D getImage(int index)
+		{
+			return _assetCache.Images[index];
+		}
+
 		virtual protected Texture2D getTexture(int index)
 		{
 			return _assetCache.Textures[index];
@@ -491,13 +514,13 @@ namespace UnityGLTF
 			for(int i = 0; i < _root.Materials.Count; ++i)
 			{
 				UnityEngine.Material material = CreateUnityMaterial(_root.Materials[i], i);
-				_assetCache.Materials.Add(material);
+				AddMaterial(material);
 				setProgress(IMPORT_STEP.MATERIAL, (i + 1), _root.Materials.Count);
 				yield return null;
 			}
 		}
 
-		virtual protected UnityEngine.Material CreateUnityMaterial(GLTF.Schema.Material def, int materialIndex)
+		protected UnityEngine.Material CreateUnityMaterial(GLTF.Schema.Material def, int materialIndex)
 		{
 			Extension specularGlossinessExtension = null;
 			bool isSpecularPBR = def.Extensions != null && def.Extensions.TryGetValue("KHR_materials_pbrSpecularGlossiness", out specularGlossinessExtension);
@@ -684,17 +707,24 @@ namespace UnityGLTF
 			}
 		}
 
-		protected virtual void CreateMeshObject(GLTF.Schema.Mesh mesh, int meshId)
+		protected virtual void CreateMeshObject(GLTF.Schema.Mesh meshDef, int meshId)
 		{
-			for (int i = 0; i < mesh.Primitives.Count; ++i)
+			AddMesh();
+			for (int i = 0; i < meshDef.Primitives.Count; ++i)
 			{
-				var primitive = mesh.Primitives[i];
-				// TODO: add mesh primitive to _assetCache
-				CreateMeshPrimitive(primitive, mesh.Name, meshId, i); // Converted to mesh
+				var primitive = meshDef.Primitives[i];
+
+				UnityEngine.Mesh meshPrimitive
+					= CreateMeshPrimitive(primitive, meshDef.Name, meshId, i); // Converted to mesh
+
+				UnityEngine.Material material = primitive.Material != null && primitive.Material.Id >= 0
+					? getMaterial(primitive.Material.Id) : defaultMaterial;
+
+				AddMeshPrimitive(meshPrimitive, material);
 			}
 		}
 
-		virtual protected KeyValuePair<UnityEngine.Mesh, UnityEngine.Material>
+		virtual protected UnityEngine.Mesh
 		CreateMeshPrimitive(MeshPrimitive primitive, string meshName, int meshID, int primitiveIndex)
 		{
 			var meshAttributes = BuildMeshAttributes(primitive, meshID, primitiveIndex);
@@ -738,7 +768,6 @@ namespace UnityGLTF
 					: null
 			};
 
-			UnityEngine.Material material = primitive.Material != null && primitive.Material.Id >= 0 ? getMaterial(primitive.Material.Id) : defaultMaterial;
 
 			if (primitive.Attributes.ContainsKey(SemanticProperties.JOINT) && primitive.Attributes.ContainsKey(SemanticProperties.WEIGHT))
 			{
@@ -749,7 +778,7 @@ namespace UnityGLTF
 				if(bones.Length != mesh.vertices.Length || weights.Length != mesh.vertices.Length)
 				{
 					Debug.LogError("Not enough skinning data (bones:" + bones.Length + " weights:" + weights.Length + "  verts:" + mesh.vertices.Length + ")");
-					return new KeyValuePair<UnityEngine.Mesh, UnityEngine.Material>(mesh, material);
+					return mesh;
 				}
 
 				BoneWeight[] bws = new BoneWeight[mesh.vertices.Length];
@@ -815,7 +844,7 @@ namespace UnityGLTF
 			mesh.RecalculateBounds();
 			mesh.RecalculateTangents();
 
-			return new KeyValuePair<UnityEngine.Mesh, UnityEngine.Material>(mesh, material);
+			return mesh;
 		}
 
 		protected virtual Dictionary<string, AttributeAccessor> BuildMeshAttributes(MeshPrimitive primitive, int meshID, int primitiveIndex)

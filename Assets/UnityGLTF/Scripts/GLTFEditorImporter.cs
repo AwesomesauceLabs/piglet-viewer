@@ -68,56 +68,51 @@ namespace UnityGLTF
 			}
 		}
 
-		override protected Texture2D LoadImage(string rootPath, Image image, int imageID)
+		override protected void AddImage(Texture2D image)
 		{
-			Texture2D texture = base.LoadImage(rootPath, image, imageID);
+			image = _assetManager.saveTexture(
+				GLTFTextureUtils.flipTexture(image),
+				_assetManager._parsedImages.Count, "image");
 
-			// write texture to an `.asset` file
-			if (texture != null) {
-				Texture2D textureAsset = _assetManager.saveTexture(
-					GLTFTextureUtils.flipTexture(texture), imageID, "image");
-				_assetManager.registerImage(textureAsset);
-			}
-
-			// Note: This method should always return the texture that was
-			// returned by `base.LoadImage`, without modification. Unity
-			// texture functions are complex/fragile and modifying texture
-			// parameters can have many unexpected side effects.
-			return texture;
+			_assetManager.registerImage(image);
 		}
 
-
-		override protected Texture2D SetupTexture(GLTF.Schema.Texture def, int textureIndex)
+		override protected void AddTexture(Texture2D texture)
 		{
-			Texture2D texture = base.SetupTexture(def, textureIndex);
+			texture = _assetManager.saveTexture(
+				texture, _assetManager._parsedTextures.Count, "texture");
 
-			// write texture to an `.asset` file
-			if (texture != null) {
-				Texture2D textureAsset = _assetManager.saveTexture(
-					GLTFTextureUtils.flipTexture(texture), textureIndex, "texture");
-				_assetManager.registerTexture(textureAsset);
-			}
-
-			// Note: This method should always return the texture that was
-			// returned by `base.SetupTexture`, without modification. Unity
-			// texture functions are complex/fragile and modifying the texture
-			// parameters can have many unexpected side effects.
-			return texture;
+			_assetManager.registerTexture(texture);
 		}
 
-		override protected UnityEngine.Material
-		CreateUnityMaterial(GLTF.Schema.Material def, int materialIndex)
+		override protected void AddMaterial(UnityEngine.Material material)
 		{
-			UnityEngine.Material material = base.CreateUnityMaterial(def, materialIndex);
+			material = _assetManager.saveMaterial(
+				material, _assetManager._parsedMaterials.Count);
 
-			// write material to an `.asset` file
-			if (material != null) {
-				UnityEngine.Material materialAsset =
-					_assetManager.saveMaterial(material, materialIndex);
-				_assetManager.registerMaterial(materialAsset);
-			}
+			_assetManager.registerMaterial(material);
+		}
 
-			return material;
+		override protected void AddMesh()
+		{
+			_assetManager.registerMesh();
+		}
+
+		override protected void AddMeshPrimitive(
+			UnityEngine.Mesh primitive, UnityEngine.Material material)
+		{
+			int meshIndex = _assetManager._parsedMeshData.Count - 1;
+			int primitiveIndex = _assetManager._parsedMeshData[meshIndex].Count;
+
+			primitive = _assetManager.saveMesh(primitive,
+				string.Format("mesh_{0}_{1}", meshIndex, primitiveIndex));
+
+			_assetManager.registerMeshPrimitive(primitive, material);
+		}
+
+		override protected Texture2D getImage(int index)
+		{
+			return _assetManager.getImage(index);
 		}
 
 		override protected Texture2D getTexture(int index)
@@ -160,21 +155,6 @@ namespace UnityGLTF
 			}
 
 			return splitTextures;
-		}
-
-		override protected KeyValuePair<UnityEngine.Mesh, UnityEngine.Material>
-		CreateMeshPrimitive(MeshPrimitive primitive, string meshName, int meshID, int primitiveIndex)
-		{
-			KeyValuePair<UnityEngine.Mesh, UnityEngine.Material> kvp
-				= base.CreateMeshPrimitive(primitive, meshName, meshID, primitiveIndex);
-			UnityEngine.Mesh mesh = kvp.Key;
-			UnityEngine.Material material = kvp.Value;
-
-			UnityEngine.Mesh meshAsset = _assetManager.saveMesh(
-				mesh, meshName + "_" + meshID + "_" + primitiveIndex);
-			_assetManager.addPrimitiveMeshData(meshID, primitiveIndex, meshAsset, material);
-
-			return kvp;
 		}
 
 		override protected IEnumerator LoadScene(int sceneIndex = -1)

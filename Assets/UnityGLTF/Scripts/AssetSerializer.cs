@@ -140,6 +140,11 @@ public class AssetManager
 		return _importTexturesDirectory;
 	}
 
+	public UnityEngine.Texture2D getImage(int index)
+	{
+		return _parsedImages[index];
+	}
+
 	public UnityEngine.Texture2D getTexture(int index)
 	{
 		return _parsedTextures[index];
@@ -189,6 +194,17 @@ public class AssetManager
 	public void registerMaterial(UnityEngine.Material material)
 	{
 		_parsedMaterials.Add(material);
+	}
+
+	public void registerMesh()
+	{
+		_parsedMeshData.Add(new List<KeyValuePair<Mesh, Material>>());
+	}
+
+	public void registerMeshPrimitive(Mesh primitive, Material material)
+	{
+		_parsedMeshData[_parsedMeshData.Count - 1]
+			.Add(new KeyValuePair<Mesh, Material>(primitive, material));
 	}
 
 	public string generateName(string name, int index)
