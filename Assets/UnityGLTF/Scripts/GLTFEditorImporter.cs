@@ -71,8 +71,7 @@ namespace UnityGLTF
 		override protected void AddImage(Texture2D image)
 		{
 			image = _assetManager.saveTexture(
-				GLTFTextureUtils.flipTexture(image),
-				_assetManager._parsedImages.Count, "image");
+				image, _assetManager._parsedImages.Count, "image");
 
 			_assetManager.registerImage(image);
 		}

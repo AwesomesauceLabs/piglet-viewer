@@ -391,7 +391,7 @@ namespace UnityGLTF
 			{
 				Image gltfImage = _root.Images[i];
 				Texture2D image = LoadImage(_gltfDirectoryPath, gltfImage, i);
-				AddImage(image);
+				AddImage(GLTFTextureUtils.flipTexture(image));
 				setProgress(IMPORT_STEP.IMAGE, (i + 1), _root.Images.Count);
 				yield return null;
 			}
