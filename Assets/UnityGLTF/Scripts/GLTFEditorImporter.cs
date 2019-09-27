@@ -125,6 +125,23 @@ namespace UnityGLTF
 			return _assetManager.getMaterial(index);
 		}
 
+		override protected List<KeyValuePair<UnityEngine.Mesh, UnityEngine.Material>>
+		getMesh(int meshIndex)
+		{
+			return _assetManager._parsedMeshData[meshIndex];
+		}
+
+		override protected KeyValuePair<UnityEngine.Mesh, UnityEngine.Material>
+		getMeshPrimitive(int meshIndex, int primitiveIndex)
+		{
+			UnityEngine.Mesh mesh
+				= _assetManager.getMesh(meshIndex, primitiveIndex);
+			UnityEngine.Material material
+				= _assetManager.getMaterial(meshIndex, primitiveIndex);
+
+			return new KeyValuePair<UnityEngine.Mesh, UnityEngine.Material>(mesh, material);
+		}
+
 		/// <summary>
 		/// Get RGBA color values from a texture.
 		/// </summary>
@@ -155,35 +172,6 @@ namespace UnityGLTF
 			}
 
 			return splitTextures;
-		}
-
-		override protected IEnumerator LoadScene(int sceneIndex = -1)
-		{
-			Scene scene;
-			_nbParsedNodes = 0;
-
-			if (sceneIndex >= 0 && sceneIndex < _root.Scenes.Count)
-			{
-				scene = _root.Scenes[sceneIndex];
-			}
-			else
-			{
-				scene = _root.GetDefaultScene();
-			}
-
-			if (scene == null)
-			{
-				throw new Exception("No default scene in gltf file.");
-			}
-
-			_sceneObject = createGameObject(_currentSampleName);
-			foreach (var node in scene.Nodes)
-			{
-				var nodeObj = CreateNode(node.Value, node.Id);
-				nodeObj.transform.SetParent(_sceneObject.transform, false);
-			}
-
-			yield return null;
 		}
 
 		override protected IEnumerator LoadAnimations()
@@ -296,124 +284,10 @@ namespace UnityGLTF
 			}
 		}
 
-		private void BuildSkinnedMesh(GameObject nodeObj, GLTF.Schema.Skin skin, int meshIndex, int primitiveIndex)
-		{
-			if(skin.InverseBindMatrices.Value.Count == 0)
-				return;
-
-			SkinnedMeshRenderer skinMesh = nodeObj.AddComponent<SkinnedMeshRenderer>();
-			skinMesh.sharedMesh = _assetManager.getMesh(meshIndex, primitiveIndex);
-			skinMesh.sharedMaterial = _assetManager.getMaterial(meshIndex, primitiveIndex);
-
-			byte[] bufferData = _assetCache.Buffers[skin.InverseBindMatrices.Value.BufferView.Value.Buffer.Id];
-			NumericArray content = new NumericArray();
-			List<Matrix4x4> bindPoseMatrices = new List<Matrix4x4>();
-			GLTF.Math.Matrix4x4[] inverseBindMatrices = skin.InverseBindMatrices.Value.AsMatrixArray(ref content, bufferData);
-			foreach (GLTF.Math.Matrix4x4 mat in inverseBindMatrices)
-			{
-				bindPoseMatrices.Add(mat.ToUnityMatrix().switchHandedness());
-			}
-
-			skinMesh.sharedMesh.bindposes = bindPoseMatrices.ToArray();
-			if(skin.Skeleton != null && _importedObjects.ContainsKey(skin.Skeleton.Id))
-				skinMesh.rootBone = skin.Skeleton == null ? _importedObjects[skin.Skeleton.Id].transform : null;
-		}
-
-		protected virtual GameObject CreateNode(Node node, int index)
-		{
-			var nodeObj = createGameObject(node.Name != null && node.Name.Length > 0 ? node.Name : "GLTFNode_" + index);
-
-			_nbParsedNodes++;
-			setProgress(IMPORT_STEP.NODE, _nbParsedNodes, _root.Nodes.Count);
-			Vector3 position;
-			Quaternion rotation;
-			Vector3 scale;
-			node.GetUnityTRSProperties(out position, out rotation, out scale);
-			nodeObj.transform.localPosition = position;
-			nodeObj.transform.localRotation = rotation;
-			nodeObj.transform.localScale = scale;
-
-			bool isSkinned = node.Skin != null && isValidSkin(node.Skin.Id);
-			bool hasMorphOnly = node.Skin == null && node.Mesh != null && node.Mesh.Value.Weights != null && node.Mesh.Value.Weights.Count != 0;
-			if (node.Mesh != null)
-			{
-				if (isSkinned) // Mesh is skinned (it can also have morph)
-				{
-					if (!_skinIndexToGameObjects.ContainsKey(node.Skin.Id))
-						_skinIndexToGameObjects[node.Skin.Id] = new List<SkinnedMeshRenderer>();
-
-					BuildSkinnedMesh(nodeObj, node.Skin.Value, node.Mesh.Id, 0);
-					_skinIndexToGameObjects[node.Skin.Id].Add(nodeObj.GetComponent<SkinnedMeshRenderer>());
-				}
-				else if (hasMorphOnly)
-				{
-					SkinnedMeshRenderer smr = nodeObj.AddComponent<SkinnedMeshRenderer>();
-					smr.sharedMesh = _assetManager.getMesh(node.Mesh.Id, 0);
-					smr.sharedMaterial = _assetManager.getMaterial(node.Mesh.Id, 0);
-				}
-				else
-				{
-					// If several primitive, create several nodes and add them as child of this current Node
-					MeshFilter meshFilter = nodeObj.AddComponent<MeshFilter>();
-					meshFilter.sharedMesh = _assetManager.getMesh(node.Mesh.Id, 0);
-
-					MeshRenderer meshRenderer = nodeObj.AddComponent<MeshRenderer>();
-					meshRenderer.material = _assetManager.getMaterial(node.Mesh.Id, 0);
-				}
-
-				for(int i = 1; i < _assetManager._parsedMeshData[node.Mesh.Id].Count; ++i)
-				{
-					GameObject go = createGameObject(node.Name ?? "GLTFNode_" + i);
-					if (isSkinned)
-					{
-						BuildSkinnedMesh(go, node.Skin.Value, node.Mesh.Id, i);
-						_skinIndexToGameObjects[node.Skin.Id].Add(go.GetComponent<SkinnedMeshRenderer>());
-					}
-					else if (hasMorphOnly)
-					{
-						SkinnedMeshRenderer smr = go.AddComponent<SkinnedMeshRenderer>();
-						smr.sharedMesh = _assetManager.getMesh(node.Mesh.Id, i);
-						smr.sharedMaterial = _assetManager.getMaterial(node.Mesh.Id, i);
-					}
-					else
-					{
-						MeshFilter mf = go.AddComponent<MeshFilter>();
-						mf.sharedMesh = _assetManager.getMesh(node.Mesh.Id, i);
-						MeshRenderer mr = go.AddComponent<MeshRenderer>();
-						mr.material = _assetManager.getMaterial(node.Mesh.Id, i);
-					}
-
-					go.transform.SetParent(nodeObj.transform, false);
-				}
-			}
-
-			if (node.Children != null)
-			{
-				foreach (var child in node.Children)
-				{
-					var childObj = CreateNode(child.Value, child.Id);
-					childObj.transform.SetParent(nodeObj.transform, false);
-				}
-			}
-
-			_importedObjects.Add(index, nodeObj);
-			return nodeObj;
-		}
-
-		private GameObject createGameObject(string name)
+		override protected GameObject createGameObject(string name)
 		{
 			name = GLTFUtils.cleanName(name);
 			return _assetManager.createGameObject(name);
-		}
-
-		private bool isValidSkin(int skinIndex)
-		{
-			if (skinIndex >= _root.Skins.Count)
-				return false;
-
-			Skin glTFSkin = _root.Skins[skinIndex];
-
-			return glTFSkin.Joints.Count > 0 && glTFSkin.Joints.Count == glTFSkin.InverseBindMatrices.Value.Count;
 		}
 
 		override protected void finishImport()
