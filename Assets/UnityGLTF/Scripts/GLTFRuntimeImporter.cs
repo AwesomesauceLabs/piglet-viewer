@@ -941,7 +941,6 @@ namespace UnityGLTF
 				throw new Exception("No default scene in gltf file.");
 			}
 
-			// TODO: this game object does not get added to the cache.
 			_sceneObject = createGameObject(_currentSampleName);
 
 			foreach (var node in scene.Nodes)
