@@ -522,6 +522,11 @@ namespace UnityGLTF
 			return _assetCache.Meshes[meshIndex][primitiveIndex];
 		}
 
+		public GameObject GetSceneObject()
+		{
+			return _sceneObject;
+		}
+
 		protected IEnumerator LoadMaterials()
 		{
 			for(int i = 0; i < _root.Materials.Count; ++i)
