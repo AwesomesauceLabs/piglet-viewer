@@ -1075,8 +1075,32 @@ namespace UnityGLTF
 			return glTFSkin.Joints.Count > 0 && glTFSkin.Joints.Count == glTFSkin.InverseBindMatrices.Value.Count;
 		}
 
+		protected IEnumerator LoadSkins()
+		{
+			setProgress(IMPORT_STEP.SKIN, 0, _root.Skins.Count);
+			for (int i = 0; i < _root.Skins.Count; ++i)
+			{
+				LoadSkin(_root.Skins[i], i);
+				setProgress(IMPORT_STEP.SKIN, (i + 1), _root.Skins.Count);
+				yield return null;
+			}
+		}
+
+		protected void LoadSkin(GLTF.Schema.Skin skin, int index)
+		{
+			Transform[] boneList = new Transform[skin.Joints.Count];
+			for (int i = 0; i < skin.Joints.Count; ++i)
+			{
+				boneList[i] = _importedObjects[skin.Joints[i].Id].transform;
+			}
+
+			foreach (SkinnedMeshRenderer skinMesh in _skinIndexToGameObjects[index])
+			{
+				skinMesh.bones = boneList;
+			}
+		}
+
 		virtual protected IEnumerator LoadAnimations() { yield break; }
-		virtual protected IEnumerator LoadSkins() { yield break; }
 
     }
 }
