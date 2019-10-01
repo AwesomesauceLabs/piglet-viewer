@@ -20,6 +20,7 @@ public class GLTFTextureUtils
 		GL.sRGBWrite = useSRGB;
 	}
 
+#if UNITY_EDITOR
 	public static string writeTextureOnDisk(Texture2D texture, string outputPath, bool updateExtension=false)
 	{
 		string finalOutputPath = outputPath;
@@ -30,6 +31,7 @@ public class GLTFTextureUtils
 
 		return finalOutputPath;
 	}
+#endif
 
 	// Export
 	public static Texture2D bumpToNormal(Texture2D texture)
@@ -39,6 +41,7 @@ public class GLTFTextureUtils
 		return processTextureMaterial(texture, convertBump);
 	}
 
+#if UNITY_EDITOR
 	public static bool isNormalMapFromGrayScale(ref Texture2D texture)
 	{
 		TextureImporter im = AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(texture)) as TextureImporter;
@@ -47,6 +50,7 @@ public class GLTFTextureUtils
 
 		return im.convertToNormalmap;
 	}
+#endif
 
 	public static Texture2D packOcclusionMetalRough(Texture2D metallicSmoothnessMap, Texture2D occlusionMap)
 	{
@@ -98,6 +102,7 @@ public class GLTFTextureUtils
 		return exportTexture;
 	}
 
+#if UNITY_EDITOR
 	// Normal map should be exported with srgb true
 	public static Texture2D handleNormalMap(Texture2D input)
 	{
@@ -112,7 +117,9 @@ public class GLTFTextureUtils
 			return getTexture(input);
 		}
 	}
+#endif
 
+#if UNITY_EDITOR
 	private static Texture2D getTexture(Texture2D texture)
 	{
 		Texture2D temp = new Texture2D(4, 4);
@@ -137,6 +144,7 @@ public class GLTFTextureUtils
 
 		return temp;
 	}
+#endif
 
 	public static Texture2D flipTexture(Texture2D texture)
 	{
@@ -185,6 +193,7 @@ class GLTFTextureUtilsCache
 		return _packedTextures[key];
 	}
 
+#if UNITY_EDITOR
 	public Texture2D handleNormalMap(Texture2D texture)
 	{
 		if(!_convertedBump.ContainsKey(texture))
@@ -195,6 +204,7 @@ class GLTFTextureUtilsCache
 
 		return _convertedBump[texture];
 	}
+#endif
 
 	public Texture2D flipTexture(Texture2D texture)
 	{

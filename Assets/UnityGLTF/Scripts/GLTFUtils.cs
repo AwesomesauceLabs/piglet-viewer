@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using System.IO;
 using System.Text.RegularExpressions;
 using Ionic.Zip;
@@ -18,6 +20,7 @@ public class GLTFUtils
 		return Array.ConvertAll(gameObjects, gameObject => gameObject.transform);
 	}
 
+#if UNITY_EDITOR
 	public static Transform[] getSelectedTransforms()
 	{
 		if (Selection.transforms.Length <= 0)
@@ -25,6 +28,7 @@ public class GLTFUtils
 
 		return Selection.transforms;
 	}
+#endif
 
 	public static string UnityToSystemPath(string path)
 	{
@@ -195,6 +199,7 @@ public class GLTFUtils
 		return image.GetInstanceID().ToString().Replace("-", "") + "_" + image.name + extension;
 	}
 
+#if UNITY_EDITOR
 	public static bool getPixelsFromTexture(ref Texture2D texture, out Color[] pixels)
 	{
 		//Make texture readable
@@ -236,6 +241,7 @@ public class GLTFUtils
 
 		return true;
 	}
+#endif
 
 	public static AnimationCurve[] createCurvesFromArrays(float[] times, Vector3[] keyframes, bool isStepInterpolation = false, bool switchHandedness=false)
 	{
