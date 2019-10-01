@@ -11,60 +11,60 @@ using UnityGLTF.Extensions;
 
 namespace UnityGLTF
 {
-    public class GLTFRuntimeImporter
-    {
+	public class GLTFRuntimeImporter
+	{
 		public bool _useGLTFMaterial = false;
 
-        /// <summary>
-        /// Set to true when import has finished or
-        /// has been aborted by the user.
-        /// </summary>
-        protected bool _isDone = false;
-        /// <summary>
-        /// Set to true if the import was aborted
-        /// by the user
-        /// </summary>
-        protected bool _userStopped = false;
-        /// <summary>
-        /// Directory of GLTF file that is being imported.
-        /// </summary>
-        protected string _gltfDirectoryPath;
-        /// <summary>
-        /// Absolute path to GLTF file that is being imported.
-        /// </summary>
-        protected string _glTFPath = "";
+		/// <summary>
+		/// Set to true when import has finished or
+		/// has been aborted by the user.
+		/// </summary>
+		protected bool _isDone = false;
+		/// <summary>
+		/// Set to true if the import was aborted
+		/// by the user
+		/// </summary>
+		protected bool _userStopped = false;
+		/// <summary>
+		/// Directory of GLTF file that is being imported.
+		/// </summary>
+		protected string _gltfDirectoryPath;
+		/// <summary>
+		/// Absolute path to GLTF file that is being imported.
+		/// </summary>
+		protected string _glTFPath = "";
 		/// <summary>
 		/// Name to assign to the import GLTF model. This variable
 		/// is for the name of the root GameObject and also for
 		/// the name of the generated .prefab file in GLTFEditorImporter.
 		/// </summary>
 		protected string _currentSampleName = "";
-        /// <summary>
-        /// Main .gltf file as a binary blob.
-        /// </summary>
-        protected byte[] _glTFData;
-        /// <summary>
-        /// Root JSON node of the main .gltf file.
-        /// </summary>
-        protected GLTFRoot _root;
-        /// <summary>
-        /// The number of GLTF nodes that have been loaded.
-        /// </summary>
-        protected int _nbParsedNodes;
-        /// <summary>
-        /// Unity game object corresponding to root GLTF node.
-        /// </summary>
-        protected GameObject _sceneObject;
-        /// <summary>
-        /// Default Unity Material to use when a GLTF mesh does not
-        /// specify a material.
-        /// </summary>
-        public UnityEngine.Material defaultMaterial;
-        /// <summary>
-        /// Manages the coroutines for concurrent import tasks
-        /// (import images, import meshes, etc.).
-        /// </summary>
-        protected TaskManager _taskManager;
+		/// <summary>
+		/// Main .gltf file as a binary blob.
+		/// </summary>
+		protected byte[] _glTFData;
+		/// <summary>
+		/// Root JSON node of the main .gltf file.
+		/// </summary>
+		protected GLTFRoot _root;
+		/// <summary>
+		/// The number of GLTF nodes that have been loaded.
+		/// </summary>
+		protected int _nbParsedNodes;
+		/// <summary>
+		/// Unity game object corresponding to root GLTF node.
+		/// </summary>
+		protected GameObject _sceneObject;
+		/// <summary>
+		/// Default Unity Material to use when a GLTF mesh does not
+		/// specify a material.
+		/// </summary>
+		public UnityEngine.Material defaultMaterial;
+		/// <summary>
+		/// Manages the coroutines for concurrent import tasks
+		/// (import images, import meshes, etc.).
+		/// </summary>
+		protected TaskManager _taskManager;
 		/// <summary>
 		/// Caches data (e.g. buffers) in memory during import.
 		/// </summary>
@@ -72,8 +72,8 @@ namespace UnityGLTF
 
 
 		/// <summary>
-        /// Describes current stage of GLTF import process.
-        /// </summary>
+		/// Describes current stage of GLTF import process.
+		/// </summary>
 		public enum IMPORT_STEP
 		{
 			READ_FILE,
@@ -93,15 +93,15 @@ namespace UnityGLTF
 		protected RefreshWindow _finishCallback;
 		protected ProgressCallback _progressCallback;
 
-        /// <summary>
-        /// Regex for GTLF data URIs (inline base64-encoded data)
-        /// </summary>
+		/// <summary>
+		/// Regex for GTLF data URIs (inline base64-encoded data)
+		/// </summary>
 		protected const string Base64StringInitializer = "^data:[a-z-]+/[a-z-]+;base64,";
 
-        /// <summary>
-        /// Game objects that have been created for imported GLTF objects
-        /// (e.g. GLTF nodes, GLTF meshes).
-        /// </summary>
+		/// <summary>
+		/// Game objects that have been created for imported GLTF objects
+		/// (e.g. GLTF nodes, GLTF meshes).
+		/// </summary>
 		protected Dictionary<int, GameObject> _importedObjects;
 		protected Dictionary<int, List<SkinnedMeshRenderer>>_skinIndexToGameObjects;
 
@@ -1106,5 +1106,5 @@ namespace UnityGLTF
 
 		virtual protected IEnumerator LoadAnimations() { yield break; }
 
-    }
+	}
 }
