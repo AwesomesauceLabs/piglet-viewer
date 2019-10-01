@@ -612,7 +612,7 @@ namespace UnityGLTF
 					material.SetTexture("_OcclusionMap", getTexture(texture));
 				}
 
-				GLTFUtils.SetMaterialKeywords(material, GLTFUtils.WorkflowMode.Specular);
+				GLTFRuntimeUtils.SetMaterialKeywords(material, GLTFRuntimeUtils.WorkflowMode.Specular);
 			}
 			else if (def.PbrMetallicRoughness != null)
 			{
@@ -642,7 +642,7 @@ namespace UnityGLTF
 					}
 				}
 
-				GLTFUtils.SetMaterialKeywords(material, GLTFUtils.WorkflowMode.Metallic);
+				GLTFRuntimeUtils.SetMaterialKeywords(material, GLTFRuntimeUtils.WorkflowMode.Metallic);
 			}
 
 			material.SetColor("_EmissionColor", def.EmissiveFactor.ToUnityColor().gamma);
