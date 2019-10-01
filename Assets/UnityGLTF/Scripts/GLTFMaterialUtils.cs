@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-public class GLTFRuntimeUtils
+public class GLTFMaterialUtils
 {
 	public enum WorkflowMode
 	{

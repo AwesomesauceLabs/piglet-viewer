@@ -552,13 +552,13 @@ namespace UnityGLTF
 			//Transparency
 			if (def.AlphaMode == AlphaMode.MASK)
 			{
-				GLTFRuntimeUtils.SetupMaterialWithBlendMode(material, GLTFRuntimeUtils.BlendMode.Cutout);
+				GLTFMaterialUtils.SetupMaterialWithBlendMode(material, GLTFMaterialUtils.BlendMode.Cutout);
 				material.SetFloat("_Mode", 1);
 				material.SetFloat("_Cutoff", (float)def.AlphaCutoff);
 			}
 			else if (def.AlphaMode == AlphaMode.BLEND)
 			{
-				GLTFRuntimeUtils.SetupMaterialWithBlendMode(material, GLTFRuntimeUtils.BlendMode.Fade);
+				GLTFMaterialUtils.SetupMaterialWithBlendMode(material, GLTFMaterialUtils.BlendMode.Fade);
 				material.SetFloat("_Mode", 3);
 			}
 
@@ -612,7 +612,7 @@ namespace UnityGLTF
 					material.SetTexture("_OcclusionMap", getTexture(texture));
 				}
 
-				GLTFRuntimeUtils.SetMaterialKeywords(material, GLTFRuntimeUtils.WorkflowMode.Specular);
+				GLTFMaterialUtils.SetMaterialKeywords(material, GLTFMaterialUtils.WorkflowMode.Specular);
 			}
 			else if (def.PbrMetallicRoughness != null)
 			{
@@ -642,7 +642,7 @@ namespace UnityGLTF
 					}
 				}
 
-				GLTFRuntimeUtils.SetMaterialKeywords(material, GLTFRuntimeUtils.WorkflowMode.Metallic);
+				GLTFMaterialUtils.SetMaterialKeywords(material, GLTFMaterialUtils.WorkflowMode.Metallic);
 			}
 
 			material.SetColor("_EmissionColor", def.EmissiveFactor.ToUnityColor().gamma);
