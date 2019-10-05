@@ -17,30 +17,30 @@ public class GLTFRuntimeShaderConfig
     [Serializable]
     public struct ShaderVariantArray
     {
-        public ShaderVariant[] Values;
+        public ShaderVariant[] variants;
     }
 
     [Serializable]
     public struct ShaderVariant
     {
-        public string ShaderName;
-        public string ShaderPassName;
-        public string ShaderKeywords;
+        public string shader;
+        public string pass;
+        public string keywords;
     }
 
     protected ShaderVariant[] _shaderVariants;
 
     public GLTFRuntimeShaderConfig(string json)
     {
-        _shaderVariants = JsonUtility.FromJson<ShaderVariantArray>(json).Values;
+        _shaderVariants = JsonUtility.FromJson<ShaderVariantArray>(json).variants;
     }
 
     protected static string ShaderVariantToString(ShaderVariant shaderVariant)
     {
         return string.Format("(shader: \"{0}\", pass: \"{1}\", keywords: \"{2}\")",
-            shaderVariant.ShaderName,
-            shaderVariant.ShaderPassName,
-            shaderVariant.ShaderKeywords);
+            shaderVariant.shader,
+            shaderVariant.pass,
+            shaderVariant.keywords);
     }
 
 #if UNITY_EDITOR
@@ -55,7 +55,7 @@ public class GLTFRuntimeShaderConfig
             ShaderVariantCollection.ShaderVariant shaderVariant
                 = new ShaderVariantCollection.ShaderVariant();
 
-            shaderVariant.shader = Shader.Find(shaderConfig.ShaderName);
+            shaderVariant.shader = Shader.Find(shaderConfig.shader);
             if (shaderVariant.shader == null) {
                 Debug.LogErrorFormat(
                     "failed to add shader variant to collection: "
@@ -65,7 +65,7 @@ public class GLTFRuntimeShaderConfig
             }
 
             PassType passType;
-            if (!Enum.TryParse(shaderConfig.ShaderPassName, true, out passType)) {
+            if (!Enum.TryParse(shaderConfig.pass, true, out passType)) {
                 Debug.LogErrorFormat(
                     "failed to add shader variant to collection: "
                     + "unrecognized shader pass name in {0}",
@@ -74,7 +74,7 @@ public class GLTFRuntimeShaderConfig
             }
 
             shaderVariant.passType = passType;
-            shaderVariant.keywords = shaderConfig.ShaderKeywords.Split(
+            shaderVariant.keywords = shaderConfig.keywords.Split(
                 keywordSeparators, StringSplitOptions.RemoveEmptyEntries);
 
             shaderVariantCollection.Add(shaderVariant);
