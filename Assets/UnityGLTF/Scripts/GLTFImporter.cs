@@ -587,7 +587,6 @@ namespace UnityGLTF
 
 			if (def.EmissiveTexture != null)
 			{
-				material.EnableKeyword("EMISSION_MAP_ON");
 				var texture = def.EmissiveTexture.Index.Id;
 				material.SetTexture("_EmissionMap", getTexture(texture));
 				material.SetInt("_EmissionUV", def.EmissiveTexture.TexCoord);
