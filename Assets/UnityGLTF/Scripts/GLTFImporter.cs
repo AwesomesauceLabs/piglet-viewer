@@ -598,6 +598,7 @@ namespace UnityGLTF
 			{
 				KHR_materials_pbrSpecularGlossinessExtension pbr = (KHR_materials_pbrSpecularGlossinessExtension)specularGlossinessExtension;
 				material.SetColor("_Color", pbr.DiffuseFactor.ToUnityColor().gamma);
+				Debug.LogFormat("material {0}: pbr.DiffuseTexture? {1}", materialIndex, pbr.DiffuseTexture != null);
 				if (pbr.DiffuseTexture != null)
 				{
 					var texture = pbr.DiffuseTexture.Index.Id;
@@ -637,6 +638,7 @@ namespace UnityGLTF
 				var pbr = def.PbrMetallicRoughness;
 
 				material.SetColor("_Color", pbr.BaseColorFactor.ToUnityColor().gamma);
+				Debug.LogFormat("material {0}: pbr.BaseColorTexture? {1}", materialIndex, pbr.BaseColorTexture != null);
 				if (pbr.BaseColorTexture != null)
 				{
 					var texture = pbr.BaseColorTexture.Index.Id;
