@@ -35,6 +35,26 @@ public class GLTFRuntimeShaderConfig
         _shaderVariants = JsonUtility.FromJson<ShaderVariantArray>(json).variants;
     }
 
+    public ShaderVariant? GetMinimalShaderVariantForMaterial(Material material)
+    {
+        ShaderVariant? minimalMatch = null;
+
+        foreach (var shaderVariant in _shaderVariants) {
+            bool match = true;
+            foreach(var keyword in material.shaderKeywords) {
+                if (!shaderVariant.keywords.Contains(keyword)) {
+                    match = false;
+                    break;
+                }
+            }
+            if (!match)
+                continue;
+            if (!minimalMatch.HasValue || shaderVariant.keywords.Length < minimalMatch.Value.keywords.Length)
+                minimalMatch = shaderVariant;
+        }
+        return minimalMatch;
+    }
+
     protected static string ShaderVariantToString(ShaderVariant shaderVariant)
     {
         return string.Format("(shader: \"{0}\", pass: \"{1}\", keywords: \"{2}\")",

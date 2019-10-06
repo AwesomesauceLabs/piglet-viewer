@@ -538,7 +538,7 @@ namespace UnityGLTF
 			}
 		}
 
-		protected UnityEngine.Material CreateUnityMaterial(GLTF.Schema.Material def, int materialIndex)
+		virtual protected UnityEngine.Material CreateUnityMaterial(GLTF.Schema.Material def, int materialIndex)
 		{
 			Extension specularGlossinessExtension = null;
 			bool isSpecularPBR = def.Extensions != null && def.Extensions.TryGetValue("KHR_materials_pbrSpecularGlossiness", out specularGlossinessExtension);
