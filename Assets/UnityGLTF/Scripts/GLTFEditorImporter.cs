@@ -142,6 +142,27 @@ namespace UnityGLTF
 			return new KeyValuePair<UnityEngine.Mesh, UnityEngine.Material>(mesh, material);
 		}
 
+		override protected UnityEngine.Material CreateUnityMaterial(GLTF.Schema.Material def, int materialIndex)
+		{
+			// Note: In the editor, a texture must be imported with "Texture Type"
+			// set to "Normal map" before it can be assigned as the normal map
+			// of a material. (I don't know why!)
+			//
+			// The material import will still work without the fix below, but
+			// Unity will show a warning dialog and prompt the user to change
+			// the texture type to "Normal map".
+
+			if (def.NormalTexture != null) {
+				Texture2D texture = getTexture(def.NormalTexture.Index.Id);
+				TextureImporter importer = AssetImporter.GetAtPath(
+					AssetDatabase.GetAssetPath(texture)) as TextureImporter;
+				importer.textureType = TextureImporterType.NormalMap;
+				importer.SaveAndReimport();
+			}
+
+			return base.CreateUnityMaterial(def, materialIndex);
+		}
+
 		/// <summary>
 		/// Get RGBA color values from a texture.
 		/// </summary>
