@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityGLTF.Cache;
 using UnityGLTF.Extensions;
 
@@ -390,18 +391,23 @@ namespace UnityGLTF
 			for (int i = 0; i < _root.Images.Count; ++i)
 			{
 				Image gltfImage = _root.Images[i];
-				Texture2D image = LoadImage(_gltfDirectoryPath, gltfImage, i);
-				AddImage(GLTFTextureUtils.flipTexture(image));
+
+				Texture2D texture = null;
+				IEnumerator<Texture2D> task = LoadImage(_gltfDirectoryPath, gltfImage, i);
+				while (task.MoveNext()) {
+					texture = task.Current;
+					yield return null;
+				}
+
+				AddImage(GLTFTextureUtils.flipTexture(texture));
 				setProgress(IMPORT_STEP.IMAGE, (i + 1), _root.Images.Count);
 				yield return null;
 			}
 		}
 
-		protected Texture2D LoadImage(string rootPath, Image image, int imageID)
+		protected IEnumerator<Texture2D> LoadImage(string rootPath, Image image, int imageID)
 		{
-			// Note: Initial texture size does not matter,
-			// as the size will be updated by Texture2D.LoadImage().
-			var texture = new Texture2D(1, 1);
+			Texture2D texture = new Texture2D(1, 1);
 
 			if (image.Uri != null)
 			{
@@ -415,19 +421,34 @@ namespace UnityGLTF
 					var base64Data = uri.Substring(match.Length);
 					var textureData = Convert.FromBase64String(base64Data);
 					texture.LoadImage(textureData);
-					return texture;
 				}
 				else if(File.Exists(Path.Combine(rootPath, uri))) // File is a real file
 				{
-					string imagePath = Path.Combine(rootPath, uri);
-					var textureData = File.ReadAllBytes(imagePath);
-					texture.LoadImage(textureData);
-					return texture;
+					uri = UnityPathUtil.GetFileURI(Path.Combine(rootPath, uri));
+
+					// Note: Even though `uri` points to a local file,
+					// it is still necessary to use `UnityWebRequestTexture`
+					// here because it loads the texture on a background
+					// thread, rather than freezing the main thread (i.e. the
+					// Unity/UI thread).
+
+					UnityWebRequest request = UnityWebRequestTexture.GetTexture(uri);
+					request.SendWebRequest();
+
+					while (!request.isDone)
+						yield return null;
+
+					if (request.isNetworkError || request.isHttpError)
+						throw new Exception(string.Format(
+							"failed to load image URI {0}: {1}",
+							imageID, request.error));
+
+					texture = DownloadHandlerTexture.GetContent(request);
 				}
 				else
 				{
-					Debug.Log("Image not found / Unknown image buffer");
-					return null;
+					throw new Exception(string.Format(
+						"image URI not found: {0}", uri));
 				}
 			}
 			else
@@ -439,8 +460,9 @@ namespace UnityGLTF
 				var bufferContents = _assetCache.Buffers[bufferView.Buffer.Id];
 				System.Buffer.BlockCopy(bufferContents, bufferView.ByteOffset, data, 0, data.Length);
 				texture.LoadImage(data);
-				return texture;
 			}
+
+			yield return texture;
 		}
 
 		protected IEnumerator SetupTextures()
