@@ -1,8 +1,10 @@
 /[Ll]ibrary/
+/[Ll]ogs/
 /[Tt]emp/
 /[Oo]bj/
 /[Bb]uild/
 /[Bb]uilds/
+/[Pp]ackages/
 /[Pp]lugins/
 /Assets/AssetStoreTools*
 /Assets/ShaderForge*
