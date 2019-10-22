@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.IO;
-using UnityGLTF.Cache;
 using UnityEditor.Animations;
 
 public class AssetManager

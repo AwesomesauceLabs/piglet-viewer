@@ -7,7 +7,6 @@ using System.Text.RegularExpressions;
 using GLTF;
 using GLTF.Schema;
 using UnityEngine;
-using UnityGLTF.Cache;
 using UnityGLTF.Extensions;
 using UnityEditor;
 
