@@ -16,15 +16,13 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-
 #if UNITY_EDITOR
         _model = GLTFRuntimeImporter.Import(
             "C:/Users/Ben/test/gltf-models/Box.glb",
-            null, OnImportProgress);
+            OnImportProgress);
 #elif UNITY_WEBGL
         JsLib.Init();
 #endif
-
     }
 
     bool OnImportProgress(string message, int count, int total)
@@ -47,8 +45,7 @@ public class GameManager : MonoBehaviour
         if (_model != null)
             Destroy(_model);
 
-        _model = GLTFRuntimeImporter.Import(
-            "model.gltf", data, OnImportProgress);
+        _model = GLTFRuntimeImporter.Import(data, OnImportProgress);
     }
 #endif
 
@@ -85,7 +82,7 @@ public class GameManager : MonoBehaviour
         if (!bounds.HasValue)
             return;
 
-        model.transform.Translate(Camera.transform.position 
+        model.transform.Translate(Camera.transform.position
             + ModelOffsetFromCamera - bounds.Value.center);
     }
 
