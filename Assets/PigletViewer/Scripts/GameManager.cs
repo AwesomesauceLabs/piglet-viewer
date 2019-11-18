@@ -9,8 +9,12 @@ using UnityGLTF;
 public class GameManager : MonoBehaviour
 {
     public Camera Camera;
-    public Vector3 ModelOffsetFromCamera;
+    public Vector3 ModelPositionRelativeToCamera;
     public float ModelSize;
+
+    public float MouseRotateSpeed;
+    public float MousePanSpeed;
+    public float MouseZoomSpeed;
 
     private GameObject _model;
 
@@ -20,6 +24,7 @@ public class GameManager : MonoBehaviour
         _model = GLTFRuntimeImporter.Import(
             "C:/Users/Ben/test/gltf-models/Box.glb",
             OnImportProgress);
+        InitModelTransformRelativeToCamera(_model, Camera);
 #elif UNITY_WEBGL
         JsLib.Init();
 #endif
@@ -53,9 +58,13 @@ public class GameManager : MonoBehaviour
     {
         if (ModelSize < 0.001f)
             ModelSize = 0.001f;
+
+        if (MouseRotateSpeed < 0.01f)
+            MouseRotateSpeed = 0.01f;
     }
 
-    public void InitModelTransform(GameObject model)
+    public void InitModelTransformRelativeToCamera(
+        GameObject model, Camera camera)
     {
         // Scale model up/down to a standard size, so that the
         // largest dimension of its bounding box is equal to `ModelSize`.
@@ -74,7 +83,8 @@ public class GameManager : MonoBehaviour
 
         // Rotate model to face camera.
 
-        model.transform.forward = Camera.transform.forward;
+        model.transform.up = camera.transform.up;
+        model.transform.forward = camera.transform.forward;
 
         // Translate model at standard offset from camera.
 
@@ -82,8 +92,64 @@ public class GameManager : MonoBehaviour
         if (!bounds.HasValue)
             return;
 
-        model.transform.Translate(Camera.transform.position
-            + ModelOffsetFromCamera - bounds.Value.center);
+        model.transform.Translate(camera.transform.position
+            + ModelPositionRelativeToCamera - bounds.Value.center);
     }
+
+    public void Update()
+    {
+        if (_model == null)
+            return;
+
+        // left-click: rotate about model center point
+        // (i.e. center of renderer bounds)
+
+        if (Input.GetMouseButton(0)) {
+
+            Bounds? bounds = BoundsUtil.GetRendererBoundsForHierarchy(_model);
+            if (!bounds.HasValue)
+                return;
+
+            GameObject pivot = new GameObject("pivot");
+            pivot.transform.position = bounds.Value.center;
+            _model.transform.SetParent(pivot.transform, true);
+
+            Vector3 rotation = new Vector3(
+                Input.GetAxis("Mouse Y"),
+                -Input.GetAxis("Mouse X"),
+                0);
+
+            pivot.transform.Rotate(rotation * Time.deltaTime * MouseRotateSpeed);
+
+            _model.transform.SetParent(null, true);
+            Destroy(pivot);
+
+        }
+
+        // middle-click / right-click: pan camera
+
+        if (Input.GetMouseButton(1) || Input.GetMouseButton(2))
+        {
+            Vector3 translation = new Vector3(
+                -Input.GetAxis("Mouse X"),
+                -Input.GetAxis("Mouse Y"),
+                0);
+
+            Camera.transform.Translate(
+                translation * Time.deltaTime * MousePanSpeed,
+                Space.Self);
+        }
+
+        // mouse scroll wheel: zoom camera (i.e. move forward
+        // on z-axis)
+
+        float zoom = Input.GetAxis("Mouse ScrollWheel")
+            * Time.deltaTime * MouseZoomSpeed;
+
+        Camera.transform.Translate(new Vector3(0, 0, zoom),
+            Space.Self);
+
+    }
+
 
 }

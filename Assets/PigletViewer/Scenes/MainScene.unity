@@ -156,8 +156,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Camera: {fileID: 1744033486}
-  ModelOffsetFromCamera: {x: 0, y: 0.5, z: 5}
-  ModelSize: 2.4
+  ModelPositionRelativeToCamera: {x: 0, y: 0, z: 5}
+  ModelSize: 1
+  MouseRotateSpeed: 1000
 --- !u!1 &1080945429
 GameObject:
   m_ObjectHideFlags: 0
