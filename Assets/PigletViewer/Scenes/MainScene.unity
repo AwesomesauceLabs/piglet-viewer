@@ -159,6 +159,8 @@ MonoBehaviour:
   ModelPositionRelativeToCamera: {x: 0, y: 0, z: 5}
   ModelSize: 1
   MouseRotateSpeed: 1000
+  MousePanSpeed: 10
+  MouseZoomSpeed: 200
 --- !u!1 &1080945429
 GameObject:
   m_ObjectHideFlags: 0
