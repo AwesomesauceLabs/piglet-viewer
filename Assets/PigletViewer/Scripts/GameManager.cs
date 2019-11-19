@@ -1,4 +1,8 @@
-﻿using System;
+﻿#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+using B83.Win32;
+#endif
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -18,25 +22,45 @@ public class GameManager : MonoBehaviour
 
     private GameObject _model;
 
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+
+    UnityDragAndDropHook _dragAndDropHook;
+
     void Start()
     {
-#if UNITY_EDITOR
+        _dragAndDropHook = new UnityDragAndDropHook();
+        _dragAndDropHook.InstallHook();
+        _dragAndDropHook.OnDroppedFiles += OnDropFiles;
+
         _model = GLTFRuntimeImporter.Import(
             "C:/Users/Ben/test/gltf-models/Box.glb",
             OnImportProgress);
         InitModelTransformRelativeToCamera(_model, Camera);
-#elif UNITY_WEBGL
-        JsLib.Init();
-#endif
     }
 
-    bool OnImportProgress(string message, int count, int total)
+    /// <summary>
+    /// Callback for files that are drag-and-dropped onto game
+    /// window. Only works in Windows standalone builds.
+    /// </summary>
+    void OnDropFiles(List<string> paths, POINT mousePos)
     {
-        Debug.LogFormat("{0} [{1}/{2}]", message, count, total);
-        return true;
+        if (_model != null)
+            Destroy(_model);
+
+        _model = GLTFRuntimeImporter.Import(paths[0], OnImportProgress);
+
+        InitModelTransformRelativeToCamera(_model, Camera);
     }
+
+#endif
 
 #if UNITY_WEBGL
+
+    void Start()
+    {
+        JsLib.Init();
+    }
+
     public void ImportFileWebGl(string filename)
     {
         var size = JsLib.GetFileSize(filename);
@@ -52,7 +76,14 @@ public class GameManager : MonoBehaviour
 
         _model = GLTFRuntimeImporter.Import(data, OnImportProgress);
     }
+
 #endif
+
+    bool OnImportProgress(string message, int count, int total)
+    {
+        Debug.LogFormat("{0} [{1}/{2}]", message, count, total);
+        return true;
+    }
 
     public void OnValidate()
     {
@@ -150,6 +181,4 @@ public class GameManager : MonoBehaviour
             Space.Self);
 
     }
-
-
 }
