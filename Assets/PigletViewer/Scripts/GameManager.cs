@@ -6,8 +6,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Runtime.ExceptionServices;
+using System.Threading.Tasks;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityGLTF;
 
 public class GameManager : MonoBehaviour
@@ -20,7 +23,29 @@ public class GameManager : MonoBehaviour
     public float MousePanSpeed;
     public float MouseZoomSpeed;
 
+    /// <summary>
+    /// Root game object for the currently loaded model.
+    /// </summary>
     private GameObject _model;
+
+    /// <summary>
+    /// Handle to the currently running glTF import task.
+    /// This task runs in the background and is polled
+    /// for completion in `Update()`.
+    /// </summary>
+    private Task<GameObject> _importTask;
+
+    /// <summary>
+    /// The status message shown when a model is not
+    /// currently being loaded.
+    /// </summary>
+    private string _idleStatusMessage;
+
+    /// <summary>
+    /// The status message shown along the bottom
+    /// of the viewer window (e.g. "Loading mesh [3/9]").
+    /// </summary>
+    private string _statusMessage;
 
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
 
@@ -32,10 +57,15 @@ public class GameManager : MonoBehaviour
         _dragAndDropHook.InstallHook();
         _dragAndDropHook.OnDroppedFiles += OnDropFiles;
 
+        _idleStatusMessage = "Drag a .gltf/.glb file onto this window to view";
+        _statusMessage = _idleStatusMessage;
+
         _model = GLTFRuntimeImporter.Import(
             "C:/Users/Ben/test/gltf-models/Box.glb",
             OnImportProgress);
         InitModelTransformRelativeToCamera(_model, Camera);
+
+        _statusMessage = _idleStatusMessage;
     }
 
     void OnDestroy()
@@ -49,12 +79,15 @@ public class GameManager : MonoBehaviour
     /// </summary>
     void OnDropFiles(List<string> paths, POINT mousePos)
     {
+        // if we are already importing a .gltf/.glb file
+        if (_importTask != null)
+            return;
+
         if (_model != null)
             Destroy(_model);
 
-        _model = GLTFRuntimeImporter.Import(paths[0], OnImportProgress);
-
-        InitModelTransformRelativeToCamera(_model, Camera);
+        // start import task in the background
+        _importTask = GLTFRuntimeImporter.ImportAsync(paths[0], OnImportProgress);
     }
 
 #endif
@@ -63,6 +96,8 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        _idleStatusMessage = "Click \"Browse\" to load a .gltf/.glb file";
+
         JsLib.Init();
     }
 
@@ -84,9 +119,20 @@ public class GameManager : MonoBehaviour
 
 #endif
 
+    void OnGUI()
+    {
+        var messageStyle = GUI.skin.GetStyle("Label");
+        messageStyle.alignment = TextAnchor.MiddleCenter;
+        messageStyle.fontSize = 28;
+
+        GUI.Label(new Rect(0, Screen.height - 100, Screen.width, 50),
+            _statusMessage, messageStyle);
+    }
+
     bool OnImportProgress(string message, int count, int total)
     {
-        Debug.LogFormat("{0} [{1}/{2}]", message, count, total);
+        _statusMessage = string.Format("{0} [{1}/{2}]", message, count, total);
+        Debug.Log(_statusMessage);
         return true;
     }
 
@@ -132,7 +178,7 @@ public class GameManager : MonoBehaviour
             + ModelPositionRelativeToCamera - bounds.Value.center);
     }
 
-    public void Update()
+    protected void HandleMouseInput()
     {
         if (_model == null)
             return;
@@ -184,6 +230,33 @@ public class GameManager : MonoBehaviour
 
         Camera.transform.Translate(new Vector3(0, 0, zoom),
             Space.Self);
-
     }
+
+    protected void HandleImportTaskCompletion()
+    {
+        if (_importTask == null || !_importTask.IsCompleted)
+            return;
+
+        // The following rethrows the exception without losing the
+        // original stacktrace information. See:
+        // https://stackoverflow.com/questions/20170527/how-to-correctly-rethrow-an-exception-of-task-already-in-faulted-state
+        if (_importTask.IsFaulted)
+            ExceptionDispatchInfo.Capture(_importTask.Exception).Throw();
+
+        if (_importTask.IsCanceled) {
+            _importTask = null;
+            return;
+        }
+
+        _model = _importTask.Result;
+        InitModelTransformRelativeToCamera(_model, Camera);
+        _importTask = null;
+    }
+
+    public void Update()
+    {
+        HandleMouseInput();
+        HandleImportTaskCompletion();
+    }
+
 }
