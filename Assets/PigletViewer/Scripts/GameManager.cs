@@ -38,6 +38,11 @@ public class GameManager : MonoBehaviour
         InitModelTransformRelativeToCamera(_model, Camera);
     }
 
+    void OnDestroy()
+    {
+        _dragAndDropHook.UninstallHook();
+    }
+
     /// <summary>
     /// Callback for files that are drag-and-dropped onto game
     /// window. Only works in Windows standalone builds.
