@@ -102,7 +102,7 @@ public class GameManager : MonoBehaviour
 
 #endif
 
-#if UNITY_WEBGL
+#if UNITY_WEBGL && !UNITY_EDITOR
 
     void Start()
     {
