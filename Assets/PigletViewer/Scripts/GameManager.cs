@@ -5,6 +5,7 @@ using B83.Win32;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityGLTF;
+using Debug = UnityEngine.Debug;
 
 public class GameManager : MonoBehaviour
 {
@@ -34,6 +36,12 @@ public class GameManager : MonoBehaviour
     /// for completion in `Update()`.
     /// </summary>
     private Task<GameObject> _importTask;
+    
+    /// <summary>
+    /// A timer used to measure the time to import
+    /// individual glTF entities (e.g. textures, meshes).
+    /// </summary>
+    private Stopwatch _stopwatch;
 
     /// <summary>
     /// The status message shown when a model is not
@@ -47,6 +55,19 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private string _statusMessage;
 
+    /// <summary>
+    /// An object that handles drawing UI elements
+    /// (e.g. checkboxes, progress messages) on top
+    /// of the model viewer window.
+    /// </summary>
+    private ViewerGUI _gui;
+
+    private void Awake()
+    {
+        _gui = new ViewerGUI();
+        _stopwatch = new Stopwatch();
+    }
+    
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
 
     UnityDragAndDropHook _dragAndDropHook;
@@ -60,10 +81,7 @@ public class GameManager : MonoBehaviour
         _idleStatusMessage = "Drag a .gltf/.glb file onto this window to view";
         _statusMessage = _idleStatusMessage;
 
-        _model = GLTFRuntimeImporter.Import(
-            "C:/Users/Ben/test/gltf-models/Box.glb",
-            OnImportProgress);
-        InitModelTransformRelativeToCamera(_model, Camera);
+        Import("C:/Users/Ben/test/gltf-models/Box.glb");
 
         _statusMessage = _idleStatusMessage;
     }
@@ -79,15 +97,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     void OnDropFiles(List<string> paths, POINT mousePos)
     {
-        // if we are already importing a .gltf/.glb file
-        if (_importTask != null)
-            return;
-
-        if (_model != null)
-            Destroy(_model);
-
-        // start import task in the background
-        _importTask = GLTFRuntimeImporter.ImportAsync(paths[0], OnImportProgress);
+        StartImportAsync(paths[0]);
     }
 
 #endif
@@ -114,26 +124,61 @@ public class GameManager : MonoBehaviour
         if (_model != null)
             Destroy(_model);
 
-        _model = GLTFRuntimeImporter.Import(data, OnImportProgress);
+        Import(data);
     }
 
 #endif
 
+    void Import(string path)
+    {
+        _stopwatch.Reset();
+        _stopwatch.Start();
+        _model = GLTFRuntimeImporter.Import(path, OnImportProgress);
+        InitModelTransformRelativeToCamera(_model, Camera);
+    }
+
+    void Import(byte[] data)
+    {
+        _stopwatch.Reset();
+        _stopwatch.Start();
+        _model = GLTFRuntimeImporter.Import(data, OnImportProgress);
+        InitModelTransformRelativeToCamera(_model, Camera);
+    }
+
+    void StartImportAsync(string path)
+    {
+        // if we are already importing a .gltf/.glb file
+        if (_importTask != null)
+            return;
+
+        if (_model != null)
+            Destroy(_model);
+
+        // start import task in the background
+        
+        _stopwatch.Reset();
+        _stopwatch.Start();
+        _importTask = GLTFRuntimeImporter.ImportAsync(path, OnImportProgress);
+    }
+    
     void OnGUI()
     {
-        var messageStyle = GUI.skin.GetStyle("Label");
-        messageStyle.alignment = TextAnchor.MiddleCenter;
-        messageStyle.fontSize = 28;
-
-        GUI.Label(new Rect(0, Screen.height - 100, Screen.width, 50),
-            _statusMessage, messageStyle);
+        _gui.OnGUI();
     }
 
     bool OnImportProgress(GLTFImporter.Type type, int count, int total)
     {
-        _statusMessage = string.Format("{0} [{1}/{2}]",
-            type.ToString().ToLower(), count, total);
+        _stopwatch.Stop();
+        float milliseconds = _stopwatch.ElapsedMilliseconds;
+        _stopwatch.Reset();
+        _stopwatch.Start();
+        
+        _gui.OnProgress(type, count, total, milliseconds);
+        
+        _statusMessage = string.Format("loaded {0} {1}/{2} ({3} ms)",
+            type.ToString().ToLower(), count, total, milliseconds);
         Debug.Log(_statusMessage);
+        
         return true;
     }
 
