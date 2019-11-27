@@ -129,9 +129,10 @@ public class GameManager : MonoBehaviour
             _statusMessage, messageStyle);
     }
 
-    bool OnImportProgress(string message, int count, int total)
+    bool OnImportProgress(GLTFImporter.Type type, int count, int total)
     {
-        _statusMessage = string.Format("{0} [{1}/{2}]", message, count, total);
+        _statusMessage = string.Format("{0} [{1}/{2}]",
+            type.ToString().ToLower(), count, total);
         Debug.Log(_statusMessage);
         return true;
     }
