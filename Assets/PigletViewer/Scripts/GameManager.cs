@@ -96,6 +96,23 @@ public class GameManager : MonoBehaviour
     
     private void Awake()
     {
+        // By default, the Windows Unity Player will pause
+        // execution when it loses focus.  Setting
+        // `Application.runInBackground` to true overrides
+        // this behaviour and tells it to keep running
+        // always.
+        //
+        // The player must be continuously running in
+        // order for drag-and-drop of files to work in
+        // an intuitive manner.  Otherwise, dropping
+        // a .gltf/.glb file onto a non-focused player
+        // window will not immediately trigger an import,
+        // and the user will have to additionally click
+        // the window to give it focus again, before the
+        // glTF import will start running.
+        
+        Application.runInBackground = true;
+        
         Reset();
     }
     
