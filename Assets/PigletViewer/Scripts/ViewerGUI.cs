@@ -45,7 +45,7 @@ public class ViewerGUI
         labelStyle.alignment = TextAnchor.MiddleLeft;
         labelStyle.fontSize = 18;
 
-        float padding = 30;
+        float padding = 20;
         
         GUILayout.BeginArea(new Rect(
             padding, padding,
