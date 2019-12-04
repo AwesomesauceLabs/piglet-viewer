@@ -180,9 +180,6 @@ public class GameManager : MonoBehaviour
         if (_importTask != null)
             return;
 
-        if (_model != null)
-            Destroy(_model);
-
         // start import task in the background
 
         Reset();
@@ -372,6 +369,10 @@ public class GameManager : MonoBehaviour
             _importTask = null;
             return;
         }
+
+        // Destroy previously imported model (if any)
+        if (_model != null)
+            Destroy(_model);
 
         _model = _importTask.Result;
         InitModelTransformRelativeToCamera(_model, Camera);
