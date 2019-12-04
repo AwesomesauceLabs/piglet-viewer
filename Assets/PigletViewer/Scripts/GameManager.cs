@@ -160,10 +160,80 @@ public class GameManager : MonoBehaviour
         _stopwatch.Start();
         _importTask = GLTFRuntimeImporter.ImportAsync(path, OnImportProgress);
     }
+
+    /// <summary>
+    /// Rotate a GameObject hierarchy about its center, as determined
+    /// by the MeshRenderer bounds of the GameObjects in the hierarchy.
+    /// </summary>
+    protected void RotateAboutCenter(GameObject model, Vector3 rotation)
+    {
+        Bounds? bounds = BoundsUtil.GetRendererBoundsForHierarchy(model);
+        if (!bounds.HasValue)
+            return;
+
+        GameObject pivot = new GameObject("pivot");
+        pivot.transform.position = bounds.Value.center;
+        model.transform.SetParent(pivot.transform, true);
+
+        pivot.transform.Rotate(rotation);
+
+        model.transform.SetParent(null, true);
+        Destroy(pivot);
+    }
+    
+    /// <summary>
+    /// Handle any mouse events that are not consumed by IMGUI controls
+    /// (e.g. checkboxes, sliders).  This method is used to implement
+    /// the conventional mouse behaviour for rotating the model, panning the
+    /// camera, and zooming the camera.
+    /// </summary>
+    protected void HandleUnusedMouseEvents()
+    {
+        // if any GUI element (e.g. checkbox, slider) currently
+        // has focus
+
+        if (GUIUtility.hotControl != 0)
+            return;
+
+        Event @event = Event.current;
+
+        if (@event.type == EventType.MouseDrag)
+        {
+            // drag with left mouse button -> rotate model
+            if (@event.button == 0)
+            {
+                Vector3 rotation = new Vector3(
+                   -@event.delta.y, -@event.delta.x, 0)
+                   * MouseRotateSpeed;
+                
+                RotateAboutCenter(_model, rotation);
+            }
+
+            // drag with right mouse button -> pan camera
+            if (@event.button == 1)
+            {
+                Vector3 pan = new Vector3(
+                    -@event.delta.x, @event.delta.y, 0)
+                    * MousePanSpeed;
+                
+                Camera.transform.Translate(pan, Space.Self);
+            }
+        }
+
+        // mouse scroll wheel -> zoom camera
+        if (@event.type == EventType.ScrollWheel)
+        {
+            Vector3 zoom = new Vector3(0, 0, -@event.delta.y)
+                * MouseZoomSpeed;
+            
+            Camera.transform.Translate(zoom, Space.Self);
+        }
+    }
     
     void OnGUI()
     {
         _gui.OnGUI();
+        HandleUnusedMouseEvents();
     }
 
     bool OnImportProgress(GLTFImporter.Type type, int count, int total)
@@ -224,60 +294,6 @@ public class GameManager : MonoBehaviour
             + ModelPositionRelativeToCamera - bounds.Value.center);
     }
 
-    protected void HandleMouseInput()
-    {
-        if (_model == null)
-            return;
-
-        // left-click: rotate about model center point
-        // (i.e. center of renderer bounds)
-
-        if (Input.GetMouseButton(0)) {
-
-            Bounds? bounds = BoundsUtil.GetRendererBoundsForHierarchy(_model);
-            if (!bounds.HasValue)
-                return;
-
-            GameObject pivot = new GameObject("pivot");
-            pivot.transform.position = bounds.Value.center;
-            _model.transform.SetParent(pivot.transform, true);
-
-            Vector3 rotation = new Vector3(
-                Input.GetAxis("Mouse Y"),
-                -Input.GetAxis("Mouse X"),
-                0);
-
-            pivot.transform.Rotate(rotation * Time.deltaTime * MouseRotateSpeed);
-
-            _model.transform.SetParent(null, true);
-            Destroy(pivot);
-
-        }
-
-        // middle-click / right-click: pan camera
-
-        if (Input.GetMouseButton(1) || Input.GetMouseButton(2))
-        {
-            Vector3 translation = new Vector3(
-                -Input.GetAxis("Mouse X"),
-                -Input.GetAxis("Mouse Y"),
-                0);
-
-            Camera.transform.Translate(
-                translation * Time.deltaTime * MousePanSpeed,
-                Space.Self);
-        }
-
-        // mouse scroll wheel: zoom camera (i.e. move forward
-        // on z-axis)
-
-        float zoom = Input.GetAxis("Mouse ScrollWheel")
-            * Time.deltaTime * MouseZoomSpeed;
-
-        Camera.transform.Translate(new Vector3(0, 0, zoom),
-            Space.Self);
-    }
-
     protected void HandleImportTaskCompletion()
     {
         if (_importTask == null || !_importTask.IsCompleted)
@@ -301,7 +317,6 @@ public class GameManager : MonoBehaviour
 
     public void Update()
     {
-        HandleMouseInput();
         HandleImportTaskCompletion();
     }
 
