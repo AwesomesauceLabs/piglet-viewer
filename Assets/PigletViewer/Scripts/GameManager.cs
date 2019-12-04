@@ -25,6 +25,8 @@ public class GameManager : MonoBehaviour
     public float MousePanSpeed;
     public float MouseZoomSpeed;
 
+    public float SpinSpeed;
+
     /// <summary>
     /// Root game object for the currently loaded model.
     /// </summary>
@@ -197,6 +199,16 @@ public class GameManager : MonoBehaviour
 
         Event @event = Event.current;
 
+        if (@event.type == EventType.MouseDown)
+        {
+            // stop auto-spin ("Spin X" / "Spin Y")
+            // whenever the user clicks on the
+            // model/background.
+
+            _gui.SpinX = 0;
+            _gui.SpinY = 0;
+        }
+        
         if (@event.type == EventType.MouseDrag)
         {
             // drag with left mouse button -> rotate model
@@ -318,6 +330,13 @@ public class GameManager : MonoBehaviour
     public void Update()
     {
         HandleImportTaskCompletion();
+        
+        // auto-rotate model as per "Spin X" / "Spin Y"
+        // sliders in GUI
+        
+        Vector3 rotation = new Vector3(_gui.SpinY, -_gui.SpinX, 0)
+           * Time.deltaTime * SpinSpeed;
+        
+        RotateAboutCenter(_model, rotation);
     }
-
 }
