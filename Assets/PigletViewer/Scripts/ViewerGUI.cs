@@ -70,13 +70,13 @@ public class ViewerGUI
 
         var labelStyle = GUI.skin.GetStyle("Label");
         labelStyle.alignment = TextAnchor.MiddleLeft;
-        labelStyle.fontSize = 20;
+        labelStyle.fontSize = 18;
 
         float padding = 30;
-        float guiWidth = Screen.width / 4f;
         
         GUILayout.BeginArea(new Rect(
-            padding, padding, guiWidth,
+            padding, padding,
+            Screen.width - 2 * padding,
             Screen.height - 2 * padding));
 
         float rowHeight = 20;
