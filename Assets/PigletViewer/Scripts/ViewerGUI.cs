@@ -20,43 +20,16 @@ public class ViewerGUI
     public float SpinY;
     
     /// <summary>
-    /// Data used to generated import progress message for
-    /// a particular type of glTF entity (e.g. meshes).
-    /// </summary>
-    struct ProgressLine
-    {
-        /// <summary>
-        /// The type of glTF entity (e.g. textures, meshes).
-        /// </summary>
-        public GLTFImporter.Type Type;
-        /// <summary>
-        /// Number of glTF entities that have been imported
-        /// so far of this type.
-        /// </summary>
-        public int Current;
-        /// <summary>
-        /// The total number of glTF entities that will be imported
-        /// for this type.
-        /// </summary>
-        public int Total;
-        /// <summary>
-        /// The total milliseconds that have been spent
-        /// importing glTF entities of this type.
-        /// </summary>
-        public float Milliseconds;
-    }
-
-    /// <summary>
     /// The list of progress messages generated for the
     /// current glTF import.
     /// </summary>
-    private List<ProgressLine> _progressLines;
-
+    public List<string> Log;
+    
     public ViewerGUI()
     {
         SpinX = 0;
         SpinY = 0;
-        _progressLines = new List<ProgressLine>();
+        Log = new List<string>();
     }
     
     /// <summary>
@@ -121,50 +94,9 @@ public class ViewerGUI
         
         GUILayout.Space(30);
         
-        foreach (var line in _progressLines)
-        {
-            string label = string.Format(
-                "Loaded {0} {1}/{2} ({3} ms)",
-                line.Type.ToString().ToLower(),
-                line.Current, line.Total, line.Milliseconds);
-            
-            GUILayout.Label(label, labelStyle);
-        }
+        foreach (var line in Log)
+            GUILayout.Label(line, labelStyle);
         
         GUILayout.EndArea();
-    }
-
-    /// <summary>
-    /// Callback that is invoked each time a new glTF entity
-    /// (e.g. a texture, a mesh) is successfully imported.
-    /// </summary>
-    /// <param name="type">type of glTF entity that was imported</param>
-    /// <param name="current">number of entities of this type that have been imported so far</param>
-    /// <param name="total">total number of entities of this type to be imported</param>
-    /// <param name="milliseconds">time in milliseconds used to import this entity</param>
-    /// <returns></returns>
-    public bool OnProgress(GLTFImporter.Type type, int current,
-        int total, float milliseconds)
-    {
-        ProgressLine line = new ProgressLine
-        {
-            Type = type,
-            Current = current,
-            Total = total,
-            Milliseconds = milliseconds
-        };
-        
-        var tailIndex = _progressLines.Count - 1;
-        if (tailIndex < 0 || _progressLines[tailIndex].Type != type)
-        {
-            _progressLines.Add(line);
-        }
-        else
-        {
-            line.Milliseconds += _progressLines[tailIndex].Milliseconds;
-            _progressLines[tailIndex] = line;
-        }
-        
-        return true;
     }
 }

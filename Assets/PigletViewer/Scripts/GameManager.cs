@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Resources;
 using System.Runtime.InteropServices;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
@@ -64,10 +65,38 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private ViewerGUI _gui;
 
-    private void Awake()
+    /// <summary>
+    /// The current type of glTF entity that is being
+    /// imported (e.g. textures, meshes).  This variable
+    /// is used to sum the import times for entities
+    /// of the same type, and to report the total import
+    /// time that type on a single line of the progress
+    /// log.
+    /// </summary>
+    private GLTFImporter.Type _currentImportType;
+
+    /// <summary>
+    /// The total time spent importing glTF entities of
+    /// the current type (e.g. textures, meshes).
+    /// Used for generated progress messages in the GUI.
+    /// </summary>
+    private float _currentImportTypeMilliseconds;
+
+    /// <summary>
+    /// Reset state variables before importing a new
+    /// glTF model.
+    /// </summary>
+    private void Reset()
     {
         _gui = new ViewerGUI();
         _stopwatch = new Stopwatch();
+        _currentImportType = GLTFImporter.Type.None;
+        _currentImportTypeMilliseconds = 0;
+    }
+    
+    private void Awake()
+    {
+        Reset();
     }
     
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
@@ -133,16 +162,14 @@ public class GameManager : MonoBehaviour
 
     void Import(string path)
     {
-        _stopwatch.Reset();
-        _stopwatch.Start();
+        Reset();
         _model = GLTFRuntimeImporter.Import(path, OnImportProgress);
         InitModelTransformRelativeToCamera(_model, Camera);
     }
 
     void Import(byte[] data)
     {
-        _stopwatch.Reset();
-        _stopwatch.Start();
+        Reset();
         _model = GLTFRuntimeImporter.Import(data, OnImportProgress);
         InitModelTransformRelativeToCamera(_model, Camera);
     }
@@ -157,9 +184,8 @@ public class GameManager : MonoBehaviour
             Destroy(_model);
 
         // start import task in the background
-        
-        _stopwatch.Reset();
-        _stopwatch.Start();
+
+        Reset();
         _importTask = GLTFRuntimeImporter.ImportAsync(path, OnImportProgress);
     }
 
@@ -254,13 +280,38 @@ public class GameManager : MonoBehaviour
         float milliseconds = _stopwatch.ElapsedMilliseconds;
         _stopwatch.Reset();
         _stopwatch.Start();
+
+        // sum import times for glTF entities of the same type
+        // (e.g. textures, meshes)
+
+        if (type == _currentImportType)
+            _currentImportTypeMilliseconds += milliseconds;
+        else
+            _currentImportTypeMilliseconds = milliseconds;
+
+        string message;
+        if (count < total) {
+            message = string.Format("Loaded {0} {1}/{2}...",
+                type.ToString().ToLower(), count, total);
+        } else {
+            message = string.Format("Loaded {0} {1}/{2}... done ({3} ms)",
+                type.ToString().ToLower(), count, total,
+                _currentImportTypeMilliseconds);
+        }
+
+        // Update existing tail log line if we are still importing
+        // the same type of glTF entity (e.g. textures), or
+        // add a new line if we have started to import
+        // a new type.
         
-        _gui.OnProgress(type, count, total, milliseconds);
-        
-        _statusMessage = string.Format("loaded {0} {1}/{2} ({3} ms)",
-            type.ToString().ToLower(), count, total, milliseconds);
-        Debug.Log(_statusMessage);
-        
+        if (type == _currentImportType)
+            _gui.Log[_gui.Log.Count - 1] = message;
+        else
+            _gui.Log.Add(message);
+
+        Debug.Log(message);
+
+        _currentImportType = type;
         return true;
     }
 
