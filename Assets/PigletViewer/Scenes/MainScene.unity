@@ -161,6 +161,7 @@ MonoBehaviour:
   MouseRotateSpeed: 1
   MousePanSpeed: 0.02
   MouseZoomSpeed: 0.1
+  SpinSpeed: 200
 --- !u!1 &1080945429
 GameObject:
   m_ObjectHideFlags: 0
