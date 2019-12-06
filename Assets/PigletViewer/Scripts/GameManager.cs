@@ -78,7 +78,7 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// The total time spent importing glTF entities of
     /// the current type (e.g. textures, meshes).
-    /// Used for generated progress messages in the GUI.
+    /// Used to generate progress messages in the GUI.
     /// </summary>
     private float _currentImportTypeMilliseconds;
 
