@@ -131,7 +131,7 @@ public class GameManager : MonoBehaviour
         _idleStatusMessage = "Drag a .gltf/.glb file onto this window to view";
         _statusMessage = _idleStatusMessage;
 
-        Import("C:/Users/Ben/test/gltf-models/Box.glb");
+        _importTask = ImportAsync("C:/Users/Ben/test/gltf-models/Box.glb");
 
         _statusMessage = _idleStatusMessage;
     }
