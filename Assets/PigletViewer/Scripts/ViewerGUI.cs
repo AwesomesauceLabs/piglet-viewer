@@ -14,10 +14,13 @@ public class ViewerGUI
     /// Speed to auto-spin model left-to-right.
     /// </summary>
     public float SpinX;
+    
     /// <summary>
     /// Speed to auto-spin model down-to-up.
     /// </summary>
     public float SpinY;
+
+    public string FooterMessage;
     
     /// <summary>
     /// The list of progress messages generated for the
@@ -41,10 +44,16 @@ public class ViewerGUI
         Log = new List<string>();
     }
 
+    public void ResetFooterMessage()
+    {
+        FooterMessage = null;
+    }
+
     public void Reset()
     {
         ResetSpin();
         ResetLog();
+        ResetFooterMessage();
     }
     
     /// <summary>
@@ -58,6 +67,7 @@ public class ViewerGUI
 
         var labelStyle = GUI.skin.GetStyle("Label");
         labelStyle.alignment = TextAnchor.MiddleLeft;
+        labelStyle.fontStyle = FontStyle.Normal;
         labelStyle.fontSize = 18;
 
         float padding = 20;
@@ -109,9 +119,21 @@ public class ViewerGUI
         
         GUILayout.Space(30);
         
+        // progress log messages
+        
         foreach (var line in Log)
             GUILayout.Label(line, labelStyle);
         
         GUILayout.EndArea();
+        
+        // status message along the bottom of the window
+        
+        var footerStyle = GUI.skin.GetStyle("Label");
+        footerStyle.alignment = TextAnchor.MiddleCenter;
+        footerStyle.fontStyle = FontStyle.Italic;
+        footerStyle.fontSize = 22;
+
+        GUI.Label(new Rect(0, Screen.height - 100, Screen.width, 100),
+            FooterMessage, footerStyle);
     }
 }

@@ -47,18 +47,6 @@ public class GameManager : MonoBehaviour
     private Stopwatch _stopwatch;
 
     /// <summary>
-    /// The status message shown when a model is not
-    /// currently being loaded.
-    /// </summary>
-    private string _idleStatusMessage;
-
-    /// <summary>
-    /// The status message shown along the bottom
-    /// of the viewer window (e.g. "Loading mesh [3/9]").
-    /// </summary>
-    private string _statusMessage;
-
-    /// <summary>
     /// An object that handles drawing UI elements
     /// (e.g. checkboxes, progress messages) on top
     /// of the model viewer window.
@@ -128,12 +116,9 @@ public class GameManager : MonoBehaviour
         _dragAndDropHook.InstallHook();
         _dragAndDropHook.OnDroppedFiles += OnDropFiles;
 
-        _idleStatusMessage = "Drag a .gltf/.glb file onto this window to view";
-        _statusMessage = _idleStatusMessage;
+        _gui.FooterMessage = "drag .gltf/.glb file onto window to view";
 
         _importTask = ImportAsync("C:/Users/Ben/test/gltf-models/Box.glb");
-
-        _statusMessage = _idleStatusMessage;
     }
 
     void OnDestroy()
@@ -222,7 +207,8 @@ public class GameManager : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.LogException(e);
+            _gui.FooterMessage = string.Format(
+                "error: {0}", e.Message);
         }
 
         if (_model != null)
