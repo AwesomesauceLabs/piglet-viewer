@@ -27,9 +27,24 @@ public class ViewerGUI
     
     public ViewerGUI()
     {
+        Reset();
+    }
+
+    public void ResetSpin()
+    {
         SpinX = 0;
         SpinY = 0;
+    }
+
+    public void ResetLog()
+    {
         Log = new List<string>();
+    }
+
+    public void Reset()
+    {
+        ResetSpin();
+        ResetLog();
     }
     
     /// <summary>
