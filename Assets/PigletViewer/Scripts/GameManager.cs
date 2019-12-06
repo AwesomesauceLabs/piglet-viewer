@@ -86,9 +86,9 @@ public class GameManager : MonoBehaviour
     /// Reset state variables before importing a new
     /// glTF model.
     /// </summary>
-    private void Reset()
+    private void ResetImportState()
     {
-        _gui = new ViewerGUI();
+        _gui.ResetLog();
         _stopwatch = new Stopwatch();
         _currentImportType = GLTFImporter.Type.None;
         _currentImportTypeMilliseconds = 0;
@@ -96,6 +96,8 @@ public class GameManager : MonoBehaviour
     
     private void Awake()
     {
+        _gui = new ViewerGUI();
+        
         // By default, the Windows Unity Player will pause
         // execution when it loses focus.  Setting
         // `Application.runInBackground` to true overrides
@@ -113,7 +115,7 @@ public class GameManager : MonoBehaviour
         
         Application.runInBackground = true;
         
-        Reset();
+        ResetImportState();
     }
     
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
@@ -179,28 +181,59 @@ public class GameManager : MonoBehaviour
 
     void Import(string path)
     {
-        Reset();
+        ResetImportState();
         _model = GLTFRuntimeImporter.Import(path, OnImportProgress);
         InitModelTransformRelativeToCamera(_model, Camera);
     }
 
     void Import(byte[] data)
     {
-        Reset();
+        ResetImportState();
         _model = GLTFRuntimeImporter.Import(data, OnImportProgress);
         InitModelTransformRelativeToCamera(_model, Camera);
     }
 
     void StartImportAsync(string path)
     {
-        // if we are already importing a .gltf/.glb file
-        if (_importTask != null)
+        // If we attempt to import a model while an import
+        // is already in progress, just ignore the request.
+        //
+        // TODO: This case would be more gracefully handled by
+        // cancelling the existing import task, via a `CancellationToken`,
+        // and starting the requested import immediately. This would
+        // in turn require adding `CancellationToken` arguments
+        // to the `GLTFImporter` interface methods.
+
+        if (_importTask != null && !_importTask.IsCompleted)
             return;
+            
+        _importTask = ImportAsync(path);
+    }
 
-        // start import task in the background
+    private async Task<GameObject> ImportAsync(string path)
+    {
+        ResetImportState();
+        
+        Task<GameObject> task = GLTFRuntimeImporter
+            .ImportAsync(path, OnImportProgress);
+        try
+        {
+            await task;
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
 
-        Reset();
-        _importTask = GLTFRuntimeImporter.ImportAsync(path, OnImportProgress);
+        if (_model != null)
+            Destroy(_model);
+            
+        _gui.ResetSpin();
+        
+        _model = task.Result;
+        InitModelTransformRelativeToCamera(_model, Camera);
+        
+        return _model;
     }
 
     /// <summary>
@@ -371,37 +404,18 @@ public class GameManager : MonoBehaviour
             + ModelPositionRelativeToCamera - bounds.Value.center);
     }
 
-    protected void HandleImportTaskCompletion()
-    {
-        if (_importTask == null || !_importTask.IsCompleted)
-            return;
-
-        // The following rethrows the exception without losing the
-        // original stacktrace information. See:
-        // https://stackoverflow.com/questions/20170527/how-to-correctly-rethrow-an-exception-of-task-already-in-faulted-state
-        if (_importTask.IsFaulted)
-            ExceptionDispatchInfo.Capture(_importTask.Exception).Throw();
-
-        if (_importTask.IsCanceled) {
-            _importTask = null;
-            return;
-        }
-
-        // Destroy previously imported model (if any)
-        if (_model != null)
-            Destroy(_model);
-
-        _model = _importTask.Result;
-        InitModelTransformRelativeToCamera(_model, Camera);
-        _importTask = null;
-    }
-
     public void Update()
     {
-        HandleImportTaskCompletion();
-        
-        // auto-rotate model as per "Spin X" / "Spin Y"
-        // sliders in GUI
+        SpinModel();
+    }
+
+    /// <summary>
+    /// Auto-rotate model as per "Spin X" / "Spin Y" sliders in GUI.
+    /// </summary>
+    public void SpinModel()
+    {
+        if (_model == null)
+            return;
         
         Vector3 rotation = new Vector3(_gui.SpinY, -_gui.SpinX, 0)
            * Time.deltaTime * SpinSpeed;
