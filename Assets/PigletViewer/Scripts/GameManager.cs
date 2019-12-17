@@ -228,6 +228,9 @@ public class GameManager : MonoBehaviour
     /// </summary>
     protected void RotateAboutCenter(GameObject model, Vector3 rotation)
     {
+        if (model == null)
+            return;
+        
         Bounds? bounds = BoundsUtil.GetRendererBoundsForHierarchy(model);
         if (!bounds.HasValue)
             return;
