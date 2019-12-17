@@ -141,7 +141,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        _idleStatusMessage = "Click \"Browse\" to load a .gltf/.glb file";
+        _gui.FooterMessage = "click \"Browse\" below to load a .gltf/.glb file";
 
         JsLib.Init();
     }
