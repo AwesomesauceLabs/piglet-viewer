@@ -26,7 +26,7 @@ EOF
 
 echo "running WebGL build in $dest..."
 cd "$dest"
-"$unity" -quit -batchmode -projectPath $(win-path "$dest") -executeMethod WebGLBuilder.Build
+/usr/bin/time -v "$unity" -quit -batchmode -projectPath $(win-path "$dest") -executeMethod WebGLBuilder.Build
 
 echo "serving WebGL app at http://localhost:8000/index.html..."
 cd WebGL-Dist
