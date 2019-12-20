@@ -16,6 +16,6 @@
 class WebGLBuilder{
     static void Build() {
         string[] scenes = {"Assets/PigletViewer/Scenes/MainScene.unity"};
-        BuildPipeline.BuildPlayer(scenes, "WebGL-Dist", BuildTarget.WebGL, BuildOptions.None);
+        BuildPipeline.BuildPlayer(scenes, "WebGL-Dist", BuildTarget.WebGL, BuildOptions.Development);
     }
 }
