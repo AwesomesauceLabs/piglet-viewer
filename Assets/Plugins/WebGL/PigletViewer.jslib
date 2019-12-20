@@ -6,8 +6,13 @@ var JsLib = {
 
 	Init: function() {
 		var root = window.document;
-		var inputUri = root.querySelector("#inputUri");
-		inputUri.addEventListener('change', OnSelectGltfFile);
+
+		var inputUri = root.querySelector("#inputFile");
+		inputUri.addEventListener('change', OnChooseFile);
+
+		var canvas = root.querySelector('canvas');
+		canvas.addEventListener('dragover', OnCanvasDragOver);
+		canvas.addEventListener('drop', OnCanvasDrop);
 	},
 
 	GetFileData: function(filenamePtr)

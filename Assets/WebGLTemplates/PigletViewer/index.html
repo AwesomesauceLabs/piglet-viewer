@@ -14,16 +14,25 @@
       }
       body {
         margin: 0;
-        background: #444;
+        background: #f2f2f2;
+      }
+      #contentContainer {
+        display: flex;
+        height: 100vh;
+      }
+      #textContainer {
+        flex: 0 0 25%;
+        padding-left: 20px;
+        padding-right: 20px;
       }
       #gameContainer {
-        width: 100vw;
-        height: 100vh;
+        flex: 1;
       }
       canvas {
         width: 100%;
         height: 100%;
         display: block;
+        background: #dcdedf;
       }
       /* try to handle mobile dialog */
       canvas + * {
@@ -91,13 +100,35 @@
   </head>
 
   <body>
-    <div id="gameContainer"></div>
+    <section id="contentContainer">
+      <div id="textContainer">
+        <h1>Piglet Test Page</h1>
+        <p>
+          This page allows users to test loading of
+          their models with the <b>Piglet glTF importer</b>
+          for Unity.
+
+          Please note that, due to browser security restrictions,
+          this page is limited to viewing .glb files.
+        </p>
+        <h2>Load a Model</h2>
+        <p>
+          Drag a .glb file onto the viewer area or choose a
+          target below.
+        </p>
+        <input id="inputFile" type="file">
+        <h2>Sample Models (Click to Load)</h2>
+        <p>
+          Courtesy of <a>Khronos</a> and <a>Sketchfab</a>.
+        </p>
+      </div>
+      <div id="gameContainer"></div>
+    </section>
     <div id="loader">
       <img class="logo" src="logo.png">
       <div class="spinner"></div>
       <div class="progress"><div class="full"></div></div>
     </div>
-	<input id="inputUri" type="file">
   </body>
 
   <script src="%UNITY_WEBGL_LOADER_URL%"></script>
