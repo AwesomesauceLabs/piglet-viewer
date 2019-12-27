@@ -29,6 +29,12 @@ function ImportFile(file)
 	reader.readAsArrayBuffer(file);
 }
 
+function ImportUrl(url)
+{
+	console.log("loading url: " + url);
+	SendMessage("GameManager", "StartImportAsync", url);
+}
+
 // Event handler that is called when something (e.g. a file) is dragged
 // over the canvas.
 //
@@ -57,6 +63,9 @@ function OnCanvasDrop(event)
 				file = item.getAsFile();
 				ImportFile(file);
 				break;
+			} else if (item.kind == 'string' && item.type == 'text/uri-list') {
+				item.getAsString(ImportUrl);
+                break;
 			}
 		}
 	} else {

@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Networking;
 using UnityGLTF;
 using Debug = UnityEngine.Debug;
 
@@ -118,7 +119,10 @@ public class GameManager : MonoBehaviour
 
         _gui.FooterMessage = "drag .gltf/.glb file onto window to view";
 
-        _importTask = ImportAsync("C:/Users/Ben/test/gltf-models/Box.glb");
+#if false
+        StartImportAsync("https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxTextured/glTF-Binary/BoxTextured.glb");
+#endif
+        StartImportAsync("C:/Users/Ben/git/glTF-Sample-Models/2.0/BoxTextured/glTF-Binary/BoxTextured.glb");
     }
 
     void OnDestroy()
@@ -144,6 +148,10 @@ public class GameManager : MonoBehaviour
         _gui.FooterMessage = "click \"Browse\" below to load a .gltf/.glb file";
 
         JsLib.Init();
+
+#if false
+        StartImportAsync("https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxTextured/glTF-Binary/BoxTextured.glb");
+#endif
     }
 
     public void ImportFileWebGl(string filename)
@@ -198,9 +206,44 @@ public class GameManager : MonoBehaviour
     private async Task<GameObject> ImportAsync(string path)
     {
         ResetImportState();
+
+        Task<GameObject> task;
         
-        Task<GameObject> task = GLTFRuntimeImporter
-            .ImportAsync(path, OnImportProgress);
+        if (path.StartsWith("http://") || path.StartsWith("https://"))
+        {
+            Debug.LogFormat("downloading {0}...", path);
+            
+            var request = new UnityWebRequest(path);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SendWebRequest();
+
+            while (!request.isDone)
+            {
+                Debug.LogFormat("downloadProgress: {0}", request.downloadProgress);
+                // note: `Task.Delay` does not work properly in WebGL builds
+                await new WaitForSeconds(0.5f);
+            }
+
+            if (request.isNetworkError || request.isHttpError)
+            {
+                Debug.LogFormat("http error: {0}", request.error);
+                throw new Exception(string.Format(
+                   "failed to download URI {0}: {1}",
+                    path, request.error));
+            }
+
+            var data = request.downloadHandler.data;
+            Debug.LogFormat("data.Length: {0}", data.Length);
+
+            task = GLTFRuntimeImporter
+                .ImportAsync(request.downloadHandler.data, OnImportProgress);
+        }
+        else
+        {
+            task = GLTFRuntimeImporter
+                .ImportAsync(path, OnImportProgress);
+        }
+        
         try
         {
             await task;
