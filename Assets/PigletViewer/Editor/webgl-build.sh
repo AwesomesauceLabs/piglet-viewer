@@ -25,8 +25,19 @@ EOF
 
 
 echo "running WebGL build in $dest..."
+log="$dest/editor.log"
+echo "logging to: $log..."
+
 cd "$dest"
-/usr/bin/time -v "$unity" -quit -batchmode -projectPath $(win-path "$dest") -executeMethod WebGLBuilder.Build
+if ! /usr/bin/time -v "$unity" -quit -batchmode -projectPath $(win-path "$dest") -executeMethod WebGLBuilder.Build -logFile $(win-path "$log"); then
+
+    echo "Unity build failed:"
+    echo
+    egrep -i 'err|warn' "$log"
+
+    exit 1
+
+fi
 
 echo "serving WebGL app at http://localhost:8000/index.html..."
 cd WebGL-Dist
