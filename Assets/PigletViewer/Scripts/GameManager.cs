@@ -119,10 +119,8 @@ public class GameManager : MonoBehaviour
 
         _gui.FooterMessage = "drag .gltf/.glb file onto window to view";
 
-#if false
-        StartImportAsync("https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxTextured/glTF-Binary/BoxTextured.glb");
-#endif
-        StartImportAsync("C:/Users/Ben/git/glTF-Sample-Models/2.0/BoxTextured/glTF-Binary/BoxTextured.glb");
+        StartImportAsync(UnityPathUtil.GetAbsolutePath(
+            "Assets/PigletViewer/Resources/piglet-1.0.0.glb"));
     }
 
     void OnDestroy()
