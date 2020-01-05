@@ -76,3 +76,16 @@ function OnCanvasDrop(event)
 		}
 	}
 }
+
+// Rebuild the html content of the Import Log, located in the
+// left panel of the web page.
+function RebuildLogHtml()
+{
+    var html = '';
+    for (var i = 0; i < window.logArray.length; ++i) {
+        html = html + window.logArray[i] + '<br>\n';
+    }
+
+    var log = window.document.querySelector("#importLog");
+    log.innerHTML = html;
+}

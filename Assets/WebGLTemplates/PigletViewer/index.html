@@ -22,8 +22,12 @@
       }
       #textContainer {
         flex: 0 0 25%;
-        padding-left: 20px;
-        padding-right: 20px;
+        padding-left: 25px;
+        padding-right: 25px;
+      }
+      #importLog {
+        overflow-y: scroll;
+        height: 200px;
       }
       #gameContainer {
         flex: 1;
@@ -104,23 +108,26 @@
       <div id="textContainer">
         <h1>Piglet Test Page</h1>
         <p>
-          This page allows users to test loading of
-          their models with the <b>Piglet glTF importer</b>
-          for Unity.
+          This page allows users test their models with the
+          <b>Piglet glTF Importer</b> for Unity.
 
-          Please note that, due to browser security restrictions,
+          Please note: Due to browser security restrictions,
           this page is limited to viewing .glb files.
         </p>
         <h2>Load a Model</h2>
         <p>
           Drag a .glb file onto the viewer area or choose a
-          target below.
+          file below.
         </p>
         <input id="inputFile" type="file">
-        <h2>Sample Models (Click to Load)</h2>
+        <h2>Sample Models</h2>
         <p>
           Courtesy of <a>Khronos</a> and <a>Sketchfab</a>.
         </p>
+        <h2>Import Log</h2>
+        <div id="importLog">
+        </div>
+
       </div>
       <div id="gameContainer"></div>
     </section>

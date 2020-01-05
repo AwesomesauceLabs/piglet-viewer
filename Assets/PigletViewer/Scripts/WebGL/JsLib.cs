@@ -51,5 +51,19 @@ public static class JsLib
     /// </param>
     [DllImport("__Internal")]
     public static extern void FreeFileData(string filename);
+
+    /// <summary>
+    /// Append a line to the Import Log, located in the left panel
+    /// of the web page.
+    /// </summary>
+    [DllImport("__Internal")]
+    public static extern void AppendLogLine(string line);
+
+    /// <summary>
+    /// Replace the last line of the Import Log, located in the
+    /// left panel of the web page.
+    /// </summary>
+    [DllImport("__Internal")]
+    public static extern void UpdateTailLogLine(string line);
 }
 #endif

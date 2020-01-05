@@ -110,7 +110,15 @@ public class ViewerGUI
         GUI.contentColor = Color.black;
 
         float padding = 25;
-
+        
+        // In the WebGL build, the import log is shown
+        // in the left panel as part of the main web
+        // page.
+        //
+        // On Windows, the import log is drawn on top
+        // of the window, in the upper left hand corner.
+        
+#if !UNITY_WEBGL || UNITY_EDITOR
         GUILayout.BeginArea(new Rect(
             padding, padding,
             Screen.width - 2 * padding,
@@ -121,9 +129,10 @@ public class ViewerGUI
                GUILayout.Label(line, _styles.Text);
         
         GUILayout.EndArea();
+#endif
 
         // footer message and "Spin X" / "Spin Y" sliders
-        
+
         float footerAreaHeight = 100;
         
         float labelWidth = 100;

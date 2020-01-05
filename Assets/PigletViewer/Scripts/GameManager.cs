@@ -383,10 +383,17 @@ public class GameManager : MonoBehaviour
         // add a new line if we have started to import
         // a new type.
         
+#if UNITY_WEBGL && !UNITY_EDITOR        
+        if (type == _currentImportType)
+            JsLib.UpdateTailLogLine(message);
+        else
+            JsLib.AppendLogLine(message);
+#else
         if (type == _currentImportType)
             _gui.Log[_gui.Log.Count - 1] = message;
         else
             _gui.Log.Add(message);
+#endif
 
         Debug.Log(message);
 
