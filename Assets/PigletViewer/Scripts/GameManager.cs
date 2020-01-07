@@ -35,11 +35,12 @@ public class GameManager : MonoBehaviour
     private GameObject _model;
 
     /// <summary>
-    /// Handle to the currently running glTF import task.
-    /// This task runs in the background and is polled
-    /// for completion in `Update()`.
+    /// Handle to the currently running glTF import job.
+    /// This task runs in the background and is
+    /// incrementally advanced by calling
+    /// `PumpImportJob` in `Update`.
     /// </summary>
-    private Task<GameObject> _importTask;
+    private IEnumerator<GameObject> _importJob;
     
     /// <summary>
     /// A timer used to measure the time to import
@@ -118,8 +119,8 @@ public class GameManager : MonoBehaviour
         _dragAndDropHook.OnDroppedFiles += OnDropFiles;
 
         _gui.FooterMessage = "drag .gltf/.glb file onto window to view";
-
-        StartImportAsync(UnityPathUtil.GetAbsolutePath(
+        
+        StartImport(UnityPathUtil.GetAbsolutePath(
             "Assets/PigletViewer/Resources/piglet-1.0.0.glb"));
     }
 
@@ -134,7 +135,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     void OnDropFiles(List<string> paths, POINT mousePos)
     {
-        StartImportAsync(paths[0]);
+        StartImport(paths[0]);
     }
 
 #endif
@@ -146,10 +147,6 @@ public class GameManager : MonoBehaviour
         _gui.FooterMessage = "click \"Browse\" below to load a .gltf/.glb file";
 
         JsLib.Init();
-
-#if false
-        StartImportAsync("https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxTextured/glTF-Binary/BoxTextured.glb");
-#endif
     }
 
     public void ImportFileWebGl(string filename)
@@ -184,28 +181,17 @@ public class GameManager : MonoBehaviour
         InitModelTransformRelativeToCamera(_model, Camera);
     }
 
-    void StartImportAsync(string path)
+    void StartImport(string path)
     {
-        // If we attempt to import a model while an import
-        // is already in progress, just ignore the request.
-        //
-        // TODO: This case would be more gracefully handled by
-        // cancelling the existing import task, via a `CancellationToken`,
-        // and starting the requested import immediately. This would
-        // in turn require adding `CancellationToken` arguments
-        // to the `GLTFImporter` interface methods.
-
-        if (_importTask != null && !_importTask.IsCompleted)
-            return;
-            
-        _importTask = ImportAsync(path);
+        _importJob = ImportJob(path);
     }
 
-    private async Task<GameObject> ImportAsync(string path)
+    /// <summary>
+    /// Coroutine that performs glTF model import.
+    /// </summary>
+    private IEnumerator<GameObject> ImportJob(string path)
     {
         ResetImportState();
-
-        Task<GameObject> task;
         
         if (path.StartsWith("http://") || path.StartsWith("https://"))
         {
@@ -217,9 +203,9 @@ public class GameManager : MonoBehaviour
 
             while (!request.isDone)
             {
-                Debug.LogFormat("downloadProgress: {0}", request.downloadProgress);
-                // note: `Task.Delay` does not work properly in WebGL builds
-                await new WaitForSeconds(0.5f);
+                Debug.LogFormat("downloadProgress: {0}",
+                    request.downloadProgress);
+                yield return null;
             }
 
             if (request.isNetworkError || request.isHttpError)
@@ -233,34 +219,18 @@ public class GameManager : MonoBehaviour
             var data = request.downloadHandler.data;
             Debug.LogFormat("data.Length: {0}", data.Length);
 
-            task = GLTFRuntimeImporter
-                .ImportAsync(request.downloadHandler.data, OnImportProgress);
+            _importJob = GLTFRuntimeImporter
+                .ImportCoroutine(request.downloadHandler.data,
+                    OnImportProgress);
         }
         else
         {
-            task = GLTFRuntimeImporter
-                .ImportAsync(path, OnImportProgress);
-        }
-        
-        try
-        {
-            await task;
-        }
-        catch (Exception e)
-        {
-            _gui.FooterMessage = string.Format(
-                "error: {0}", e.Message);
+            _importJob = GLTFRuntimeImporter
+                .ImportCoroutine(path, OnImportProgress);
         }
 
-        if (_model != null)
-            Destroy(_model);
-            
-        _gui.ResetSpin();
-        
-        _model = task.Result;
-        InitModelTransformRelativeToCamera(_model, Camera);
-        
-        return _model;
+        while (_importJob.MoveNext())
+            yield return _importJob.Current;
     }
 
     /// <summary>
@@ -441,8 +411,55 @@ public class GameManager : MonoBehaviour
             + ModelPositionRelativeToCamera - bounds.Value.center);
     }
 
+    /// <summary>
+    /// Invoked after a model has been successfully imported.
+    /// </summary>
+    private void OnImportCompleted()
+    {
+        _gui.ResetSpin();
+
+        if (_model != null)
+            Destroy(_model);
+
+        _model = _importJob.Current;
+        InitModelTransformRelativeToCamera(_model, Camera);
+
+        _importJob = null;
+    }
+
+    /// <summary>
+    /// Invoked when an exception is thrown during model import.
+    /// </summary>
+    private void OnImportException(Exception e)
+    {
+        _gui.FooterMessage = string.Format(
+            "error: {0}", e.Message);
+        
+        _importJob = null;
+    }
+    
+    /// <summary>
+    /// Manually advance the current import job (if any).
+    /// </summary>
+    private void PumpImportJob()
+    {
+        if (_importJob == null)
+            return;
+
+        try {
+            if (!_importJob.MoveNext())
+                OnImportCompleted();
+        } catch (Exception e) {
+            OnImportException(e);
+        }
+    }
+    
+    /// <summary>
+    /// Unity callback that is invoked once per frame.
+    /// </summary>
     public void Update()
     {
+        PumpImportJob();
         SpinModel();
     }
 
