@@ -3,6 +3,7 @@ using B83.Win32;
 #endif
 
 using System;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -120,8 +121,8 @@ public class GameManager : MonoBehaviour
 
         _gui.FooterMessage = "drag .gltf/.glb file onto window to view";
         
-        StartImport(UnityPathUtil.GetAbsolutePath(
-            "Assets/PigletViewer/Resources/piglet-1.0.0.glb"));
+        StartImport(Path.Combine(Application.streamingAssetsPath,
+            "piglet-1.0.0.glb"));
     }
 
     void OnDestroy()
