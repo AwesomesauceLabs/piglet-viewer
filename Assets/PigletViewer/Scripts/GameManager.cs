@@ -121,8 +121,10 @@ public class GameManager : MonoBehaviour
 
         _gui.FooterMessage = "drag .gltf/.glb file onto window to view";
         
-        StartImport(Path.Combine(Application.streamingAssetsPath,
-            "piglet-1.0.0.glb"));
+        Uri uri = new Uri(Path.Combine(
+            Application.streamingAssetsPath, "piglet-1.0.0.glb"));
+        
+        StartImport(uri);
     }
 
     void OnDestroy()
@@ -136,7 +138,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     void OnDropFiles(List<string> paths, POINT mousePos)
     {
-        StartImport(paths[0]);
+        StartImport(new Uri(paths[0]));
     }
 
 #endif
@@ -182,23 +184,23 @@ public class GameManager : MonoBehaviour
         InitModelTransformRelativeToCamera(_model, Camera);
     }
 
-    void StartImport(string path)
+    void StartImport(Uri uri)
     {
-        _importJob = ImportJob(path);
+        _importJob = ImportJob(uri);
     }
 
     /// <summary>
     /// Coroutine that performs glTF model import.
     /// </summary>
-    private IEnumerator<GameObject> ImportJob(string path)
+    private IEnumerator<GameObject> ImportJob(Uri uri)
     {
         ResetImportState();
         
-        if (path.StartsWith("http://") || path.StartsWith("https://"))
+        if (!uri.IsFile)
         {
-            Debug.LogFormat("downloading {0}...", path);
+            Debug.LogFormat("downloading {0}...", uri);
             
-            var request = new UnityWebRequest(path);
+            var request = new UnityWebRequest(uri);
             request.downloadHandler = new DownloadHandlerBuffer();
             request.SendWebRequest();
 
@@ -211,10 +213,10 @@ public class GameManager : MonoBehaviour
 
             if (request.isNetworkError || request.isHttpError)
             {
-                Debug.LogFormat("http error: {0}", request.error);
+                Debug.LogFormat("web request error: {0}", request.error);
                 throw new Exception(string.Format(
                    "failed to download URI {0}: {1}",
-                    path, request.error));
+                    uri, request.error));
             }
 
             var data = request.downloadHandler.data;
@@ -227,7 +229,8 @@ public class GameManager : MonoBehaviour
         else
         {
             _importJob = GLTFRuntimeImporter
-                .ImportCoroutine(path, OnImportProgress);
+                .ImportCoroutine(uri.AbsolutePath,
+                    OnImportProgress);
         }
 
         while (_importJob.MoveNext())
