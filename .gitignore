@@ -10,6 +10,10 @@
 /Assets/ShaderForge*
 /Assets/VSCode*
 
+# JetBrains (Rider IDE)
+/Assets/Plugins/Editor/JetBrains/
+/.idea/
+
 # Visual Studio 2015 cache directory
 /.vs/
 # Visual Studio Code directory
@@ -43,3 +47,6 @@ sysinfo.txt
 *.unitypackage
 
 /www/node_modules/
+
+# directory that I use for testing glTF imports
+/Assets/Imported/
