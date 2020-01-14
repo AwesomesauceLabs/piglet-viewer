@@ -195,6 +195,8 @@ public class GameManager : MonoBehaviour
     private IEnumerator<GameObject> ImportJob(Uri uri)
     {
         ResetImportState();
+
+        ImportTask importTask = null;
         
         if (!uri.IsFile)
         {
@@ -222,19 +224,23 @@ public class GameManager : MonoBehaviour
             var data = request.downloadHandler.data;
             Debug.LogFormat("data.Length: {0}", data.Length);
 
-            _importJob = GLTFRuntimeImporter
-                .ImportCoroutine(request.downloadHandler.data,
+            importTask = GLTFRuntimeImporter
+                .GetImportTask(request.downloadHandler.data,
                     OnImportProgress);
         }
         else
         {
-            _importJob = GLTFRuntimeImporter
-                .ImportCoroutine(uri.AbsolutePath,
+            importTask = GLTFRuntimeImporter
+                .GetImportTask(uri.AbsolutePath,
                     OnImportProgress);
         }
 
-        while (_importJob.MoveNext())
-            yield return _importJob.Current;
+        importTask.OnCompleted += OnImportCompleted;
+        importTask.OnException += OnImportException;
+        importTask.RethrowExceptionAfterCallbacks = false;
+       
+        while (importTask.MoveNext())
+            yield return null;
     }
 
     /// <summary>
@@ -325,7 +331,7 @@ public class GameManager : MonoBehaviour
         HandleUnusedMouseEvents();
     }
 
-    bool OnImportProgress(GLTFImporter.Type type, int count, int total)
+    void OnImportProgress(GLTFImporter.Type type, int count, int total)
     {
         _stopwatch.Stop();
         float milliseconds = _stopwatch.ElapsedMilliseconds;
@@ -370,7 +376,6 @@ public class GameManager : MonoBehaviour
         Debug.Log(message);
 
         _currentImportType = type;
-        return true;
     }
 
     public void OnValidate()
@@ -418,14 +423,14 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// Invoked after a model has been successfully imported.
     /// </summary>
-    private void OnImportCompleted()
+    private void OnImportCompleted(GameObject model)
     {
         _gui.ResetSpin();
 
         if (_model != null)
             Destroy(_model);
 
-        _model = _importJob.Current;
+        _model = model;
         InitModelTransformRelativeToCamera(_model, Camera);
 
         _importJob = null;
@@ -450,9 +455,10 @@ public class GameManager : MonoBehaviour
         if (_importJob == null)
             return;
 
-        try {
+        try
+        {
             if (!_importJob.MoveNext())
-                OnImportCompleted();
+                _importJob = null;
         } catch (Exception e) {
             OnImportException(e);
         }
