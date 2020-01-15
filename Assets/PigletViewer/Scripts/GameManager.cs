@@ -41,7 +41,7 @@ public class GameManager : MonoBehaviour
     /// incrementally advanced by calling
     /// `PumpImportJob` in `Update`.
     /// </summary>
-    private IEnumerator<GameObject> _importJob;
+    private ImportTask _importJob;
     
     /// <summary>
     /// A timer used to measure the time to import
@@ -186,61 +186,14 @@ public class GameManager : MonoBehaviour
 
     void StartImport(Uri uri)
     {
-        _importJob = ImportJob(uri);
-    }
-
-    /// <summary>
-    /// Coroutine that performs glTF model import.
-    /// </summary>
-    private IEnumerator<GameObject> ImportJob(Uri uri)
-    {
         ResetImportState();
 
-        ImportTask importTask = null;
-        
-        if (!uri.IsFile)
-        {
-            Debug.LogFormat("downloading {0}...", uri);
-            
-            var request = new UnityWebRequest(uri);
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.SendWebRequest();
+        _importJob = GLTFRuntimeImporter
+            .GetImportTask(uri, OnImportProgress);
 
-            while (!request.isDone)
-            {
-                Debug.LogFormat("downloadProgress: {0}",
-                    request.downloadProgress);
-                yield return null;
-            }
-
-            if (request.isNetworkError || request.isHttpError)
-            {
-                Debug.LogFormat("web request error: {0}", request.error);
-                throw new Exception(string.Format(
-                   "failed to download URI {0}: {1}",
-                    uri, request.error));
-            }
-
-            var data = request.downloadHandler.data;
-            Debug.LogFormat("data.Length: {0}", data.Length);
-
-            importTask = GLTFRuntimeImporter
-                .GetImportTask(request.downloadHandler.data,
-                    OnImportProgress);
-        }
-        else
-        {
-            importTask = GLTFRuntimeImporter
-                .GetImportTask(uri.AbsolutePath,
-                    OnImportProgress);
-        }
-
-        importTask.OnCompleted += OnImportCompleted;
-        importTask.OnException += OnImportException;
-        importTask.RethrowExceptionAfterCallbacks = false;
-       
-        while (importTask.MoveNext())
-            yield return null;
+        _importJob.OnCompleted += OnImportCompleted;
+        _importJob.OnException += OnImportException;
+        _importJob.RethrowExceptionAfterCallbacks = false;
     }
 
     /// <summary>
@@ -448,28 +401,13 @@ public class GameManager : MonoBehaviour
     }
     
     /// <summary>
-    /// Manually advance the current import job (if any).
-    /// </summary>
-    private void PumpImportJob()
-    {
-        if (_importJob == null)
-            return;
-
-        try
-        {
-            if (!_importJob.MoveNext())
-                _importJob = null;
-        } catch (Exception e) {
-            OnImportException(e);
-        }
-    }
-    
-    /// <summary>
     /// Unity callback that is invoked once per frame.
     /// </summary>
     public void Update()
     {
-        PumpImportJob();
+        // advance import job
+        _importJob?.MoveNext();
+        
         SpinModel();
     }
 
