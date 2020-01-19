@@ -32,7 +32,7 @@ function ImportFile(file)
 function ImportUrl(url)
 {
 	console.log("loading url: " + url);
-	SendMessage("GameManager", "StartImportAsync", url);
+	SendMessage("GameManager", "StartImport", url);
 }
 
 // Event handler that is called when something (e.g. a file) is dragged

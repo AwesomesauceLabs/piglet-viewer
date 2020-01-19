@@ -121,10 +121,8 @@ public class GameManager : MonoBehaviour
 
         _gui.FooterMessage = "drag .gltf/.glb file onto window to view";
         
-        Uri uri = new Uri(Path.Combine(
+        StartImport(Path.Combine(
             Application.streamingAssetsPath, "piglet-1.0.0.glb"));
-        
-        StartImport(uri);
     }
 
     void OnDestroy()
@@ -138,7 +136,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     void OnDropFiles(List<string> paths, POINT mousePos)
     {
-        StartImport(new Uri(paths[0]));
+        StartImport(paths[0]);
     }
 
 #endif
@@ -184,10 +182,21 @@ public class GameManager : MonoBehaviour
         InitModelTransformRelativeToCamera(_model, Camera);
     }
 
-    void StartImport(Uri uri)
+    /// <summary>
+    /// Create a glTF import task, which will be incrementally advanced
+    /// in each call to Update().
+    ///
+    /// Note that the URI argument must be passed as a string
+    /// rather than a `Uri` object, so that it can be called from
+    /// javascript code.
+    /// </summary>
+    /// <param name="uriStr">The URI of the input glTF file.</param>
+    void StartImport(string uriStr)
     {
+        Uri uri = new Uri(uriStr);
+        
         ResetImportState();
-
+        
         _importJob = GLTFRuntimeImporter
             .GetImportTask(uri, OnImportProgress);
 
