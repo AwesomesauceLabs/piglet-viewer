@@ -186,9 +186,9 @@ public class GameManager : MonoBehaviour
     /// Create a glTF import task, which will be incrementally advanced
     /// in each call to Update().
     ///
-    /// Note that the URI argument must be passed as a string
-    /// rather than a `Uri` object, so that it can be called from
-    /// javascript code.
+    /// Note that the URI argument must be passed in as a string
+    /// rather than a `Uri` object, so that this method
+    /// can be invoked from javascript.
     /// </summary>
     /// <param name="uriStr">The URI of the input glTF file.</param>
     void StartImport(string uriStr)
