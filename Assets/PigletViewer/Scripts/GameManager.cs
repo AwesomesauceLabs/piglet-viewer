@@ -307,14 +307,31 @@ public class GameManager : MonoBehaviour
             _importStepMilliseconds = milliseconds;
 
         string message;
-        if (count < total) {
-            message = string.Format("Loaded {0} {1}/{2}...",
-                importStep.ToString().ToLower(), count, total);
-        } else {
-            message = string.Format("Loaded {0} {1}/{2}... done ({3} ms)",
-                importStep.ToString().ToLower(), count, total,
-                _importStepMilliseconds);
+        int currentStep = Math.Min(count + 1, total);
+        switch (importStep)
+        {
+            case GLTFImporter.ImportStep.Download:
+                float kb = count / 1024f;
+                float totalKb = total / 1024f;
+                message = string.Format(
+                    "Downloading file {0}kb/{1}kb...", kb, totalKb);
+                break;
+            case GLTFImporter.ImportStep.Unzip:
+                message = string.Format(
+                    "Unzipping file {0}/{1}...", currentStep, total);
+                break;
+            case GLTFImporter.ImportStep.Parse:
+                message = string.Format(
+                    "Parsing JSON {0}/{1}...", currentStep, total);
+                break;
+            default:
+                message = string.Format("Loading {0} {1}/{2}...",
+                    importStep.ToString().ToLower(), currentStep, total);
+                break;
         }
+
+        if (count == total)
+            message += string.Format(" done ({0} ms)", _importStepMilliseconds);
 
         // Update existing tail log line if we are still importing
         // the same type of glTF entity (e.g. textures), or
