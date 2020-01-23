@@ -295,10 +295,8 @@ public class GameManager : MonoBehaviour
 
     void OnImportProgress(GLTFImporter.ImportStep importStep, int count, int total)
     {
-        _stopwatch.Stop();
         float milliseconds = _stopwatch.ElapsedMilliseconds;
-        _stopwatch.Reset();
-        _stopwatch.Start();
+        _stopwatch.Restart();
 
         // sum import times for glTF entities of the same type
         // (e.g. textures, meshes)
