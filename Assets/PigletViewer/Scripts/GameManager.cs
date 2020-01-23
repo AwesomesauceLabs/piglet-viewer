@@ -64,7 +64,7 @@ public class GameManager : MonoBehaviour
     /// time that type on a single line of the progress
     /// log.
     /// </summary>
-    private GLTFImporter.ImportStep _currentImportType;
+    private GLTFImporter.ImportStep _importStep;
 
     /// <summary>
     /// The total time spent importing glTF entities of
@@ -81,7 +81,7 @@ public class GameManager : MonoBehaviour
     {
         _gui.ResetLog();
         _stopwatch = new Stopwatch();
-        _currentImportType = GLTFImporter.ImportStep.None;
+        _importStep = GLTFImporter.ImportStep.None;
         _currentImportTypeMilliseconds = 0;
     }
     
@@ -303,7 +303,7 @@ public class GameManager : MonoBehaviour
         // sum import times for glTF entities of the same type
         // (e.g. textures, meshes)
 
-        if (importStep == _currentImportType)
+        if (importStep == _importStep)
             _currentImportTypeMilliseconds += milliseconds;
         else
             _currentImportTypeMilliseconds = milliseconds;
@@ -329,7 +329,7 @@ public class GameManager : MonoBehaviour
         else
             JsLib.AppendLogLine(message);
 #else
-        if (importStep == _currentImportType)
+        if (importStep == _importStep)
             _gui.Log[_gui.Log.Count - 1] = message;
         else
             _gui.Log.Add(message);
@@ -337,7 +337,7 @@ public class GameManager : MonoBehaviour
 
         Debug.Log(message);
 
-        _currentImportType = importStep;
+        _importStep = importStep;
     }
 
     public void OnValidate()
