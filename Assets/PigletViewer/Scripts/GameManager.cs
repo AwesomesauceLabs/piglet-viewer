@@ -64,7 +64,7 @@ public class GameManager : MonoBehaviour
     /// time that type on a single line of the progress
     /// log.
     /// </summary>
-    private GLTFImporter.Type _currentImportType;
+    private GLTFImporter.ImportStep _currentImportType;
 
     /// <summary>
     /// The total time spent importing glTF entities of
@@ -81,7 +81,7 @@ public class GameManager : MonoBehaviour
     {
         _gui.ResetLog();
         _stopwatch = new Stopwatch();
-        _currentImportType = GLTFImporter.Type.None;
+        _currentImportType = GLTFImporter.ImportStep.None;
         _currentImportTypeMilliseconds = 0;
     }
     
@@ -293,7 +293,7 @@ public class GameManager : MonoBehaviour
         HandleUnusedMouseEvents();
     }
 
-    void OnImportProgress(GLTFImporter.Type type, int count, int total)
+    void OnImportProgress(GLTFImporter.ImportStep type, int count, int total)
     {
         _stopwatch.Stop();
         float milliseconds = _stopwatch.ElapsedMilliseconds;
