@@ -71,7 +71,7 @@ public class GameManager : MonoBehaviour
     /// the current type (e.g. textures, meshes).
     /// Used to generate progress messages in the GUI.
     /// </summary>
-    private float _currentImportTypeMilliseconds;
+    private float _importStepMilliseconds;
 
     /// <summary>
     /// Reset state variables before importing a new
@@ -82,7 +82,7 @@ public class GameManager : MonoBehaviour
         _gui.ResetLog();
         _stopwatch = new Stopwatch();
         _importStep = GLTFImporter.ImportStep.None;
-        _currentImportTypeMilliseconds = 0;
+        _importStepMilliseconds = 0;
     }
     
     private void Awake()
@@ -304,9 +304,9 @@ public class GameManager : MonoBehaviour
         // (e.g. textures, meshes)
 
         if (importStep == _importStep)
-            _currentImportTypeMilliseconds += milliseconds;
+            _importStepMilliseconds += milliseconds;
         else
-            _currentImportTypeMilliseconds = milliseconds;
+            _importStepMilliseconds = milliseconds;
 
         string message;
         if (count < total) {
@@ -315,7 +315,7 @@ public class GameManager : MonoBehaviour
         } else {
             message = string.Format("Loaded {0} {1}/{2}... done ({3} ms)",
                 importStep.ToString().ToLower(), count, total,
-                _currentImportTypeMilliseconds);
+                _importStepMilliseconds);
         }
 
         // Update existing tail log line if we are still importing
