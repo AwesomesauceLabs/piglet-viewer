@@ -293,7 +293,7 @@ public class GameManager : MonoBehaviour
         HandleUnusedMouseEvents();
     }
 
-    void OnImportProgress(GLTFImporter.ImportStep type, int count, int total)
+    void OnImportProgress(GLTFImporter.ImportStep importStep, int count, int total)
     {
         _stopwatch.Stop();
         float milliseconds = _stopwatch.ElapsedMilliseconds;
@@ -303,7 +303,7 @@ public class GameManager : MonoBehaviour
         // sum import times for glTF entities of the same type
         // (e.g. textures, meshes)
 
-        if (type == _currentImportType)
+        if (importStep == _currentImportType)
             _currentImportTypeMilliseconds += milliseconds;
         else
             _currentImportTypeMilliseconds = milliseconds;
@@ -311,10 +311,10 @@ public class GameManager : MonoBehaviour
         string message;
         if (count < total) {
             message = string.Format("Loaded {0} {1}/{2}...",
-                type.ToString().ToLower(), count, total);
+                importStep.ToString().ToLower(), count, total);
         } else {
             message = string.Format("Loaded {0} {1}/{2}... done ({3} ms)",
-                type.ToString().ToLower(), count, total,
+                importStep.ToString().ToLower(), count, total,
                 _currentImportTypeMilliseconds);
         }
 
@@ -329,7 +329,7 @@ public class GameManager : MonoBehaviour
         else
             JsLib.AppendLogLine(message);
 #else
-        if (type == _currentImportType)
+        if (importStep == _currentImportType)
             _gui.Log[_gui.Log.Count - 1] = message;
         else
             _gui.Log.Add(message);
@@ -337,7 +337,7 @@ public class GameManager : MonoBehaviour
 
         Debug.Log(message);
 
-        _currentImportType = type;
+        _currentImportType = importStep;
     }
 
     public void OnValidate()
