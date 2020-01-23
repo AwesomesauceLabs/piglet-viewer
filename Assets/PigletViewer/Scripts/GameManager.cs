@@ -293,7 +293,7 @@ public class GameManager : MonoBehaviour
         HandleUnusedMouseEvents();
     }
 
-    void OnImportProgress(GLTFImporter.ImportStep importStep, int count, int total)
+    void OnImportProgress(GLTFImporter.ImportStep importStep, int numCompleted, int total)
     {
         float milliseconds = _stopwatch.ElapsedMilliseconds;
         _stopwatch.Restart();
@@ -307,11 +307,11 @@ public class GameManager : MonoBehaviour
             _importStepMilliseconds = milliseconds;
 
         string message;
-        int currentStep = Math.Min(count + 1, total);
+        int currentStep = Math.Min(numCompleted + 1, total);
         switch (importStep)
         {
             case GLTFImporter.ImportStep.Download:
-                float kb = count / 1024f;
+                float kb = numCompleted / 1024f;
                 float totalKb = total / 1024f;
                 message = string.Format(
                     "Downloading file {0}kb/{1}kb...", kb, totalKb);
@@ -330,7 +330,7 @@ public class GameManager : MonoBehaviour
                 break;
         }
 
-        if (count == total)
+        if (numCompleted == total)
             message += string.Format(" done ({0} ms)", _importStepMilliseconds);
 
         // Update existing tail log line if we are still importing
