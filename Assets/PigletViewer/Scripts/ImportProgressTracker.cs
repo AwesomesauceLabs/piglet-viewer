@@ -141,7 +141,7 @@ namespace Piglet
                     float kb = progressStep.NumCompleted / 1024f;
                     float totalKb = progressStep.NumTotal / 1024f;
                     message = string.Format(
-                        "Downloading file {0}kb/{1}kb...", kb, totalKb);
+                        "Downloading {0}kb/{1}kb...", kb, totalKb);
                     break;
                 case GLTFImporter.ImportStep.Unzip:
                     message = string.Format(
@@ -150,7 +150,7 @@ namespace Piglet
                     break;
                 case GLTFImporter.ImportStep.Parse:
                     message = string.Format(
-                        "Parsing JSON {0}/{1}...", currentStep,
+                        "Parsing json {0}/{1}...", currentStep,
                         progressStep.NumTotal);
                     break;
                 default:
