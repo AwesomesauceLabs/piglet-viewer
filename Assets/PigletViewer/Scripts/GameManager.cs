@@ -12,6 +12,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using System.Text;
+using Piglet;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Networking;
@@ -44,12 +45,6 @@ public class GameManager : MonoBehaviour
     private ImportTask _importJob;
     
     /// <summary>
-    /// A timer used to measure the time to import
-    /// individual glTF entities (e.g. textures, meshes).
-    /// </summary>
-    private Stopwatch _stopwatch;
-
-    /// <summary>
     /// An object that handles drawing UI elements
     /// (e.g. checkboxes, progress messages) on top
     /// of the model viewer window.
@@ -57,22 +52,11 @@ public class GameManager : MonoBehaviour
     private ViewerGUI _gui;
 
     /// <summary>
-    /// The current type of glTF entity that is being
-    /// imported (e.g. textures, meshes).  This variable
-    /// is used to sum the import times for entities
-    /// of the same type, and to report the total import
-    /// time that type on a single line of the progress
-    /// log.
+    /// Times import steps, and generates nicely formatted
+    /// progress messages.
     /// </summary>
-    private GLTFImporter.ImportStep _importStep;
-
-    /// <summary>
-    /// The total time spent importing glTF entities of
-    /// the current type (e.g. textures, meshes).
-    /// Used to generate progress messages in the GUI.
-    /// </summary>
-    private float _importStepMilliseconds;
-
+    private ImportProgressTracker _progressTracker;
+    
     /// <summary>
     /// Reset state variables before importing a new
     /// glTF model.
@@ -80,9 +64,7 @@ public class GameManager : MonoBehaviour
     private void ResetImportState()
     {
         _gui.ResetLog();
-        _stopwatch = new Stopwatch();
-        _importStep = GLTFImporter.ImportStep.None;
-        _importStepMilliseconds = 0;
+        _progressTracker = new ImportProgressTracker();
     }
     
     private void Awake()
@@ -197,6 +179,8 @@ public class GameManager : MonoBehaviour
         
         ResetImportState();
         
+        _progressTracker.StartImport();
+        
         _importJob = GLTFRuntimeImporter
             .GetImportTask(uri, OnImportProgress);
 
@@ -295,43 +279,12 @@ public class GameManager : MonoBehaviour
 
     void OnImportProgress(GLTFImporter.ImportStep importStep, int numCompleted, int total)
     {
-        float milliseconds = _stopwatch.ElapsedMilliseconds;
-        _stopwatch.Restart();
+        _progressTracker.UpdateProgress(importStep, numCompleted, total);
 
-        // sum import times for glTF entities of the same type
-        // (e.g. textures, meshes)
-
-        if (importStep == _importStep)
-            _importStepMilliseconds += milliseconds;
-        else
-            _importStepMilliseconds = milliseconds;
-
-        string message;
-        int currentStep = Math.Min(numCompleted + 1, total);
-        switch (importStep)
-        {
-            case GLTFImporter.ImportStep.Download:
-                float kb = numCompleted / 1024f;
-                float totalKb = total / 1024f;
-                message = string.Format(
-                    "Downloading file {0}kb/{1}kb...", kb, totalKb);
-                break;
-            case GLTFImporter.ImportStep.Unzip:
-                message = string.Format(
-                    "Unzipping file {0}/{1}...", currentStep, total);
-                break;
-            case GLTFImporter.ImportStep.Parse:
-                message = string.Format(
-                    "Parsing JSON {0}/{1}...", currentStep, total);
-                break;
-            default:
-                message = string.Format("Loading {0} {1}/{2}...",
-                    importStep.ToString().ToLower(), currentStep, total);
-                break;
-        }
-
+        string message = _progressTracker.GetProgressMessage();
         if (numCompleted == total)
-            message += string.Format(" done ({0} ms)", _importStepMilliseconds);
+            message += string.Format(" done ({0} ms)",
+                _progressTracker.GetMillisecondsForCurrentImportStep());
 
         // Update existing tail log line if we are still importing
         // the same type of glTF entity (e.g. textures), or
@@ -339,20 +292,18 @@ public class GameManager : MonoBehaviour
         // a new type.
         
 #if UNITY_WEBGL && !UNITY_EDITOR        
-        if (type == _currentImportType)
-            JsLib.UpdateTailLogLine(message);
-        else
+        if (_progressTracker.IsNewImportStep())
             JsLib.AppendLogLine(message);
-#else
-        if (importStep == _importStep)
-            _gui.Log[_gui.Log.Count - 1] = message;
         else
+            JsLib.UpdateTailLogLine(message);
+#else
+        if (_progressTracker.IsNewImportStep())
             _gui.Log.Add(message);
+        else
+            _gui.Log[_gui.Log.Count - 1] = message;
 #endif
 
         Debug.Log(message);
-
-        _importStep = importStep;
     }
 
     public void OnValidate()
