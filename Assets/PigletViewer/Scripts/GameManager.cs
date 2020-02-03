@@ -282,9 +282,6 @@ public class GameManager : MonoBehaviour
         _progressTracker.UpdateProgress(importStep, numCompleted, total);
 
         string message = _progressTracker.GetProgressMessage();
-        if (numCompleted == total)
-            message += string.Format(" done ({0} ms)",
-                _progressTracker.GetMillisecondsForCurrentImportStep());
 
         // Update existing tail log line if we are still importing
         // the same type of glTF entity (e.g. textures), or

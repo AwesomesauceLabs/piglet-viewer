@@ -160,6 +160,12 @@ namespace Piglet
                     break;
             }
 
+            if (progressStep.NumCompleted == progressStep.NumTotal)
+            {
+                message += string.Format(" done ({0} ms)",
+                    GetMillisecondsForCurrentImportStep());
+            }
+
             return message;
         }
     }
