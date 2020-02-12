@@ -105,6 +105,93 @@ public class GameManager : MonoBehaviour
         
         StartImport(Path.Combine(
             Application.streamingAssetsPath, "piglet-1.0.0.glb"));
+        
+        ParseCommandLineArgs();
+    }
+
+    /// <summary>
+    /// Parse command line arguments and start initial model
+    /// import (if any).
+    /// </summary>
+    private void ParseCommandLineArgs()
+    {
+        string[] args = Environment.GetCommandLineArgs();
+        
+        bool profile = false;
+        bool quitAfterLoad = false;
+        long delayLoadMilliseconds = 0;
+        
+        // default model to load at startup, unless
+        // --load or --no-load is used
+
+        ImportTask importTask = GLTFRuntimeImporter
+            .GetImportTask(Path.Combine(
+                Application.streamingAssetsPath, "piglet-1.0.0.glb"));
+
+        for (int i = 0; i < args.Length; ++i)
+        {
+            Debug.LogFormat("args[{0}]: {1}", i, args[i]);
+            
+            if (args[i] == "--delay-load")
+            {
+                // Delay initial model import at startup.
+                // I added this option so that I could prevent
+                // Unity player loading/initialization from affecting
+                // my profiling results. 
+                delayLoadMilliseconds = Int64.Parse(args[i + 1]);
+            }
+            else if (args[i] == "--load")
+            {
+                // Specify a model to load at startup,
+                // in place of the default Piglet model.
+                string uri = args[i + 1];
+                importTask = GLTFRuntimeImporter
+                    .GetImportTask(uri, OnImportProgress);
+            }
+            else if (args[i] == "--no-load")
+            {
+                // Don't load a model at startup.
+                importTask = null;
+            }
+            else if (args[i] == "--profile")
+            {
+                // Record and log profiling results while
+                // importing the initial model. This option times
+                // IEnumerator.MoveNext() calls and identifies
+                // which import subtasks cause the longest
+                // interruptions the main Unity thread.
+                profile = true;
+            }
+            else if (args[i] == "--quit-after-load")
+            {
+                // Exit the viewer immediately after loading
+                // the initial model. This option is usually
+                // used in conjunction with --profile to
+                // perform automated profiling from the command
+                // line.
+                quitAfterLoad = true;
+            }
+        }
+
+        if (importTask == null)
+            return;
+
+        if (delayLoadMilliseconds > 0)
+            importTask.PushTask(SleepUtil.SleepEnum(
+                delayLoadMilliseconds));
+            
+        if (profile)
+            importTask.OnCompleted += _ => importTask.LogProfilingData();
+
+        importTask.OnCompleted += OnImportCompleted;
+
+        if (quitAfterLoad)
+            importTask.OnCompleted += _ => Application.Quit(0);
+        
+        importTask.OnException += OnImportException;
+        importTask.RethrowExceptionAfterCallbacks = false;
+        
+        StartImport(importTask);
     }
 
     void OnDestroy()
@@ -177,18 +264,23 @@ public class GameManager : MonoBehaviour
     {
         Uri uri = new Uri(uriStr);
         
-        ResetImportState();
-        
-        _progressTracker.StartImport();
-        
-        _importJob = GLTFRuntimeImporter
+        ImportTask importJob = GLTFRuntimeImporter
             .GetImportTask(uri, OnImportProgress);
 
-        _importJob.OnCompleted += OnImportCompleted;
-        _importJob.OnException += OnImportException;
-        _importJob.RethrowExceptionAfterCallbacks = false;
+        importJob.OnCompleted += OnImportCompleted;
+        importJob.OnException += OnImportException;
+        importJob.RethrowExceptionAfterCallbacks = false;
+        
+        StartImport(importJob);
     }
 
+    void StartImport(ImportTask importTask)
+    {
+        ResetImportState();
+        _progressTracker.StartImport();
+        _importJob = importTask;
+    }
+    
     /// <summary>
     /// Rotate a GameObject hierarchy about its center, as determined
     /// by the MeshRenderer bounds of the GameObjects in the hierarchy.
