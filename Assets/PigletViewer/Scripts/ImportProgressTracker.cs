@@ -153,6 +153,16 @@ namespace Piglet
                         "Parsing json {0}/{1}...", currentStep,
                         progressStep.NumTotal);
                     break;
+                case GLTFImporter.ImportStep.MorphTarget:
+                    message = string.Format(
+                        "Loading morph targets for node {0}/{1}...",
+                        currentStep, progressStep.NumTotal);
+                    break;
+                case GLTFImporter.ImportStep.Skin:
+                    message = string.Format(
+                        "Loading skinning data for node {0}/{1}...",
+                        currentStep, progressStep.NumTotal);
+                    break;
                 default:
                     message = string.Format("Loading {0} {1}/{2}...",
                         progressStep.Step.ToString().ToLower(),
