@@ -103,9 +103,6 @@ public class GameManager : MonoBehaviour
 
         _gui.FooterMessage = "drag .gltf/.glb file onto window to view";
         
-        StartImport(Path.Combine(
-            Application.streamingAssetsPath, "piglet-1.0.0.glb"));
-        
         ParseCommandLineArgs();
     }
 
