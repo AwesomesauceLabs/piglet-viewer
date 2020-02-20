@@ -128,8 +128,6 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < args.Length; ++i)
         {
-            Debug.LogFormat("args[{0}]: {1}", i, args[i]);
-            
             if (args[i] == "--delay-load")
             {
                 // Delay initial model import at startup.
