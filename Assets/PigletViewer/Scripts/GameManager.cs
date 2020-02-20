@@ -123,7 +123,8 @@ public class GameManager : MonoBehaviour
 
         ImportTask importTask = GLTFRuntimeImporter
             .GetImportTask(Path.Combine(
-                Application.streamingAssetsPath, "piglet-1.0.0.glb"));
+                Application.streamingAssetsPath, "piglet-1.0.0.glb"),
+                OnImportProgress);
 
         for (int i = 0; i < args.Length; ++i)
         {
