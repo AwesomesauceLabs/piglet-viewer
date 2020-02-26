@@ -91,6 +91,24 @@ public class GameManager : MonoBehaviour
         ResetImportState();
     }
     
+#if UNITY_ANDROID && !UNITY_EDITOR
+    void Start()
+    {
+        AndroidJavaClass player
+            = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
+        AndroidJavaObject currentActivity
+            = player.GetStatic<AndroidJavaObject>("currentActivity");
+        AndroidJavaObject intent
+            = currentActivity.Call<AndroidJavaObject>("getIntent");
+                 
+        string uri = intent.Call<string> ("getDataString");
+        if (string.IsNullOrEmpty(uri))
+            uri = Path.Combine(Application.streamingAssetsPath, "piglet-1.0.0.glb");
+        
+        StartImport(uri);
+    }
+#endif
+
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
 
     UnityDragAndDropHook _dragAndDropHook;
