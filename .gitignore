@@ -2,13 +2,18 @@
 /[Ll]ogs/
 /[Tt]emp/
 /[Oo]bj/
-/[Bb]uild/
-/[Bb]uilds/
 /[Pp]ackages/
 /[Pp]lugins/
 /Assets/AssetStoreTools*
 /Assets/ShaderForge*
 /Assets/VSCode*
+
+# I keep my build scripts (.do files) under
+# Builds, and this is also where the build
+# artifacts are generated.
+
+.redo
+/[Bb]uilds/[Aa]ndroid/piglet.apk
 
 # JetBrains (Rider IDE)
 /Assets/Plugins/Editor/JetBrains/
