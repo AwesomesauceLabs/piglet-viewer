@@ -92,7 +92,14 @@ public class GameManager : MonoBehaviour
     }
     
 #if UNITY_ANDROID && !UNITY_EDITOR
-    void Start()
+
+    /// <summary>
+    /// Get the URI that was used to launch or resume PigletViewer (if any).
+    /// This is usually the result of opening a .gltf/.glb in an
+    /// Android file browser.
+    /// </summary>
+    /// <returns></returns>
+    string GetAndroidIntentUri()
     {
         AndroidJavaClass player
             = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
@@ -101,12 +108,43 @@ public class GameManager : MonoBehaviour
         AndroidJavaObject intent
             = currentActivity.Call<AndroidJavaObject>("getIntent");
                  
-        string uri = intent.Call<string> ("getDataString");
+        return intent.Call<string> ("getDataString");
+    }
+    
+    /// <summary>
+    /// Unity callback that is invoked when the application starts.
+    /// </summary>
+    void Start()
+    {
+        string uri = GetAndroidIntentUri();
+ 
         if (string.IsNullOrEmpty(uri))
             uri = Path.Combine(Application.streamingAssetsPath, "piglet-1.0.0.glb");
         
         StartImport(uri);
     }
+
+    /// <summary>
+    /// Unity callback that is invoked when the application gains
+    /// or loses focus.
+    /// </summary>
+    private void OnApplicationFocus(bool hasFocus)
+    {
+        // if Unity Player is losing focus, rather than gaining focus
+        if (!hasFocus)
+           return;
+
+        string uri = GetAndroidIntentUri();
+        
+        // if Unity Player is regaining focus without a new model URI
+        // to load (e.g. user selected Piglet Viewer in Android app
+        // switcher)
+        if (string.IsNullOrEmpty(uri))
+            return;
+        
+        StartImport(uri);
+    }
+
 #endif
 
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
