@@ -17,10 +17,78 @@
         android:label="@string/app_name">
         <activity android:name="com.unity3d.player.UnityPlayerActivity"
                   android:label="@string/app_name">
+
+            <!-- Unity's default intent filter -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!-- Intent filter for .gltf/.glb file associations -->
+            <intent-filter>
+
+                <action android:name="android.intent.action.VIEW" />
+
+                <!--
+                Note: An intent filter must have the DEFAULT category in order
+                to receive implicit intents (e.g. double-clicking a file
+                in a file browser).
+
+                See: https://developer.android.com/guide/topics/manifest/category-element
+                -->
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <!--
+                Match .gltf/.glb file extensions.
+
+                Note: Unlike normal regular expressions, the "*" operator Android
+                pathPatterns is not greedy, and this makes it awkward
+                to express certain patterns.  For example the pattern
+                ".\\.gltf" will not match the path "my.model.gltf" because the
+                leading ".*" will stop consuming characters when it encounters
+                the first period character ("."). The kludge used here is to
+                define separate patterns for different numbers of leading
+                period characters (from 0 to 3).
+
+                For further explanation, see: https://stackoverflow.com/questions/3400072/pathpattern-to-match-file-extension-does-not-work-if-a-period-exists-elsewhere-i
+
+                TODO: It would be preferable to match on mimeType rather
+                than file extensions, but MIME types for .gltf/.glb are not
+                well established yet. For further discussion about .gltf/.glb MIME
+                types see: https://github.com/KhronosGroup/glTF/issues/412
+                -->
+
+                <data android:pathPattern=".*\\.gltf" />
+                <data android:pathPattern=".*\\..*\\.gltf" />
+                <data android:pathPattern=".*\\..*\\..*\\.gltf" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.gltf" />
+
+                <data android:pathPattern=".*\\.glb" />
+                <data android:pathPattern=".*\\..*\\.glb" />
+                <data android:pathPattern=".*\\..*\\..*\\.glb" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.glb" />
+
+                <data android:scheme="file" android:host="*" android:pathPattern=".*\\.glb" android:mimeType="*/*" />
+
+                <!--
+                Note: Applications are typically launched with a
+                content URI (rather than a file path or a file URI) when
+                double-clicking a file in an Android file browser.
+                See: https://stackoverflow.com/a/39885806
+
+                Content URIs are commonly used in lieu of file URIs since Android 7.0,
+                to enable more fine-grained control of file permissions. For
+                further info about Android content URIs, a good starting point is:
+                https://developer.android.com/reference/android/support/v4/content/FileProvider
+                -->
+
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="*/*" />
+                <data android:host="*" />
+
+            </intent-filter>
+
             <meta-data android:name="unityplayer.UnityActivity" android:value="true" />
         </activity>
     </application>
