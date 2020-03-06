@@ -521,6 +521,22 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void Update()
     {
+        
+#if UNITY_ANDROID
+        // On Android, the "Back" button is mapped to the
+        // Escape key. See:
+        // https://answers.unity.com/questions/25535/android-back-button-event.html
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            AndroidJavaClass player
+                = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+            AndroidJavaObject activity
+                = player.GetStatic<AndroidJavaObject>("currentActivity");
+
+            activity.Call<bool>("moveTaskToBack", true);
+        }
+#endif
+        
         // advance import job
         _importJob?.MoveNext();
         
