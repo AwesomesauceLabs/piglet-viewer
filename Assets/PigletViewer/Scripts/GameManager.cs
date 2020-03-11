@@ -49,7 +49,7 @@ public class GameManager : Singleton<GameManager>
     /// (e.g. checkboxes, progress messages) on top
     /// of the model viewer window.
     /// </summary>
-    private ViewerGUI _gui;
+    public ViewerGUI Gui;
 
     /// <summary>
     /// Times import steps, and generates nicely formatted
@@ -99,13 +99,13 @@ public class GameManager : Singleton<GameManager>
     /// </summary>
     private void ResetImportState()
     {
-        _gui.ResetLog();
+        Gui.ResetLog();
         _progressTracker = new ImportProgressTracker();
     }
     
     private void Awake()
     {
-        _gui = new ViewerGUI();
+        Gui = new ViewerGUI();
         
         // By default, the Windows Unity Player will pause
         // execution when it loses focus.  Setting
@@ -197,7 +197,7 @@ public class GameManager : Singleton<GameManager>
         _dragAndDropHook.InstallHook();
         _dragAndDropHook.OnDroppedFiles += OnDropFiles;
 
-        _gui.FooterMessage = "drag .gltf/.glb file onto window to view";
+        Gui.FooterMessage = "drag .gltf/.glb file onto window to view";
         
         ParseCommandLineArgs();
     }
@@ -564,8 +564,8 @@ public class GameManager : Singleton<GameManager>
             // whenever the user clicks on the
             // model/background.
 
-            _gui.SpinX = 0;
-            _gui.SpinY = 0;
+            Gui.SpinX = 0;
+            Gui.SpinY = 0;
         }
 
         if (mouseActions.HasFlag(MouseAction.Rotate))
@@ -592,7 +592,7 @@ public class GameManager : Singleton<GameManager>
     
     void OnGUI()
     {
-        _gui.OnGUI();
+        Gui.OnGUI();
         HandleUnusedMouseEvents();
     }
 
@@ -614,9 +614,9 @@ public class GameManager : Singleton<GameManager>
             JsLib.UpdateTailLogLine(message);
 #else
         if (_progressTracker.IsNewImportStep())
-            _gui.Log.Add(message);
+            Gui.Log.Add(message);
         else
-            _gui.Log[_gui.Log.Count - 1] = message;
+            Gui.Log[Gui.Log.Count - 1] = message;
 #endif
 
         Debug.Log(message);
@@ -636,7 +636,7 @@ public class GameManager : Singleton<GameManager>
     /// </summary>
     private void OnImportCompleted(GameObject model)
     {
-        _gui.ResetSpin();
+        Gui.ResetSpin();
 
         if (_model != null)
             Destroy(_model);
@@ -652,7 +652,7 @@ public class GameManager : Singleton<GameManager>
     /// </summary>
     private void OnImportException(Exception e)
     {
-        _gui.FooterMessage = string.Format(
+        Gui.FooterMessage = string.Format(
             "error: {0}", e.Message);
         
         _importJob = null;
@@ -693,7 +693,7 @@ public class GameManager : Singleton<GameManager>
         if (_model == null)
             return;
         
-        Vector3 rotation = new Vector3(_gui.SpinY, -_gui.SpinX, 0)
+        Vector3 rotation = new Vector3(Gui.SpinY, -Gui.SpinX, 0)
            * Time.deltaTime * SpinSpeed;
         
         RotateAboutCenter(_model, rotation);
