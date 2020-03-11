@@ -329,13 +329,6 @@ public class GameManager : Singleton<GameManager>
 
 #endif
 
-    void Import(string path)
-    {
-        ResetImportState();
-        _model = GLTFRuntimeImporter.Import(path, OnImportProgress);
-        InitModelTransformRelativeToCamera(_model, Camera);
-    }
-
     void Import(byte[] data)
     {
         ResetImportState();
