@@ -9,8 +9,7 @@ public class ModelBehaviour : MonoBehaviour
     /// </summary>
     void Start()
     {
-        InitModelTransformRelativeToCamera(
-            gameObject, GameManager.Instance.Camera);
+        InitModelTransformRelativeToCamera(GameManager.Instance.Camera);
     }
 
     /// <summary>
@@ -20,13 +19,12 @@ public class ModelBehaviour : MonoBehaviour
     {
     }
     
-    public void InitModelTransformRelativeToCamera(
-        GameObject model, Camera camera)
+    public void InitModelTransformRelativeToCamera(Camera camera)
     {
         // Scale model up/down to a standard size, so that the
         // largest dimension of its bounding box is equal to `ModelSize`.
 
-        Bounds? bounds = BoundsUtil.GetRendererBoundsForHierarchy(model);
+        Bounds? bounds = BoundsUtil.GetRendererBoundsForHierarchy(gameObject);
         if (!bounds.HasValue)
             return;
 
@@ -34,22 +32,22 @@ public class ModelBehaviour : MonoBehaviour
         if (size < 0.000001f)
             return;
 
-        Vector3 scale = model.transform.localScale;
+        Vector3 scale = transform.localScale;
         float scaleFactor = GameManager.Instance.ModelSize / size;
-        model.transform.localScale = scale * scaleFactor;
+        transform.localScale = scale * scaleFactor;
 
         // Rotate model to face camera.
 
-        model.transform.up = camera.transform.up;
-        model.transform.forward = camera.transform.forward;
+        transform.up = camera.transform.up;
+        transform.forward = camera.transform.forward;
 
         // Translate model at standard offset from camera.
 
-        bounds = BoundsUtil.GetRendererBoundsForHierarchy(model);
+        bounds = BoundsUtil.GetRendererBoundsForHierarchy(gameObject);
         if (!bounds.HasValue)
             return;
 
-        model.transform.Translate(camera.transform.position
+        transform.Translate(camera.transform.position
             + GameManager.Instance.ModelPositionRelativeToCamera
             - bounds.Value.center);
     }
