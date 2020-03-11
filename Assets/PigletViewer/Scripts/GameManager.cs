@@ -121,6 +121,10 @@ public class GameManager : MonoBehaviour
         // and the user will have to additionally click
         // the window to give it focus again, before the
         // glTF import will start running.
+        //
+        // Note: This flag has no effect on Android,
+        // iOS, or WebGL, so there is no harm in always
+        // setting it to true.
         
         Application.runInBackground = true;
         
