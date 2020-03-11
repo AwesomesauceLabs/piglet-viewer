@@ -333,7 +333,7 @@ public class GameManager : Singleton<GameManager>
     {
         ResetImportState();
         _model = GLTFRuntimeImporter.Import(data, OnImportProgress);
-        InitModelTransformRelativeToCamera(_model, Camera);
+        _model.AddComponent<ModelBehaviour>();
     }
 
     /// <summary>
@@ -631,39 +631,6 @@ public class GameManager : Singleton<GameManager>
             MouseRotateSpeed = 0.01f;
     }
 
-    public void InitModelTransformRelativeToCamera(
-        GameObject model, Camera camera)
-    {
-        // Scale model up/down to a standard size, so that the
-        // largest dimension of its bounding box is equal to `ModelSize`.
-
-        Bounds? bounds = BoundsUtil.GetRendererBoundsForHierarchy(model);
-        if (!bounds.HasValue)
-            return;
-
-        float size = bounds.Value.extents.MaxComponent();
-        if (size < 0.000001f)
-            return;
-
-        Vector3 scale = model.transform.localScale;
-        float scaleFactor = ModelSize / size;
-        model.transform.localScale = scale * scaleFactor;
-
-        // Rotate model to face camera.
-
-        model.transform.up = camera.transform.up;
-        model.transform.forward = camera.transform.forward;
-
-        // Translate model at standard offset from camera.
-
-        bounds = BoundsUtil.GetRendererBoundsForHierarchy(model);
-        if (!bounds.HasValue)
-            return;
-
-        model.transform.Translate(camera.transform.position
-            + ModelPositionRelativeToCamera - bounds.Value.center);
-    }
-
     /// <summary>
     /// Invoked after a model has been successfully imported.
     /// </summary>
@@ -675,7 +642,7 @@ public class GameManager : Singleton<GameManager>
             Destroy(_model);
 
         _model = model;
-        InitModelTransformRelativeToCamera(_model, Camera);
+        _model.AddComponent<ModelBehaviour>();
 
         _importJob = null;
     }
