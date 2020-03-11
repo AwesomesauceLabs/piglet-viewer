@@ -549,8 +549,7 @@ public class GameManager : Singleton<GameManager>
         {
             Vector3 rotation = new Vector3(-deltaY, -deltaX, 0)
                * MouseRotateSpeed;
-            _model.GetComponent<ModelBehaviour>()
-                .RotateAboutCenter(_model, rotation);
+            _model.GetComponent<ModelBehaviour>().RotateAboutCenter(rotation);
         }
 
         if (mouseActions.HasFlag(MouseAction.Pan))
