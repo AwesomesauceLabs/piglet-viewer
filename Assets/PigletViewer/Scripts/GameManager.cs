@@ -106,29 +106,11 @@ public class GameManager : Singleton<GameManager>
     private void Awake()
     {
         Gui = new ViewerGUI();
-        
-        // By default, the Windows Unity Player will pause
-        // execution when it loses focus.  Setting
-        // `Application.runInBackground` to true overrides
-        // this behaviour and tells it to keep running
-        // always.
-        //
-        // The player must be continuously running in
-        // order for drag-and-drop of files to work in
-        // an intuitive manner.  Otherwise, dropping
-        // a .gltf/.glb file onto a non-focused player
-        // window will not immediately trigger an import,
-        // and the user will have to additionally click
-        // the window to give it focus again, before the
-        // glTF import will start running.
-        //
-        // Note: This flag has no effect on Android,
-        // iOS, or WebGL, so there is no harm in always
-        // setting it to true.
-        
-        Application.runInBackground = true;
-        
         ResetImportState();
+        
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+        gameObject.AddComponent<WindowsViewerBehaviour>();
+#endif
     }
     
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -187,121 +169,6 @@ public class GameManager : Singleton<GameManager>
 
 #endif
 
-#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-
-    UnityDragAndDropHook _dragAndDropHook;
-
-    void Start()
-    {
-        _dragAndDropHook = new UnityDragAndDropHook();
-        _dragAndDropHook.InstallHook();
-        _dragAndDropHook.OnDroppedFiles += OnDropFiles;
-
-        Gui.FooterMessage = "drag .gltf/.glb file onto window to view";
-        
-        ParseCommandLineArgs();
-    }
-
-    /// <summary>
-    /// Parse command line arguments and start initial model
-    /// import (if any).
-    /// </summary>
-    private void ParseCommandLineArgs()
-    {
-        string[] args = Environment.GetCommandLineArgs();
-        
-        bool profile = false;
-        bool quitAfterLoad = false;
-        long delayLoadMilliseconds = 0;
-        
-        // default model to load at startup, unless
-        // --load or --no-load is used
-
-        ImportTask importTask = GLTFRuntimeImporter
-            .GetImportTask(Path.Combine(
-                Application.streamingAssetsPath, "piglet-1.0.0.glb"),
-                OnImportProgress);
-
-        for (int i = 0; i < args.Length; ++i)
-        {
-            if (args[i] == "--delay-load")
-            {
-                // Delay initial model import at startup.
-                // I added this option so that I could prevent
-                // Unity player loading/initialization from affecting
-                // my profiling results. 
-                delayLoadMilliseconds = Int64.Parse(args[i + 1]);
-            }
-            else if (args[i] == "--load")
-            {
-                // Specify a model to load at startup,
-                // in place of the default Piglet model.
-                string uri = args[i + 1];
-                importTask = GLTFRuntimeImporter
-                    .GetImportTask(uri, OnImportProgress);
-            }
-            else if (args[i] == "--no-load")
-            {
-                // Don't load a model at startup.
-                importTask = null;
-            }
-            else if (args[i] == "--profile")
-            {
-                // Record and log profiling results while
-                // importing the initial model. This option times
-                // IEnumerator.MoveNext() calls and identifies
-                // which import subtasks cause the longest
-                // interruptions the main Unity thread.
-                profile = true;
-            }
-            else if (args[i] == "--quit-after-load")
-            {
-                // Exit the viewer immediately after loading
-                // the initial model. This option is usually
-                // used in conjunction with --profile to
-                // perform automated profiling from the command
-                // line.
-                quitAfterLoad = true;
-            }
-        }
-
-        if (importTask == null)
-            return;
-
-        if (delayLoadMilliseconds > 0)
-            importTask.PushTask(SleepUtil.SleepEnum(
-                delayLoadMilliseconds));
-            
-        if (profile)
-            importTask.OnCompleted += _ => importTask.LogProfilingData();
-
-        importTask.OnCompleted += OnImportCompleted;
-
-        if (quitAfterLoad)
-            importTask.OnCompleted += _ => Application.Quit(0);
-        
-        importTask.OnException += OnImportException;
-        importTask.RethrowExceptionAfterCallbacks = false;
-        
-        StartImport(importTask);
-    }
-
-    void OnDestroy()
-    {
-        _dragAndDropHook.UninstallHook();
-    }
-
-    /// <summary>
-    /// Callback for files that are drag-and-dropped onto game
-    /// window. Only works in Windows standalone builds.
-    /// </summary>
-    void OnDropFiles(List<string> paths, POINT mousePos)
-    {
-        StartImport(paths[0]);
-    }
-
-#endif
-
 #if UNITY_WEBGL && !UNITY_EDITOR
 
     void Start()
@@ -345,7 +212,7 @@ public class GameManager : Singleton<GameManager>
     /// can be invoked from javascript.
     /// </summary>
     /// <param name="uriStr">The URI of the input glTF file.</param>
-    void StartImport(string uriStr)
+    public void StartImport(string uriStr)
     {
         Uri uri = new Uri(uriStr);
         
@@ -359,7 +226,7 @@ public class GameManager : Singleton<GameManager>
         StartImport(importJob);
     }
 
-    void StartImport(ImportTask importTask)
+    public void StartImport(ImportTask importTask)
     {
         ResetImportState();
         _progressTracker.StartImport();
@@ -573,7 +440,7 @@ public class GameManager : Singleton<GameManager>
         HandleUnusedMouseEvents();
     }
 
-    void OnImportProgress(GLTFImporter.ImportStep importStep, int numCompleted, int total)
+    public void OnImportProgress(GLTFImporter.ImportStep importStep, int numCompleted, int total)
     {
         _progressTracker.UpdateProgress(importStep, numCompleted, total);
 
@@ -611,7 +478,7 @@ public class GameManager : Singleton<GameManager>
     /// <summary>
     /// Invoked after a model has been successfully imported.
     /// </summary>
-    private void OnImportCompleted(GameObject model)
+    public void OnImportCompleted(GameObject model)
     {
         Gui.ResetSpin();
 
@@ -627,7 +494,7 @@ public class GameManager : Singleton<GameManager>
     /// <summary>
     /// Invoked when an exception is thrown during model import.
     /// </summary>
-    private void OnImportException(Exception e)
+    public void OnImportException(Exception e)
     {
         Gui.FooterMessage = string.Format(
             "error: {0}", e.Message);
