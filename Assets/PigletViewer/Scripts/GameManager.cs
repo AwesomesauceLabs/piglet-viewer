@@ -19,7 +19,7 @@ using UnityEngine.Networking;
 using UnityGLTF;
 using Debug = UnityEngine.Debug;
 
-public class GameManager : MonoBehaviour
+public class GameManager : Singleton<GameManager>
 {
     public Camera Camera;
     public Vector3 ModelPositionRelativeToCamera;
