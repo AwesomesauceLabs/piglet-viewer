@@ -367,29 +367,6 @@ public class GameManager : Singleton<GameManager>
     }
     
     /// <summary>
-    /// Rotate a GameObject hierarchy about its center, as determined
-    /// by the MeshRenderer bounds of the GameObjects in the hierarchy.
-    /// </summary>
-    protected void RotateAboutCenter(GameObject model, Vector3 rotation)
-    {
-        if (model == null)
-            return;
-        
-        Bounds? bounds = BoundsUtil.GetRendererBoundsForHierarchy(model);
-        if (!bounds.HasValue)
-            return;
-
-        GameObject pivot = new GameObject("pivot");
-        pivot.transform.position = bounds.Value.center;
-        model.transform.SetParent(pivot.transform, true);
-
-        pivot.transform.Rotate(rotation);
-
-        model.transform.SetParent(null, true);
-        Destroy(pivot);
-    }
-    
-    /// <summary>
     /// Handle any mouse events that are not consumed by IMGUI controls
     /// (e.g. checkboxes, sliders).  This method is used to implement
     /// the conventional mouse behaviour for rotating the model, panning the
@@ -568,11 +545,12 @@ public class GameManager : Singleton<GameManager>
             Gui.SpinY = 0;
         }
 
-        if (mouseActions.HasFlag(MouseAction.Rotate))
+        if (mouseActions.HasFlag(MouseAction.Rotate) && _model != null)
         {
             Vector3 rotation = new Vector3(-deltaY, -deltaX, 0)
                * MouseRotateSpeed;
-            RotateAboutCenter(_model, rotation);
+            _model.GetComponent<ModelBehaviour>()
+                .RotateAboutCenter(_model, rotation);
         }
 
         if (mouseActions.HasFlag(MouseAction.Pan))
@@ -681,21 +659,6 @@ public class GameManager : Singleton<GameManager>
         
         // advance import job
         _importJob?.MoveNext();
-        
-        SpinModel();
     }
 
-    /// <summary>
-    /// Auto-rotate model as per "Spin X" / "Spin Y" sliders in GUI.
-    /// </summary>
-    public void SpinModel()
-    {
-        if (_model == null)
-            return;
-        
-        Vector3 rotation = new Vector3(Gui.SpinY, -Gui.SpinX, 0)
-           * Time.deltaTime * SpinSpeed;
-        
-        RotateAboutCenter(_model, rotation);
-    }
 }

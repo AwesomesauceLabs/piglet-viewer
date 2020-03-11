@@ -17,6 +17,43 @@ public class ModelBehaviour : MonoBehaviour
     /// </summary>
     void Update()
     {
+        SpinModel();
+    }
+    
+    /// <summary>
+    /// Auto-rotate model as per "Spin X" / "Spin Y" sliders in GUI.
+    /// </summary>
+    public void SpinModel()
+    {
+        ViewerGUI gui = GameManager.Instance.Gui;
+        
+        Vector3 rotation = new Vector3(gui.SpinY, -gui.SpinX, 0)
+           * Time.deltaTime * GameManager.Instance.SpinSpeed;
+        
+        RotateAboutCenter(gameObject, rotation);
+    }
+
+    /// <summary>
+    /// Rotate a GameObject hierarchy about its center, as determined
+    /// by the MeshRenderer bounds of the GameObjects in the hierarchy.
+    /// </summary>
+    public void RotateAboutCenter(GameObject model, Vector3 rotation)
+    {
+        if (model == null)
+            return;
+        
+        Bounds? bounds = BoundsUtil.GetRendererBoundsForHierarchy(model);
+        if (!bounds.HasValue)
+            return;
+
+        GameObject pivot = new GameObject("pivot");
+        pivot.transform.position = bounds.Value.center;
+        model.transform.SetParent(pivot.transform, true);
+
+        pivot.transform.Rotate(rotation);
+
+        model.transform.SetParent(null, true);
+        Destroy(pivot);
     }
     
     public void InitModelTransformRelativeToCamera(Camera camera)
