@@ -156,10 +156,127 @@ public class GameManager : Singleton<GameManager>
         _progressTracker.StartImport();
         _importJob = importTask;
     }
-    
+
+    /// <summary>
+    /// Handle touch screen input (Android and WebGL).
+    ///
+    /// Note: This code uses the `Touch` class
+    /// from Unity's old input system ("Input Manager").
+    /// At the time of coding, I was not aware that there
+    /// was a newer Unity input system ("Input System",
+    /// introduced in Unity 2019.1), which provides a new touch
+    /// input API via `InputSystem.EnhancedTouch.Touch`.
+    /// See https://forum.unity.com/threads/inputsystem-enhancedtouch-touch-and-unity-ads.779351/
+    /// The code below works fine and is likely to
+    /// be supported by Unity for a long time. But if I
+    /// ever need to make major changes, I should consider
+    /// using the new input system.
+    /// </summary>
+    protected void ProcessTouchInput()
+    {
+        // if user is currently interacting with an IMGUI control (e.g. a slider)
+        if (GUIUtility.hotControl != 0)
+            return;
+
+        // if touch screen input is not supported on the current platform
+        if (!Input.touchSupported)
+            return;
+        
+        MouseAction mouseActions = MouseAction.None;
+        bool mouseDown = false;
+        float deltaX = 0f;
+        float deltaY = 0f;
+        float deltaZ = 0f;
+
+        // if number of fingers has changed
+        if (Input.touchCount != _prevTouchCount)
+        {
+            _prevPinchDist = null;
+            _prevPinchMidpoint = null;
+        }
+        else if (_prevTouchCount == 0 && Input.touchCount > 0)
+        {
+            // perform mouse click actions when finger(s) first touch screen
+            mouseDown = true;
+        }
+        else if (_prevTouchCount == Input.touchCount)
+        {
+            // perform mouse drag actions while number of fingers
+            // touching screen is > 0 and does not change
+
+            if (Input.touchCount == 1)
+            {
+                // one-finger drag -> rotate model
+                
+                Touch touch = Input.GetTouch(0);
+                
+                deltaX = touch.deltaPosition.x * 0.3f;
+                deltaY = -touch.deltaPosition.y * 0.3f;
+
+                mouseActions |= MouseAction.Rotate;
+            }
+            else if (Input.touchCount == 2)
+            {
+                Touch touch0 = Input.GetTouch(0);
+                Touch touch1 = Input.GetTouch(1);
+
+                // two fingers pinch -> zoom
+
+                float pinchDist = (touch1.position - touch0.position).magnitude;
+
+                if (_prevPinchDist.HasValue)
+                {
+                    mouseActions |= MouseAction.Zoom;
+                    
+                    float pinchDelta = pinchDist - _prevPinchDist.Value;
+                    deltaZ = pinchDelta * 0.03f;
+                }
+
+                _prevPinchDist = pinchDist;
+                
+                // two-finger drag -> pan
+                
+                Vector2 pinchMidpoint = (touch0.position + touch1.position) / 2.0f;
+                if (_prevPinchMidpoint.HasValue)
+                {
+                    mouseActions |= MouseAction.Pan;
+
+                    Vector2 deltaMidpoint
+                        = pinchMidpoint - _prevPinchMidpoint.Value;
+                    
+                    deltaX = deltaMidpoint.x * 0.3f;
+                    deltaY = -deltaMidpoint.y * 0.3f;
+                }
+
+                _prevPinchMidpoint = pinchMidpoint;
+            }
+        }
+
+        if (mouseDown)
+        {
+            // stop auto-spin ("Spin X" / "Spin Y")
+            // whenever the user clicks on the
+            // model/background.
+
+            Gui.SpinX = 0;
+            Gui.SpinY = 0;
+        }
+
+        if (mouseActions.HasFlag(MouseAction.Rotate))
+            RotateModel(new Vector3(-deltaY, -deltaX, 0));
+
+        if (mouseActions.HasFlag(MouseAction.Pan))
+            PanCamera(new Vector3(-deltaX, deltaY, 0));
+
+        if (mouseActions.HasFlag(MouseAction.Zoom))
+            ZoomCamera(deltaZ);
+        
+        _prevTouchCount = Input.touchCount;
+    }
+
     /// <summary>
     /// Handle any mouse events that are not consumed by IMGUI controls
-    /// (e.g. checkboxes, sliders).  This method is used to implement
+    /// (e.g. checkboxes, sliders). This method is used to implement
     /// the conventional mouse behaviour for rotating the model, panning the
     /// camera, and zooming the camera.
     /// </summary>
@@ -178,109 +295,6 @@ public class GameManager : Singleton<GameManager>
         float deltaX = 0f;
         float deltaY = 0f;
         float deltaZ = 0f;
-
-        // Handle touch screen input (Android and WebGL).
-        //
-        // To ensure that Touch processing only happens
-        // once per frame, we only process Touch input
-        // on EventType.Repaint events.  Otherwise,
-        // the speed of model rotation/zooming/panning
-        // will depend on the number of GUI events per
-        // frame.
-        //
-        // Note 1: EventType.Repaint happens before
-        // GUIUtility.hotControl is set by mouse events
-        // (e.g. EventType.MouseDown), so the model will
-        // continue to rotate/zoom/pan in response to Touch input,
-        // even if the user is interacting with IMGUI
-        // controls (e.g. sliders, checkboxes).  This is
-        // undesirable behaviour, but for the time being it
-        // doesn't matter because there are no interactive
-        // controls shown on Android.  In particular,
-        // I've disabled the "Spin X" / "Spin Y" sliders
-        // on Android because they are too small and
-        // difficult to interact with.
-        //
-        // Note 2: This code uses the `Touch` class
-        // from Unity's old input system ("Input Manager").
-        // At the time of coding, I was not aware that there
-        // was a newer Unity input system ("Input System"), 
-        // introduced in Unity 2019.1, which provides a new touch
-        // input API via `InputSystem.EnhancedTouch.Touch`.
-        // See https://forum.unity.com/threads/inputsystem-enhancedtouch-touch-and-unity-ads.779351/
-        // The code below works fine and is likely to
-        // be supported by Unity for a long time. But if I
-        // ever need to make major changes, I should consider
-        // using the new input system.
-
-        if (Input.touchSupported && @event.type == EventType.Repaint)
-        {
-            // if number of fingers has changed
-            if (Input.touchCount != _prevTouchCount)
-            {
-                _prevPinchDist = null;
-                _prevPinchMidpoint = null;
-            }
-            else if (_prevTouchCount == 0 && Input.touchCount > 0)
-            {
-                // perform mouse click actions when finger(s) first touch screen
-                mouseDown = true;
-            }
-            else if (_prevTouchCount == Input.touchCount)
-            {
-                // perform mouse drag actions while number of fingers
-                // touching screen is > 0 and does not change
-
-                if (Input.touchCount == 1)
-                {
-                    // one-finger drag -> rotate model
-                    
-                    Touch touch = Input.GetTouch(0);
-                    
-                    deltaX = touch.deltaPosition.x * 0.3f;
-                    deltaY = -touch.deltaPosition.y * 0.3f;
-
-                    mouseActions |= MouseAction.Rotate;
-                }
-                else if (Input.touchCount == 2)
-                {
-                    Touch touch0 = Input.GetTouch(0);
-                    Touch touch1 = Input.GetTouch(1);
-
-                    // two fingers pinch -> zoom
-
-                    float pinchDist = (touch1.position - touch0.position).magnitude;
-
-                    if (_prevPinchDist.HasValue)
-                    {
-                        mouseActions |= MouseAction.Zoom;
-                        
-                        float pinchDelta = pinchDist - _prevPinchDist.Value;
-                        deltaZ = pinchDelta * 0.03f;
-                    }
-
-                    _prevPinchDist = pinchDist;
-                    
-                    // two-finger drag -> pan
-                    
-                    Vector2 pinchMidpoint = (touch0.position + touch1.position) / 2.0f;
-                    if (_prevPinchMidpoint.HasValue)
-                    {
-                        mouseActions |= MouseAction.Pan;
-
-                        Vector2 deltaMidpoint
-                            = pinchMidpoint - _prevPinchMidpoint.Value;
-                        
-                        deltaX = deltaMidpoint.x * 0.3f;
-                        deltaY = -deltaMidpoint.y * 0.3f;
-                    }
-
-                    _prevPinchMidpoint = pinchMidpoint;
-                }
-            }
-
-            _prevTouchCount = Input.touchCount;
-        }
 
         // Handle mouse input for rotating/zooming/panning the model.
         //
@@ -328,26 +342,47 @@ public class GameManager : Singleton<GameManager>
             Gui.SpinY = 0;
         }
 
-        if (mouseActions.HasFlag(MouseAction.Rotate) && _model != null)
-        {
-            Vector3 rotation = new Vector3(-deltaY, -deltaX, 0)
-               * MouseRotateSpeed;
-            _model.GetComponent<ModelBehaviour>().RotateAboutCenter(rotation);
-        }
+        if (mouseActions.HasFlag(MouseAction.Rotate))
+            RotateModel(new Vector3(-deltaY, -deltaX, 0));
 
         if (mouseActions.HasFlag(MouseAction.Pan))
-        {
-            Vector3 pan = new Vector3(-deltaX, deltaY, 0)
-                * MousePanSpeed;
-            Camera.transform.Translate(pan, Space.Self);
-        }
+            PanCamera(new Vector3(-deltaX, deltaY, 0));
 
         if (mouseActions.HasFlag(MouseAction.Zoom))
-        {
-            Vector3 zoom = new Vector3(0, 0, deltaZ)
-                * MouseZoomSpeed;
-            Camera.transform.Translate(zoom, Space.Self);
-        }
+            ZoomCamera(deltaZ);
+    }
+
+    /// <summary>
+    /// Rotate the current loaded model (if any) about
+    /// its center, as per the given Euler angles.
+    /// </summary>
+    protected void RotateModel(Vector3 rotation)
+    {
+        if (_model == null)
+            return;
+        
+        _model.GetComponent<ModelBehaviour>().RotateAboutCenter(
+            rotation * MouseRotateSpeed);
+    }
+
+    /// <summary>
+    /// Move the camera as per the given displacement vector.
+    /// </summary>
+    protected void PanCamera(Vector3 pan)
+    {
+        if (Camera == null)
+            return;
+
+        Camera.transform.Translate(pan * MousePanSpeed, Space.Self);
+    }
+
+    /// <summary>
+    /// Move the camera along the Z-axis, towards/away from the model.
+    /// </summary>
+    protected void ZoomCamera(float deltaZ)
+    {
+        Vector3 zoom = new Vector3(0, 0, deltaZ);
+        Camera.transform.Translate(zoom * MouseZoomSpeed, Space.Self);
     }
     
     void OnGUI()
@@ -423,6 +458,8 @@ public class GameManager : Singleton<GameManager>
     /// </summary>
     public void Update()
     {
+        ProcessTouchInput();
+
         // advance import job
         _importJob?.MoveNext();
     }
