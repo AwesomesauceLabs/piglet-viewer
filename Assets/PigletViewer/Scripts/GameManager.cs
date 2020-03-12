@@ -112,38 +112,16 @@ public class GameManager : Singleton<GameManager>
         gameObject.AddComponent<WindowsViewerBehaviour>();
 #elif UNITY_ANDROID
         gameObject.AddComponent<AndroidViewerBehaviour>();
+#elif UNITY_WEBGL
+        gameObject.AddComponent<WebGlViewerBehaviour>();
 #endif
     }
-    
-#if UNITY_WEBGL && !UNITY_EDITOR
 
-    void Start()
+    public void Import(byte[] data)
     {
-        _gui.FooterMessage = "click \"Browse\" below to load a .gltf/.glb file";
-
-        JsLib.Init();
-    }
-
-    public void ImportFileWebGl(string filename)
-    {
-        var size = JsLib.GetFileSize(filename);
-        var jsData = JsLib.GetFileData(filename);
-
-        var data = new byte[size];
-        Marshal.Copy(jsData, data, 0, size);
-
-        JsLib.FreeFileData(filename);
-
         if (_model != null)
             Destroy(_model);
 
-        Import(data);
-    }
-
-#endif
-
-    void Import(byte[] data)
-    {
         ResetImportState();
         _model = GLTFRuntimeImporter.Import(data, OnImportProgress);
         _model.AddComponent<ModelBehaviour>();
