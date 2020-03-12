@@ -179,66 +179,49 @@ public class GameManager : Singleton<GameManager>
         float deltaY = 0f;
         float deltaZ = 0f;
 
-        if (Input.touchSupported)
+        // Handle touch screen input (Android and WebGL).
+        //
+        // To ensure that Touch processing only happens
+        // once per frame, we only process Touch input
+        // on EventType.Repaint events.  Otherwise,
+        // the speed of model rotation/zooming/panning
+        // will depend on the number of GUI events per
+        // frame.
+        //
+        // Note 1: EventType.Repaint happens before
+        // GUIUtility.hotControl is set by mouse events
+        // (e.g. EventType.MouseDown), so the model will
+        // continue to rotate/zoom/pan in response to Touch input,
+        // even if the user is interacting with IMGUI
+        // controls (e.g. sliders, checkboxes).  This is
+        // undesirable behaviour, but for the time being it
+        // doesn't matter because there are no interactive
+        // controls shown on Android.  In particular,
+        // I've disabled the "Spin X" / "Spin Y" sliders
+        // on Android because they are too small and
+        // difficult to interact with.
+        //
+        // Note 2: This code uses the `Touch` class
+        // from Unity's old input system ("Input Manager").
+        // At the time of coding, I was not aware that there
+        // was a newer Unity input system ("Input System"), 
+        // introduced in Unity 2019.1, which provides a new touch
+        // input API via `InputSystem.EnhancedTouch.Touch`.
+        // See https://forum.unity.com/threads/inputsystem-enhancedtouch-touch-and-unity-ads.779351/
+        // The code below works fine and is likely to
+        // be supported by Unity for a long time. But if I
+        // ever need to make major changes, I should consider
+        // using the new input system.
+
+        if (Input.touchSupported && @event.type == EventType.Repaint)
         {
-            // Handle touch screen input (Android).
-            //
-            // To ensure that Touch processing only happens
-            // once per frame, we only process Touch input
-            // on EventType.Repaint events.  Otherwise,
-            // the speed of model rotation/zooming/panning
-            // will depend on the number of GUI events per
-            // frame.
-            //
-            // Note 1: EventType.Repaint happens before
-            // GUIUtility.hotControl is set by mouse events
-            // (e.g. EventType.MouseDown), so the model will
-            // continue to rotate/zoom/pan in response to Touch input,
-            // even if the user is interacting with IMGUI
-            // controls (e.g. sliders, checkboxes).  This is
-            // undesirable behaviour, but for the time being it
-            // doesn't matter because there are no interactive
-            // controls shown on Android.  In particular,
-            // I've disabled the "Spin X" / "Spin Y" sliders
-            // on Android because they are too small and
-            // difficult to interact with.
-            //
-            // Note 2: This code uses the `Touch` class
-            // from Unity's old input system ("Input Manager").
-            // At the time of coding, I was not aware that there
-            // was a newer Unity input system ("Input System"), 
-            // introduced in Unity 2019.1, which provides a new touch
-            // input API via `InputSystem.EnhancedTouch.Touch`.
-            // See https://forum.unity.com/threads/inputsystem-enhancedtouch-touch-and-unity-ads.779351/
-            // The code below works fine and is likely to
-            // be supported by Unity for a long time. But if I
-            // ever need to make major changes, I should consider
-            // using the new input system.
-            //
-            // Note 3: The old input system (see Note 2 above) simulates
-            // IMGUI mouse events in response to touch inputs, whereas
-            // the new input system does not. For example e.g. an
-            // EventType.MouseDown will be generated
-            // in response to a finger touching the screen. The fact
-            // that the new input system ("Input System") doesn't simulate
-            // mouse events is considered a bug and as of Mar 10, 2020
-            // it has not been fixed. See
-            // https://forum.unity.com/threads/inputsystem-enhancedtouch-touch-and-unity-ads.779351/
-            // for discussion.
-
-            if (@event.type != EventType.Repaint)
-                return;
-
-            // if finger(s) were lifted from screen
-            if (Input.touchCount == 0)
+            // if number of fingers has changed
+            if (Input.touchCount != _prevTouchCount)
             {
-                _prevTouchCount = Input.touchCount;
                 _prevPinchDist = null;
                 _prevPinchMidpoint = null;
-                return;
             }
-
-            if (_prevTouchCount == 0 && Input.touchCount > 0)
+            else if (_prevTouchCount == 0 && Input.touchCount > 0)
             {
                 // perform mouse click actions when finger(s) first touch screen
                 mouseDown = true;
@@ -298,14 +281,21 @@ public class GameManager : Singleton<GameManager>
 
             _prevTouchCount = Input.touchCount;
         }
-        else
-        {
-            // handle mouse input for rotating/zooming/panning the model
 
-            deltaX = @event.delta.x;
-            deltaY = @event.delta.y;
-            deltaZ = 0f;
-            
+        // Handle mouse input for rotating/zooming/panning the model.
+        //
+        // Note: The test for Input.touchCount == 0 ensures
+        // that the code is only run in response to input from a
+        // *real* mouse, rather than mouse events simulated from
+        // a touch screen. It would be better/cleaner to set 
+        // Input.simulateMouseWithTouches to false to achieve this
+        // separation, but I found that the setting has no effect
+        // (in Unity 2018.3). Moreover, Input.simulateMouseWithTouches
+        // is known to be ignored under WebGL:
+        // https://forum.unity.com/threads/input-simulatemousewithtouches-is-ignored-in-webgl.388157/
+
+        if (Input.touchCount == 0)
+        {
             switch (@event.type)
             {
                 case EventType.MouseDown:
@@ -316,6 +306,8 @@ public class GameManager : Singleton<GameManager>
                         mouseActions = MouseAction.Rotate;
                     else if (@event.button == 1)
                         mouseActions = MouseAction.Pan;
+                    deltaX = @event.delta.x;
+                    deltaY = @event.delta.y;
                     break;
                 case EventType.ScrollWheel:
                     mouseActions = MouseAction.Zoom;
