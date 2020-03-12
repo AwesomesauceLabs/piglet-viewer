@@ -327,7 +327,7 @@ public class GameManager : Singleton<GameManager>
                     mouseActions = MouseAction.Zoom;
                     // note: Unity passes in mouse scroll wheel
                     // change via deltaY
-                    deltaZ = -deltaY;
+                    deltaZ = -@event.delta.y;
                     break;
             }
         }
