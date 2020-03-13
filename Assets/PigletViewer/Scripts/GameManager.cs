@@ -289,7 +289,7 @@ public class GameManager : Singleton<GameManager>
     /// the conventional mouse behaviour for rotating the model, panning the
     /// camera, and zooming the camera.
     /// </summary>
-    protected void HandleUnusedMouseEvents()
+    protected void ProcessMouseInput()
     {
         // if any GUI element (e.g. checkbox, slider) currently
         // has focus
@@ -397,7 +397,7 @@ public class GameManager : Singleton<GameManager>
     void OnGUI()
     {
         Gui.OnGUI();
-        HandleUnusedMouseEvents();
+        ProcessMouseInput();
     }
 
     public void OnImportProgress(GLTFImporter.ImportStep importStep, int numCompleted, int total)
