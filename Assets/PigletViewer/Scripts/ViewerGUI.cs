@@ -20,6 +20,11 @@ public class ViewerGUI
     /// </summary>
     public float SpinY;
 
+    /// <summary>
+    /// Message shown along the bottom of the view area.
+    /// Typically used for instructions or for reporting
+    /// errors.
+    /// </summary>
     public string FooterMessage;
     
     /// <summary>
@@ -28,6 +33,10 @@ public class ViewerGUI
     /// </summary>
     public List<string> Log;
 
+    /// <summary>
+    /// Enscapsulates GUIStyles that control GUI rendering (e.g.
+    /// font sizes, text alignment).
+    /// </summary>
     private class Styles
     {
         public GUIStyle Title;
@@ -68,6 +77,10 @@ public class ViewerGUI
         ResetFooterMessage();
     }
 
+    /// <summary>
+    /// Initialize GUIStyles used to render the GUI
+    /// (e.g. font sizes, text alignment).
+    /// </summary>
     private void InitStyles()
     {
         if (_styles != null)
