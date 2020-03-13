@@ -112,13 +112,11 @@ public class ViewerGUI
     }
 
     /// <summary>
-    /// Draws GUI elements (e.g. progress messages, checkboxes)
-    /// onto the model viewer window.
+    /// Render the GUI for the viewer (e.g. progress log,
+    /// "Spin X"/"Spin Y" sliders).
     /// </summary>
-    public void OnGUI()
+    public void DrawGUI()
     {
-        InitStyles();
-        
         // set font color to black
         GUI.contentColor = Color.black;
 
@@ -214,6 +212,15 @@ public class ViewerGUI
             }
 
         GUILayout.EndArea();
-        
+    }
+
+    /// <summary>
+    /// Draws GUI elements (e.g. progress messages, checkboxes)
+    /// onto the model viewer window.
+    /// </summary>
+    public void OnGUI()
+    {
+        InitStyles();
+        DrawGUI();
     }
 }
