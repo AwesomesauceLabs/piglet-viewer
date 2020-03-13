@@ -56,28 +56,37 @@ public class GameManager : Singleton<GameManager>
     /// progress messages.
     /// </summary>
     private ImportProgressTracker _progressTracker;
-    
+
     /// <summary>
-    /// The number fingers that were touching the screen during
-    /// the previous frame (Android).
+    /// Describes the state of touchscreen input (e.g. Android)
+    /// for a single frame.
     /// </summary>
-    private int _prevTouchCount = 0;
-    
+    private struct TouchState
+    {
+        /// <summary>
+        /// The number fingers in contact with the touch screen.
+        /// </summary>
+        public int TouchCount;
+        
+        /// <summary>
+        /// The distance between the two fingers touching
+        /// the screen, or null if there aren't two fingers
+        /// touching the screen.
+        /// </summary>
+        public float? PinchDist;
+        
+        /// <summary>
+        /// The midpoint between the two fingers touching
+        /// the screen, or null if there aren't two fingers
+        /// touching the screen.
+        /// </summary>
+        public Vector2? PinchMidpoint;
+    }
+
     /// <summary>
-    /// The distance between the two fingers touching
-    /// the screen during the previous frame (Android).  Null
-    /// if there weren't two fingers touching the screen
-    /// during the previous frame.
+    /// The touch screen input state from the previous frame.
     /// </summary>
-    private float? _prevPinchDist;
-    
-    /// <summary>
-    /// The midpoint between the two fingers touching
-    /// the screen during the previous frame (Android). Null
-    /// if there weren't two fingers touching the screen
-    /// during the previous frame.
-    /// </summary>
-    private Vector2? _prevPinchMidpoint;
+    private TouchState _prevTouchState;
 
     /// <summary>
     /// Possible actions to perform on the 3D model,
@@ -105,6 +114,7 @@ public class GameManager : Singleton<GameManager>
     
     private void Awake()
     {
+        _prevTouchState = new TouchState();
         Gui = new ViewerGUI();
         ResetImportState();
         
@@ -189,17 +199,17 @@ public class GameManager : Singleton<GameManager>
         float deltaZ = 0f;
 
         // if number of fingers has changed
-        if (Input.touchCount != _prevTouchCount)
+        if (Input.touchCount != _prevTouchState.TouchCount)
         {
-            _prevPinchDist = null;
-            _prevPinchMidpoint = null;
+            _prevTouchState.PinchDist = null;
+            _prevTouchState.PinchMidpoint = null;
         }
-        else if (_prevTouchCount == 0 && Input.touchCount > 0)
+        else if (Input.touchCount > 0 && _prevTouchState.TouchCount == 0)
         {
             // perform mouse click actions when finger(s) first touch screen
             mouseDown = true;
         }
-        else if (_prevTouchCount == Input.touchCount)
+        else if (Input.touchCount == _prevTouchState.TouchCount)
         {
             // perform mouse drag actions while number of fingers
             // touching screen is > 0 and does not change
@@ -224,31 +234,31 @@ public class GameManager : Singleton<GameManager>
 
                 float pinchDist = (touch1.position - touch0.position).magnitude;
 
-                if (_prevPinchDist.HasValue)
+                if (_prevTouchState.PinchDist.HasValue)
                 {
                     mouseActions |= MouseAction.Zoom;
                     
-                    float pinchDelta = pinchDist - _prevPinchDist.Value;
+                    float pinchDelta = pinchDist - _prevTouchState.PinchDist.Value;
                     deltaZ = pinchDelta * 0.03f;
                 }
 
-                _prevPinchDist = pinchDist;
+                _prevTouchState.PinchDist = pinchDist;
                 
                 // two-finger drag -> pan
                 
                 Vector2 pinchMidpoint = (touch0.position + touch1.position) / 2.0f;
-                if (_prevPinchMidpoint.HasValue)
+                if (_prevTouchState.PinchMidpoint.HasValue)
                 {
                     mouseActions |= MouseAction.Pan;
 
                     Vector2 deltaMidpoint
-                        = pinchMidpoint - _prevPinchMidpoint.Value;
+                        = pinchMidpoint - _prevTouchState.PinchMidpoint.Value;
                     
                     deltaX = deltaMidpoint.x * 0.3f;
                     deltaY = -deltaMidpoint.y * 0.3f;
                 }
 
-                _prevPinchMidpoint = pinchMidpoint;
+                _prevTouchState.PinchMidpoint = pinchMidpoint;
             }
         }
 
@@ -270,8 +280,8 @@ public class GameManager : Singleton<GameManager>
 
         if (mouseActions.HasFlag(MouseAction.Zoom))
             ZoomCamera(deltaZ);
-        
-        _prevTouchCount = Input.touchCount;
+
+        _prevTouchState.TouchCount = Input.touchCount;
     }
 
     /// <summary>
