@@ -203,11 +203,10 @@ public class GameManager : Singleton<GameManager>
         {
             _prevTouchState.PinchDist = null;
             _prevTouchState.PinchMidpoint = null;
-        }
-        else if (Input.touchCount > 0 && _prevTouchState.TouchCount == 0)
-        {
+            
             // perform mouse click actions when finger(s) first touch screen
-            mouseDown = true;
+            if (_prevTouchState.TouchCount == 0)
+                mouseDown = true;
         }
         else if (Input.touchCount == _prevTouchState.TouchCount)
         {
