@@ -42,7 +42,7 @@ public class GameManager : Singleton<GameManager>
     /// incrementally advanced by calling
     /// `PumpImportJob` in `Update`.
     /// </summary>
-    private ImportTask _importJob;
+    private ImportTask _importTask;
     
     /// <summary>
     /// Times import steps, and generates nicely formatted
@@ -110,7 +110,7 @@ public class GameManager : Singleton<GameManager>
     {
         ResetImportState();
         _progressTracker.StartImport();
-        _importJob = importTask;
+        _importTask = importTask;
     }
 
     /// <summary>
@@ -195,7 +195,7 @@ public class GameManager : Singleton<GameManager>
         _model = model;
         _model.AddComponent<ModelBehaviour>();
 
-        _importJob = null;
+        _importTask = null;
     }
 
     /// <summary>
@@ -206,7 +206,7 @@ public class GameManager : Singleton<GameManager>
         ViewerGUI.Instance.FooterMessage = string.Format(
             "error: {0}", e.Message);
         
-        _importJob = null;
+        _importTask = null;
     }
     
     /// <summary>
@@ -215,7 +215,7 @@ public class GameManager : Singleton<GameManager>
     public void Update()
     {
         // advance import job
-        _importJob?.MoveNext();
+        _importTask?.MoveNext();
     }
 
 }
