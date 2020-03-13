@@ -45,13 +45,6 @@ public class GameManager : Singleton<GameManager>
     private ImportTask _importJob;
     
     /// <summary>
-    /// An object that handles drawing UI elements
-    /// (e.g. checkboxes, progress messages) on top
-    /// of the model viewer window.
-    /// </summary>
-    public ViewerGUI Gui;
-
-    /// <summary>
     /// Times import steps, and generates nicely formatted
     /// progress messages.
     /// </summary>
@@ -63,13 +56,12 @@ public class GameManager : Singleton<GameManager>
     /// </summary>
     private void ResetImportState()
     {
-        Gui.ResetLog();
+        ViewerGUI.Instance.ResetLog();
         _progressTracker = new ImportProgressTracker();
     }
     
     private void Awake()
     {
-        Gui = new ViewerGUI();
         ResetImportState();
         
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
@@ -154,11 +146,6 @@ public class GameManager : Singleton<GameManager>
         Camera.transform.Translate(zoom * MouseZoomSpeed, Space.Self);
     }
     
-    void OnGUI()
-    {
-        Gui.OnGUI();
-    }
-
     public void OnImportProgress(GLTFImporter.ImportStep importStep, int numCompleted, int total)
     {
         _progressTracker.UpdateProgress(importStep, numCompleted, total);
@@ -176,10 +163,11 @@ public class GameManager : Singleton<GameManager>
         else
             JsLib.UpdateTailLogLine(message);
 #else
+        List<string> log = ViewerGUI.Instance.Log;
         if (_progressTracker.IsNewImportStep())
-            Gui.Log.Add(message);
+            log.Add(message);
         else
-            Gui.Log[Gui.Log.Count - 1] = message;
+            log[log.Count - 1] = message;
 #endif
 
         Debug.Log(message);
@@ -199,7 +187,7 @@ public class GameManager : Singleton<GameManager>
     /// </summary>
     public void OnImportCompleted(GameObject model)
     {
-        Gui.ResetSpin();
+        ViewerGUI.Instance.ResetSpin();
 
         if (_model != null)
             Destroy(_model);
@@ -215,7 +203,7 @@ public class GameManager : Singleton<GameManager>
     /// </summary>
     public void OnImportException(Exception e)
     {
-        Gui.FooterMessage = string.Format(
+        ViewerGUI.Instance.FooterMessage = string.Format(
             "error: {0}", e.Message);
         
         _importJob = null;

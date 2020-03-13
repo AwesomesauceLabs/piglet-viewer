@@ -25,7 +25,7 @@ public class ModelBehaviour : MonoBehaviour
     /// </summary>
     public void SpinModel()
     {
-        ViewerGUI gui = GameManager.Instance.Gui;
+        ViewerGUI gui = ViewerGUI.Instance;
         
         Vector3 rotation = new Vector3(gui.SpinY, -gui.SpinX, 0)
            * Time.deltaTime * GameManager.Instance.SpinSpeed;

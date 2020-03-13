@@ -158,7 +158,7 @@ public class InputHandler : Singleton<GameManager>
         // whenever the user clicks on the
         // model/background.
         if (mouseDown)
-            GameManager.Instance.Gui.ResetSpin();
+            ViewerGUI.Instance.ResetSpin();
 
         if (mouseActions.HasFlag(MouseAction.Rotate))
             GameManager.Instance.RotateModel(new Vector3(-deltaY, -deltaX, 0));
@@ -234,7 +234,7 @@ public class InputHandler : Singleton<GameManager>
         // whenever the user clicks on the
         // model/background.
         if (mouseDown)
-            GameManager.Instance.Gui.ResetSpin();
+            ViewerGUI.Instance.ResetSpin();
 
         if (mouseActions.HasFlag(MouseAction.Rotate))
             GameManager.Instance.RotateModel(new Vector3(-deltaY, -deltaX, 0));

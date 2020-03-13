@@ -8,7 +8,7 @@ using UnityGLTF;
 /// Draws the UI elements (e.g. progress messages, checkboxes)
 /// on top of the model viewer window.
 /// </summary>
-public class ViewerGUI
+public class ViewerGUI : Singleton<ViewerGUI>
 {
     /// <summary>
     /// Speed to auto-spin model left-to-right.

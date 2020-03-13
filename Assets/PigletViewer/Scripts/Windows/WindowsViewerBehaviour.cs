@@ -30,7 +30,7 @@ public class WindowsViewerBehaviour : MonoBehaviour
         _dragAndDropHook.InstallHook();
         _dragAndDropHook.OnDroppedFiles += OnDropFiles;
 
-        GameManager.Instance.Gui.FooterMessage
+        ViewerGUI.Instance.FooterMessage
             = "drag .gltf/.glb file onto window to view";
         
         // By default, the Windows Unity Player will pause
