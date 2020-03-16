@@ -5,7 +5,7 @@ using UnityEngine;
 /// Maps mouse input and touchscreen input to corresponding actions in the
 /// viewer (e.g. rotate model).
 /// </summary>
-public class InputHandler : Singleton<GameManager>
+public class InputHandler : Singleton<InputHandler>
 {
     /// <summary>
     /// Describes the state of touchscreen input (e.g. Android)
