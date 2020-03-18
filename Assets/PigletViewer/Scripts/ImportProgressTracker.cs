@@ -155,12 +155,7 @@ namespace Piglet
                     break;
                 case GLTFImporter.ImportStep.MorphTarget:
                     message = string.Format(
-                        "Loading morph targets for node {0}/{1}...",
-                        currentStep, progressStep.NumTotal);
-                    break;
-                case GLTFImporter.ImportStep.Skin:
-                    message = string.Format(
-                        "Loading skinning data for node {0}/{1}...",
+                        "Loading morph data {0}/{1}...",
                         currentStep, progressStep.NumTotal);
                     break;
                 default:
