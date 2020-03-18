@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using UnityEngine;
 using UnityGLTF;
 
 namespace Piglet
@@ -141,7 +142,8 @@ namespace Piglet
                     float kb = progressStep.NumCompleted / 1024f;
                     float totalKb = progressStep.NumTotal / 1024f;
                     message = string.Format(
-                        "Downloading {0}kb/{1}kb...", kb, totalKb);
+                        "Downloading {0:D}kb/{1:D}kb...",
+                        (int)Mathf.Round(kb), (int)Mathf.Round(totalKb));
                     break;
                 case GLTFImporter.ImportStep.Unzip:
                     message = string.Format(
