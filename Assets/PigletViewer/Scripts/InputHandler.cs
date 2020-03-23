@@ -186,6 +186,19 @@ public class InputHandler : Singleton<InputHandler>
         if (GUIUtility.hotControl != 0)
             return;
 
+        // Note: The test for Input.touchCount != 0 ensures
+        // that the code is only run in response to input from a
+        // *real* mouse, rather than mouse events simulated from
+        // a touch screen. It would be better/cleaner to set 
+        // Input.simulateMouseWithTouches to false to achieve this
+        // separation, but I found that the setting has no effect
+        // (in Unity 2018.3). Moreover, there is a bug where
+        // Input.simulateMouseWithTouches is ignored under WebGL:
+        // https://forum.unity.com/threads/input-simulatemousewithtouches-is-ignored-in-webgl.388157/
+
+        if (Input.touchCount != 0)
+            return;
+        
         Event @event = Event.current;
 
         MouseAction mouseActions = MouseAction.None;
@@ -194,40 +207,25 @@ public class InputHandler : Singleton<InputHandler>
         float deltaY = 0f;
         float deltaZ = 0f;
 
-        // Handle mouse input for rotating/zooming/panning the model.
-        //
-        // Note: The test for Input.touchCount == 0 ensures
-        // that the code is only run in response to input from a
-        // *real* mouse, rather than mouse events simulated from
-        // a touch screen. It would be better/cleaner to set 
-        // Input.simulateMouseWithTouches to false to achieve this
-        // separation, but I found that the setting has no effect
-        // (in Unity 2018.3). Moreover, Input.simulateMouseWithTouches
-        // is known to be ignored under WebGL:
-        // https://forum.unity.com/threads/input-simulatemousewithtouches-is-ignored-in-webgl.388157/
-
-        if (Input.touchCount == 0)
+        switch (@event.type)
         {
-            switch (@event.type)
-            {
-                case EventType.MouseDown:
-                    mouseDown = true;
-                    break;
-                case EventType.MouseDrag:
-                    if (@event.button == 0)
-                        mouseActions = MouseAction.Rotate;
-                    else if (@event.button == 1)
-                        mouseActions = MouseAction.Pan;
-                    deltaX = @event.delta.x;
-                    deltaY = @event.delta.y;
-                    break;
-                case EventType.ScrollWheel:
-                    mouseActions = MouseAction.Zoom;
-                    // note: Unity passes in mouse scroll wheel
-                    // change via deltaY
-                    deltaZ = -@event.delta.y;
-                    break;
-            }
+            case EventType.MouseDown:
+                mouseDown = true;
+                break;
+            case EventType.MouseDrag:
+                if (@event.button == 0)
+                    mouseActions = MouseAction.Rotate;
+                else if (@event.button == 1)
+                    mouseActions = MouseAction.Pan;
+                deltaX = @event.delta.x;
+                deltaY = @event.delta.y;
+                break;
+            case EventType.ScrollWheel:
+                mouseActions = MouseAction.Zoom;
+                // note: Unity passes in mouse scroll wheel
+                // change via deltaY
+                deltaZ = -@event.delta.y;
+                break;
         }
         
         // stop auto-spin ("Spin X" / "Spin Y")
