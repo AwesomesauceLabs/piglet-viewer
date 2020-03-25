@@ -15,7 +15,7 @@ public class WebGlViewerBehaviour : MonoBehaviour
     /// </summary>
     void Start()
     {
-        GameManager.Instance.Gui.FooterMessage
+        ViewerGUI.Instance.FooterMessage
             = "click \"Browse\" below to load a .gltf/.glb file";
         JsLib.Init();
     }
