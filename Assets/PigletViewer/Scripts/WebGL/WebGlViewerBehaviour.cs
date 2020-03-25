@@ -10,13 +10,14 @@ public class WebGlViewerBehaviour : MonoBehaviour
 {
     /// <summary>
     /// Unity callback that is invoked before the first frame update.
-    /// Here we initialize drag-and-drop, parse command line arguments,
-    /// and start the initial glTF model import (if any).
     /// </summary>
     void Start()
     {
         ViewerGUI.Instance.FooterMessage
             = "click \"Browse\" below to load a .gltf/.glb file";
+        
+        // run javascript startup tasks (e.g. register event
+        // handlers for drag-and-drop)
         JsLib.Init();
     }
 
