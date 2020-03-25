@@ -51,6 +51,46 @@ public class InputHandler : Singleton<InputHandler>
         Pan = 1 << 1,
         Zoom = 1 << 2,
     };
+    
+    /// <summary>
+    /// Flags indicating which mouse buttons are currently pressed.
+    /// </summary>
+    [Flags]
+    private enum MouseButtons
+    {
+        None = 0,
+        LeftButton = 1,
+        RightButton = 1 << 1,
+        MiddleButton = 1 << 2,
+    };
+
+    /// <summary>
+    /// Describes which mouse buttons are pressed and
+    /// the coordinates of the mouse cursor.
+    /// </summary>
+    private struct MouseState
+    {
+        /// <summary>
+        /// Flags indicates the mouse buttons that are currently pressed.
+        /// </summary>
+        public MouseButtons Buttons;
+        /// <summary>
+        /// Current position of the mouse cursor.
+        /// </summary>
+        public Vector3? Position;
+    }
+
+    /// <summary>
+    /// The mouse state (pressed buttons and cursor position)
+    /// for the current frame.
+    /// </summary>
+    private MouseState _mouseState;
+
+    /// <summary>
+    /// The mouse state (pressed buttons and cursor position)
+    /// from the previous frame.
+    /// </summary>
+    private MouseState _prevMouseState;
 
     /// <summary>
     /// Unity callback that is invoked before the first frame update.
@@ -58,6 +98,7 @@ public class InputHandler : Singleton<InputHandler>
     protected void Start()
     {
         _prevTouchState = new TouchState();
+        _prevMouseState = new MouseState();
     }
 
     /// <summary>
@@ -173,10 +214,16 @@ public class InputHandler : Singleton<InputHandler>
     }
 
     /// <summary>
-    /// Handle any mouse events that are not consumed by IMGUI controls
-    /// (e.g. checkboxes, sliders). This method is used to implement
-    /// the conventional mouse behaviour for rotating the model, panning the
-    /// camera, and zooming the camera.
+    /// Rotate/pan/zoom model in response to mouse input.
+    /// 
+    /// Note: This code uses Unity's Input Manager
+    /// (`Input`) to read mouse input, whereas previous revisions
+    /// used IMGUI events such as `EventType.MouseDown`.
+    /// I switched to solely using `Input` because I found that
+    /// `EventType.MouseDrag` events were not being generated
+    /// in WebGL while holding down either the middle mouse
+    /// button or the right mouse button, and I couldn't figure
+    /// out why.
     /// </summary>
     protected void ProcessMouseInput()
     {
@@ -198,58 +245,71 @@ public class InputHandler : Singleton<InputHandler>
 
         if (Input.touchCount != 0)
             return;
-        
-        Event @event = Event.current;
 
+        MouseButtons buttons = MouseButtons.None;
         MouseAction mouseActions = MouseAction.None;
-        bool mouseDown = false;
         float deltaX = 0f;
         float deltaY = 0f;
         float deltaZ = 0f;
 
-        switch (@event.type)
+        if (Input.GetMouseButton(0))
+            buttons |= MouseButtons.LeftButton;
+        if (Input.GetMouseButton(1))
+            buttons |= MouseButtons.RightButton;
+        if (Input.GetMouseButton(2))
+            buttons |= MouseButtons.MiddleButton;
+
+        if (Input.mouseScrollDelta != Vector2.zero)
         {
-            case EventType.MouseDown:
-                mouseDown = true;
-                break;
-            case EventType.MouseDrag:
-                if (@event.button == 0)
-                    mouseActions = MouseAction.Rotate;
-                else if (@event.button == 1)
-                    mouseActions = MouseAction.Pan;
-                deltaX = @event.delta.x;
-                deltaY = @event.delta.y;
-                break;
-            case EventType.ScrollWheel:
-                mouseActions = MouseAction.Zoom;
-                // note: Unity passes in mouse scroll wheel
-                // change via deltaY
-                deltaZ = -@event.delta.y;
-                break;
+            mouseActions = MouseAction.Zoom;
+            deltaZ = Input.mouseScrollDelta.y;
+        }
+
+        // Detect mouse drag events by comparing the current
+        // mouse button states and cursor position to
+        // those of the previous frame.
+
+        if (buttons != MouseButtons.None
+            && buttons == _prevMouseState.Buttons
+            && _prevMouseState.Position.HasValue)
+        {
+            Vector3 mouseDelta = Input.mousePosition - _prevMouseState.Position.Value;
+
+            if (buttons.HasFlag(MouseButtons.LeftButton))
+                mouseActions |= MouseAction.Rotate;
+            if (buttons.HasFlag(MouseButtons.RightButton))
+                mouseActions |= MouseAction.Pan;
+
+            deltaX = mouseDelta.x;
+            deltaY = mouseDelta.y;
         }
         
-        // stop auto-spin ("Spin X" / "Spin Y")
+        // Stop auto-spin ("Spin X" / "Spin Y")
         // whenever the user clicks on the
         // model/background.
-        if (mouseDown)
+        
+        if (Input.GetMouseButtonDown(0)
+            || Input.GetMouseButtonDown(1)
+            || Input.GetMouseButtonDown(2))
+        {
             ViewerGUI.Instance.ResetSpin();
+        }
 
         if (mouseActions.HasFlag(MouseAction.Rotate))
-            GameManager.Instance.RotateModel(new Vector3(-deltaY, -deltaX, 0));
+            GameManager.Instance.RotateModel(new Vector3(deltaY, -deltaX, 0));
 
         if (mouseActions.HasFlag(MouseAction.Pan))
-            GameManager.Instance.PanCamera(new Vector3(-deltaX, deltaY, 0));
+            GameManager.Instance.PanCamera(new Vector3(-deltaX, -deltaY, 0));
 
         if (mouseActions.HasFlag(MouseAction.Zoom))
             GameManager.Instance.ZoomCamera(deltaZ);
-    }
 
-    /// <summary>
-    /// Unity callback that is invoked for all IMGUI events (e.g. Repaint, MouseDown).
-    /// </summary>
-    public void OnGUI()
-    {
-        ProcessMouseInput();
+        // Record current mouse position and button states 
+        // for use in the next frame, so that we can detect when
+        // button states have changed.
+        
+        _prevMouseState.Buttons = buttons;
+        _prevMouseState.Position = Input.mousePosition;
     }
 
     /// <summary>
@@ -258,5 +318,6 @@ public class InputHandler : Singleton<InputHandler>
     public void Update()
     {
         ProcessTouchInput();
+        ProcessMouseInput();
     }
 }
