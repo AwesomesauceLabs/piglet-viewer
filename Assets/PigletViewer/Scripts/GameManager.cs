@@ -60,6 +60,10 @@ public class GameManager : Singleton<GameManager>
         _progressTracker = new ImportProgressTracker();
     }
     
+    /// <summary>
+    /// Unity callback that is invoked before the first frame update
+    /// and prior to Start().
+    /// </summary>
     private void Awake()
     {
         ResetImportState();
