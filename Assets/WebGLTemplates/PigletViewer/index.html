@@ -34,8 +34,13 @@
         padding: 10px;
         height: 200px;
       }
-      #gameContainer {
+      #viewArea {
         flex: 1;
+      }
+      #gameContainer {
+        width: 100%;
+        height: 100%;
+        display: block;
       }
       canvas {
         width: 100%;
@@ -49,14 +54,14 @@
       }
       .logo {
           display: block;
-          max-width: 100vw;
+          max-width: 75vw;
           max-height: 70vh;
       }
 
       .progress {
           margin: 1.5em;
           border: 1px solid white;
-          width: 50vw;
+          width: 50%;
           display: none;
       }
       .progress .full {
@@ -68,10 +73,10 @@
 
       #loader {
         position: absolute;
-        left: 0;
+        left: 25%;
         top: 0;
-        width: 100vw;
-        height: 100vh;
+        width: 75%;
+        height: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -134,13 +139,15 @@
         </div>
 
       </div>
-      <div id="gameContainer"></div>
+      <div id="viewArea">
+        <div id="gameContainer"></div>
+        <div id="loader">
+          <img class="logo" src="logo.png">
+          <div class="spinner"></div>
+          <div class="progress"><div class="full"></div></div>
+        </div>
+      </div>
     </section>
-    <div id="loader">
-      <img class="logo" src="logo.png">
-      <div class="spinner"></div>
-      <div class="progress"><div class="full"></div></div>
-    </div>
   </body>
 
   <script src="%UNITY_WEBGL_LOADER_URL%"></script>
