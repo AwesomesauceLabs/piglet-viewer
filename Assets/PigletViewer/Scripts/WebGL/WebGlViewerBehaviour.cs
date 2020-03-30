@@ -20,6 +20,10 @@ public class WebGlViewerBehaviour : MonoBehaviour
         // run javascript startup tasks (e.g. register event
         // handlers for drag-and-drop)
         JsLib.Init();
+        
+        // load default model (Piglet mascot) 
+        GameManager.Instance.StartImport(Path.Combine(
+            Application.streamingAssetsPath, "piglet-1.0.0.glb"));
     }
 
     /// <summary>
