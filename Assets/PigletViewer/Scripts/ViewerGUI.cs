@@ -120,8 +120,6 @@ public class ViewerGUI : Singleton<ViewerGUI>
         // set font color to black
         GUI.contentColor = Color.black;
 
-        float padding = 25;
-        
         // In the WebGL build, the import log is shown
         // in the left panel as part of the main web
         // page.
@@ -130,6 +128,8 @@ public class ViewerGUI : Singleton<ViewerGUI>
         // of the window, in the upper left hand corner.
         
 #if !UNITY_WEBGL || UNITY_EDITOR
+        float padding = 25;
+        
         GUILayout.BeginArea(new Rect(
             padding, padding,
             Screen.width - 2 * padding,
