@@ -1,4 +1,5 @@
 ﻿#if UNITY_WEBGL
+using System.IO;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
@@ -50,7 +51,7 @@ public class WebGlViewerBehaviour : MonoBehaviour
 
         JsLib.FreeFileData(filename);
 
-        GameManager.Instance.Import(data);
+        GameManager.Instance.StartImport(data);
     }
 }
 #endif

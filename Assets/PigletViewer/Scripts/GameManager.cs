@@ -77,14 +77,22 @@ public class GameManager : Singleton<GameManager>
 #endif
     }
 
-    public void Import(byte[] data)
+    /// <summary>
+    /// Create a glTF import task, which will be incrementally advanced
+    /// in each call to Update().
+    ///
+    /// This version of StartImport is only used by the WebGL viewer.
+    /// </summary>
+    public void StartImport(byte[] data)
     {
-        if (_model != null)
-            Destroy(_model);
+        ImportTask importJob = GLTFRuntimeImporter
+            .GetImportTask(data, OnImportProgress);
 
-        ResetImportState();
-        _model = GLTFRuntimeImporter.Import(data, OnImportProgress);
-        _model.AddComponent<ModelBehaviour>();
+        importJob.OnCompleted += OnImportCompleted;
+        importJob.OnException += OnImportException;
+        importJob.RethrowExceptionAfterCallbacks = false;
+
+        StartImport(importJob);
     }
 
     /// <summary>
