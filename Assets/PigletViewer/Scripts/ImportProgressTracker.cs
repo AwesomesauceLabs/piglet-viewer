@@ -142,7 +142,7 @@ namespace Piglet
                     float kb = progressStep.NumCompleted / 1024f;
                     float totalKb = progressStep.NumTotal / 1024f;
                     message = string.Format(
-                        "Downloading {0:D}kb/{1:D}kb...",
+                        "Downloading {0:D}/{1:D} KB...",
                         (int)Mathf.Round(kb), (int)Mathf.Round(totalKb));
                     break;
                 case GLTFImporter.ImportStep.Parse:
