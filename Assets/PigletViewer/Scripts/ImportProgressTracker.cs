@@ -145,11 +145,6 @@ namespace Piglet
                         "Downloading {0:D}kb/{1:D}kb...",
                         (int)Mathf.Round(kb), (int)Mathf.Round(totalKb));
                     break;
-                case GLTFImporter.ImportStep.Unzip:
-                    message = string.Format(
-                        "Unzipping file {0}/{1}...", currentStep,
-                        progressStep.NumTotal);
-                    break;
                 case GLTFImporter.ImportStep.Parse:
                     message = string.Format(
                         "Parsing json {0}/{1}...", currentStep,
