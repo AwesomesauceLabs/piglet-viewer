@@ -200,6 +200,7 @@ public class GameManager : Singleton<GameManager>
     public void OnImportCompleted(GameObject model)
     {
         ViewerGUI.Instance.ResetSpin();
+        ViewerGUI.Instance.ResetFooterMessage();
 
         if (_model != null)
             Destroy(_model);

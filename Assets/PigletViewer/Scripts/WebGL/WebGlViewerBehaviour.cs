@@ -14,8 +14,9 @@ public class WebGlViewerBehaviour : MonoBehaviour
     /// </summary>
     void Start()
     {
-        ViewerGUI.Instance.FooterMessage
-            = "click \"Browse\" below to load a .gltf/.glb file";
+        ViewerGUI.Instance.DefaultFooterMessage
+            = "drag .glb/.zip onto window to view";
+        ViewerGUI.Instance.ResetFooterMessage();
         
         // run javascript startup tasks (e.g. register event
         // handlers for drag-and-drop)

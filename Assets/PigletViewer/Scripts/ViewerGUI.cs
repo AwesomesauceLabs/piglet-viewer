@@ -26,6 +26,14 @@ public class ViewerGUI : Singleton<ViewerGUI>
     /// errors.
     /// </summary>
     public string FooterMessage;
+
+    /// <summary>
+    /// The default footer message to use when
+    /// the footer message is reset.  The footer
+    /// message is typically reset after a new
+    /// glTF model has been loaded.
+    /// </summary>
+    public string DefaultFooterMessage;
     
     /// <summary>
     /// The list of progress messages generated for the
@@ -67,7 +75,7 @@ public class ViewerGUI : Singleton<ViewerGUI>
 
     public void ResetFooterMessage()
     {
-        FooterMessage = null;
+        FooterMessage = DefaultFooterMessage;
     }
 
     public void Reset()
