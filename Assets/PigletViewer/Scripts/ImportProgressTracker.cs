@@ -138,11 +138,11 @@ namespace Piglet
             string message;
             switch (progressStep.Step)
             {
-                case GLTFImporter.ImportStep.Download:
+                case GLTFImporter.ImportStep.Read:
                     float kb = progressStep.NumCompleted / 1024f;
                     float totalKb = progressStep.NumTotal / 1024f;
                     message = string.Format(
-                        "Downloading {0:D}/{1:D} KB...",
+                        "Reading {0:D}/{1:D} KB...",
                         (int)Mathf.Round(kb), (int)Mathf.Round(totalKb));
                     break;
                 case GLTFImporter.ImportStep.Parse:
