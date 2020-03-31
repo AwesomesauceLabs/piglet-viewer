@@ -152,7 +152,7 @@ namespace Piglet
                     break;
                 case GLTFImporter.ImportStep.MorphTarget:
                     message = string.Format(
-                        "Loading morph data {0}/{1}...",
+                        "Loading morph targets {0}/{1}...",
                         currentStep, progressStep.NumTotal);
                     break;
                 default:
