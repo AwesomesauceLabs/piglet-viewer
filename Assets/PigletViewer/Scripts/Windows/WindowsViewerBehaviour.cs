@@ -72,14 +72,6 @@ public class WindowsViewerBehaviour : MonoBehaviour
         Uri uri = new Uri(Path.Combine(Application.streamingAssetsPath,
             "piglet-1.0.0.glb"));
         
-#if false        
-        uri = new Uri("C:/Users/Ben/git/glTF-Sample-Models/2.0/Duck/glTF/duck-gltf.zip");
-#endif
-        
-#if false
-        uri = new Uri("C:/Users/Ben/git/glTF-Sample-Models/2.0/FlightHelmet/FlightHelmet.zip");
-#endif
-        
         ImportTask importTask = GLTFRuntimeImporter
             .GetImportTask(uri, GameManager.Instance.OnImportProgress);
 
