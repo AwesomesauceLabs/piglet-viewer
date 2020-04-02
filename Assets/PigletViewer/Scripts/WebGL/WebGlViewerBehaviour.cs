@@ -56,7 +56,7 @@ public class WebGlViewerBehaviour : MonoBehaviour
 
         JsLib.FreeFileData(filename);
 
-        GameManager.Instance.StartImport(data);
+        GameManager.Instance.StartImport(data, filename);
     }
 }
 #endif

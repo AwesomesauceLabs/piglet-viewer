@@ -69,22 +69,19 @@ public class WindowsViewerBehaviour : MonoBehaviour
         // default model to load at startup, unless
         // --load or --no-load is used
 
-        ImportTask importTask = GLTFRuntimeImporter
-            .GetImportTask(Path.Combine(
-                Application.streamingAssetsPath, "piglet-1.0.0.glb"),
-                GameManager.Instance.OnImportProgress);
+        Uri uri = new Uri(Path.Combine(Application.streamingAssetsPath,
+            "piglet-1.0.0.glb"));
         
 #if false        
-        ImportTask importTask = GLTFRuntimeImporter.GetImportTask(
-            "C:/Users/Ben/git/glTF-Sample-Models/2.0/Duck/glTF/duck-gltf.zip",
-            GameManager.Instance.OnImportProgress);
+        uri = new Uri("C:/Users/Ben/git/glTF-Sample-Models/2.0/Duck/glTF/duck-gltf.zip");
 #endif
         
 #if false
-        ImportTask importTask = GLTFRuntimeImporter.GetImportTask(
-            "C:/Users/Ben/git/glTF-Sample-Models/2.0/FlightHelmet/FlightHelmet.zip",
-            GameManager.Instance.OnImportProgress);
+        uri = new Uri("C:/Users/Ben/git/glTF-Sample-Models/2.0/FlightHelmet/FlightHelmet.zip");
 #endif
+        
+        ImportTask importTask = GLTFRuntimeImporter
+            .GetImportTask(uri, GameManager.Instance.OnImportProgress);
 
         for (int i = 0; i < args.Length; ++i)
         {
@@ -100,7 +97,7 @@ public class WindowsViewerBehaviour : MonoBehaviour
             {
                 // Specify a model to load at startup,
                 // in place of the default Piglet model.
-                string uri = args[i + 1];
+                uri = new Uri(args[i + 1]);
                 importTask = GLTFRuntimeImporter
                     .GetImportTask(uri, GameManager.Instance.OnImportProgress);
             }
@@ -147,7 +144,7 @@ public class WindowsViewerBehaviour : MonoBehaviour
         importTask.OnException += GameManager.Instance.OnImportException;
         importTask.RethrowExceptionAfterCallbacks = false;
 
-        GameManager.Instance.StartImport(importTask);
+        GameManager.Instance.StartImport(importTask, uri);
     }
 
     /// <summary>

@@ -83,8 +83,10 @@ public class GameManager : Singleton<GameManager>
     ///
     /// This version of StartImport is only used by the WebGL viewer.
     /// </summary>
-    public void StartImport(byte[] data)
+    public void StartImport(byte[] data, string filename)
     {
+        Uri uri = new Uri(filename);
+
         ImportTask importJob = GLTFRuntimeImporter
             .GetImportTask(data, OnImportProgress);
 
@@ -92,7 +94,7 @@ public class GameManager : Singleton<GameManager>
         importJob.OnException += OnImportException;
         importJob.RethrowExceptionAfterCallbacks = false;
 
-        StartImport(importJob);
+        StartImport(importJob, uri);
     }
 
     /// <summary>
@@ -115,13 +117,19 @@ public class GameManager : Singleton<GameManager>
         importJob.OnException += OnImportException;
         importJob.RethrowExceptionAfterCallbacks = false;
         
-        StartImport(importJob);
+        StartImport(importJob, uri);
     }
 
-    public void StartImport(ImportTask importTask)
+    public void StartImport(ImportTask importTask, Uri uri)
     {
         ResetImportState();
+
+        string basename = uri.Segments[uri.Segments.Length - 1];
+        string message = String.Format("Loading \"{0}\"...", basename);
+        ViewerGUI.Instance.Log.Add(message);
+        
         _progressTracker.StartImport();
+        
         _importTask = importTask;
     }
 
