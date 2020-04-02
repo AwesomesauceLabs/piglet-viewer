@@ -111,7 +111,7 @@ public class ViewerGUI : Singleton<ViewerGUI>
 
         _styles.SliderLabel = new GUIStyle(GUI.skin.label);
         _styles.SliderLabel.alignment = TextAnchor.MiddleCenter;
-        _styles.SliderLabel.fontSize = 18;
+        _styles.SliderLabel.fontSize = 24;
         
         _styles.FooterText = new GUIStyle(GUI.skin.label);
         _styles.FooterText.alignment = TextAnchor.MiddleCenter;
