@@ -73,6 +73,18 @@ public class WindowsViewerBehaviour : MonoBehaviour
             .GetImportTask(Path.Combine(
                 Application.streamingAssetsPath, "piglet-1.0.0.glb"),
                 GameManager.Instance.OnImportProgress);
+        
+#if false        
+        ImportTask importTask = GLTFRuntimeImporter.GetImportTask(
+            "C:/Users/Ben/git/glTF-Sample-Models/2.0/Duck/glTF/duck-gltf.zip",
+            GameManager.Instance.OnImportProgress);
+#endif
+        
+#if false
+        ImportTask importTask = GLTFRuntimeImporter.GetImportTask(
+            "C:/Users/Ben/git/glTF-Sample-Models/2.0/FlightHelmet/FlightHelmet.zip",
+            GameManager.Instance.OnImportProgress);
+#endif
 
         for (int i = 0; i < args.Length; ++i)
         {
