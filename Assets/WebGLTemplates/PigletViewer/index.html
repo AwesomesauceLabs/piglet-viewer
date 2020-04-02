@@ -12,6 +12,12 @@
       *, *:before, *:after {
         box-sizing: inherit;
       }
+      header {
+        background-color: #dededf;
+      }
+      header h1 {
+        text-align: center;
+      }
       body {
         margin: 0;
         background: #f2f2f2;
@@ -116,28 +122,30 @@
   <body>
     <section id="contentContainer">
       <div id="textContainer">
-        <h1>Piglet Test Page</h1>
+        <header>
+          <h1>Load a Model</h1>
+        </header>
         <p>
-          This page allows users test their models with the
-          <b>Piglet glTF Importer</b> for Unity.
-
-          Please note: Due to browser security restrictions,
-          this page is limited to viewing .glb files.
+          This page allows users test their 3D models with the
+          <a href="">Piglet glTF Importer for Unity</a>.
         </p>
-        <h2>Load a Model</h2>
         <p>
-          Drag a .glb file onto the viewer area or choose a
-          file below.
+          To load a model, select a .glb/.zip file below or
+          drag a .glb/.zip onto the view area. It is possible to drag
+          URLs onto the view area as well.
         </p>
         <input id="inputFile" type="file">
-        <h2>Sample Models</h2>
+        <header>
+          <h1>Sample Models</h1>
+        </header>
         <p>
-          Courtesy of <a>Khronos</a> and <a>Sketchfab</a>.
+          Drag links onto view area to load.
         </p>
-        <h2>Import Log</h2>
+        <header>
+          <h1>Import Log</h1>
+        </header>
         <div id="importLog">
         </div>
-
       </div>
       <div id="viewArea">
         <div id="gameContainer"></div>
