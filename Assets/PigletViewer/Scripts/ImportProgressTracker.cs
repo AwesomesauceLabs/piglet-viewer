@@ -69,6 +69,30 @@ namespace Piglet
         }
 
         /// <summary>
+        /// Append a line to the import progress log.
+        /// </summary>
+        public void AddLine(string line)
+        {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            JsLib.AppendLogLine(line);
+#else
+            Log.Add(line);
+#endif
+        }
+
+        /// <summary>
+        /// Replace the last line of the import progress log.
+        /// </summary>
+        public void ReplaceLastLine(string line)
+        {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            JsLib.UpdateTailLogLine(line);
+#else
+            Log[Log.Count - 1] = line;
+#endif
+        }
+
+        /// <summary>
         /// Clear any recorded progress steps and restart
         /// the import stopwatch at zero milliseconds.
         /// </summary>

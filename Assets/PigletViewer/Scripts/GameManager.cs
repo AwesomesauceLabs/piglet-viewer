@@ -156,18 +156,10 @@ public class GameManager : Singleton<GameManager>
         // add a new line if we have started to import
         // a new type.
         
-#if UNITY_WEBGL && !UNITY_EDITOR        
-        if (_progressTracker.IsNewImportStep())
-            JsLib.AppendLogLine(message);
-        else
-            JsLib.UpdateTailLogLine(message);
-#else
-        List<string> log = ImportProgressTracker.Instance.Log;
         if (ImportProgressTracker.Instance.IsNewImportStep())
-            log.Add(message);
+            ImportProgressTracker.Instance.AddLine(message);
         else
-            log[log.Count - 1] = message;
-#endif
+            ImportProgressTracker.Instance.ReplaceLastLine(message);
 
         Debug.Log(message);
     }
