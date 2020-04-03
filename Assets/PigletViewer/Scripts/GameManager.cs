@@ -146,8 +146,14 @@ public class GameManager : Singleton<GameManager>
         ViewerGUI.Instance.ResetFooterMessage();
 
         ImportLog.Instance.AddLine(
-            String.Format("Finished import in {0} ms.",
+            String.Format("Total import time: {0} ms",
                 ImportLog.Instance.Stopwatch.ElapsedMilliseconds));
+
+        ImportLog.Instance.AddLine(
+            String.Format("Longest Unity thread stall: {0} ms",
+                _importTask.LongestStepInMilliseconds()));
+
+        ImportLog.Instance.AddLine("Success!");
 
         if (_model != null)
             Destroy(_model);
