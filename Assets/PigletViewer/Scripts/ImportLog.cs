@@ -57,8 +57,8 @@ namespace Piglet
         /// A stopwatch used to track the time used for importing
         /// individual glTF entities (e.g. textures, meshes).
         /// </summary>
-        private readonly Stopwatch _stopwatch;
-        
+        public readonly Stopwatch Stopwatch;
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -66,7 +66,7 @@ namespace Piglet
         {
             Lines = new List<string>();
             _progressSteps = new List<ProgressStep>();
-            _stopwatch = new Stopwatch();
+            Stopwatch = new Stopwatch();
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Piglet
         {
             Lines.Clear();
             _progressSteps.Clear();
-            _stopwatch.Restart();
+            Stopwatch.Restart();
         }
 
         public void OnImportProgress(GLTFImporter.ImportStep importStep, int numCompleted, int total)
@@ -133,7 +133,7 @@ namespace Piglet
                     Step = importStep,
                     NumCompleted = numCompleted,
                     NumTotal = numTotal,
-                    ElapsedMilliseconds = _stopwatch.ElapsedMilliseconds
+                    ElapsedMilliseconds = Stopwatch.ElapsedMilliseconds
                 }
             );
         }

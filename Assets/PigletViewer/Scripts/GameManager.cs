@@ -145,6 +145,10 @@ public class GameManager : Singleton<GameManager>
         ViewerGUI.Instance.ResetSpin();
         ViewerGUI.Instance.ResetFooterMessage();
 
+        ImportLog.Instance.AddLine(
+            String.Format("Finished import in {0} ms.",
+                ImportLog.Instance.Stopwatch.ElapsedMilliseconds));
+
         if (_model != null)
             Destroy(_model);
 
