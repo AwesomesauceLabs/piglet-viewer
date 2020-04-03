@@ -1,23 +1,7 @@
-﻿#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-using B83.Win32;
-#endif
-
-using System;
-using System.IO;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Resources;
-using System.Runtime.InteropServices;
-using System.Runtime.ExceptionServices;
-using System.Threading.Tasks;
-using System.Text;
+﻿using System;
 using Piglet;
 using UnityEngine;
-using UnityEngine.Assertions;
-using UnityEngine.Networking;
 using UnityGLTF;
-using Debug = UnityEngine.Debug;
 
 public class GameManager : Singleton<GameManager>
 {
