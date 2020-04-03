@@ -44,7 +44,8 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
                         singletonObject.name = typeof(T).ToString() + " (Singleton)";
  
                         // Make instance persistent.
-                        DontDestroyOnLoad(singletonObject);
+                        if (Application.isPlaying)
+                            DontDestroyOnLoad(singletonObject);
                     }
                 }
  
