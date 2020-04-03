@@ -62,7 +62,7 @@ namespace Piglet
         /// <summary>
         /// Constructor.
         /// </summary>
-        public ImportProgressTracker()
+        protected ImportProgressTracker()
         {
             Log = new List<string>();
             _progressSteps = new List<ProgressStep>();
