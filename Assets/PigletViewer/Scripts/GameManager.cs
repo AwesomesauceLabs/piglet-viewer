@@ -85,7 +85,7 @@ public class GameManager : Singleton<GameManager>
         ImportLog.Instance.StartImport();
 
         string basename = uri.Segments[uri.Segments.Length - 1];
-        string message = String.Format("Loading \"{0}\"...", basename);
+        string message = String.Format("Loading {0}...", basename);
         ImportLog.Instance.AddLine(message);
         
         importTask.OnCompleted += OnImportCompleted;
