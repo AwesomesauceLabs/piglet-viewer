@@ -11,7 +11,7 @@ namespace Piglet
     /// Times the various steps/substeps of a glTF import and generates
     /// nicely formatted progress messages.
     /// </summary>
-    public class ImportProgressTracker : Singleton<ImportProgressTracker>
+    public class ImportLog : Singleton<ImportLog>
     {
         /// <summary>
         /// The list of progress messages generated for the
@@ -62,7 +62,7 @@ namespace Piglet
         /// <summary>
         /// Constructor.
         /// </summary>
-        protected ImportProgressTracker()
+        protected ImportLog()
         {
             Log = new List<string>();
             _progressSteps = new List<ProgressStep>();

@@ -74,7 +74,7 @@ public class WindowsViewerBehaviour : MonoBehaviour
         
         ImportTask importTask = GLTFRuntimeImporter
             .GetImportTask(uri,
-                ImportProgressTracker.Instance.OnImportProgress);
+                ImportLog.Instance.OnImportProgress);
 
         for (int i = 0; i < args.Length; ++i)
         {
@@ -93,7 +93,7 @@ public class WindowsViewerBehaviour : MonoBehaviour
                 uri = new Uri(args[i + 1]);
                 importTask = GLTFRuntimeImporter
                     .GetImportTask(uri,
-                        ImportProgressTracker.Instance.OnImportProgress);
+                        ImportLog.Instance.OnImportProgress);
             }
             else if (args[i] == "--no-load")
             {

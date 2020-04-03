@@ -71,7 +71,7 @@ public class GameManager : Singleton<GameManager>
 
         ImportTask importTask = GLTFRuntimeImporter
             .GetImportTask(data,
-                ImportProgressTracker.Instance.OnImportProgress);
+                ImportLog.Instance.OnImportProgress);
 
         StartImport(importTask, uri);
     }
@@ -91,18 +91,18 @@ public class GameManager : Singleton<GameManager>
         
         ImportTask importTask = GLTFRuntimeImporter
             .GetImportTask(uri,
-                ImportProgressTracker.Instance.OnImportProgress);
+                ImportLog.Instance.OnImportProgress);
 
         StartImport(importTask, uri);
     }
 
     public void StartImport(ImportTask importTask, Uri uri)
     {
-        ImportProgressTracker.Instance.StartImport();
+        ImportLog.Instance.StartImport();
 
         string basename = uri.Segments[uri.Segments.Length - 1];
         string message = String.Format("Loading \"{0}\"...", basename);
-        ImportProgressTracker.Instance.Log.Add(message);
+        ImportLog.Instance.Log.Add(message);
         
         importTask.OnCompleted += OnImportCompleted;
         importTask.OnException += OnImportException;
