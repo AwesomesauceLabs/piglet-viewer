@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 using UnityGLTF;
+using Debug = UnityEngine.Debug;
 
 namespace Piglet
 {
@@ -101,6 +102,24 @@ namespace Piglet
             Log.Clear();
             _progressSteps.Clear();
             _stopwatch.Restart();
+        }
+
+        public void OnImportProgress(GLTFImporter.ImportStep importStep, int numCompleted, int total)
+        {
+            UpdateProgress(importStep, numCompleted, total);
+            string message = GetProgressMessage();
+
+            // Update existing tail log line if we are still importing
+            // the same type of glTF entity (e.g. textures), or
+            // add a new line if we have started to import
+            // a new type.
+            
+            if (IsNewImportStep())
+                AddLine(message);
+            else
+                ReplaceLastLine(message);
+
+            Debug.Log(message);
         }
 
         /// <summary>

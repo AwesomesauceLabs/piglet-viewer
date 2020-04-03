@@ -70,7 +70,8 @@ public class GameManager : Singleton<GameManager>
         Uri uri = new Uri(filename);
 
         ImportTask importTask = GLTFRuntimeImporter
-            .GetImportTask(data, OnImportProgress);
+            .GetImportTask(data,
+                ImportProgressTracker.Instance.OnImportProgress);
 
         StartImport(importTask, uri);
     }
@@ -89,7 +90,8 @@ public class GameManager : Singleton<GameManager>
         Uri uri = new Uri(uriStr);
         
         ImportTask importTask = GLTFRuntimeImporter
-            .GetImportTask(uri, OnImportProgress);
+            .GetImportTask(uri,
+                ImportProgressTracker.Instance.OnImportProgress);
 
         StartImport(importTask, uri);
     }
@@ -142,24 +144,6 @@ public class GameManager : Singleton<GameManager>
         Camera.transform.Translate(zoom * MouseZoomSpeed, Space.Self);
     }
     
-    public void OnImportProgress(GLTFImporter.ImportStep importStep, int numCompleted, int total)
-    {
-        ImportProgressTracker.Instance.UpdateProgress(importStep, numCompleted, total);
-        string message = ImportProgressTracker.Instance.GetProgressMessage();
-
-        // Update existing tail log line if we are still importing
-        // the same type of glTF entity (e.g. textures), or
-        // add a new line if we have started to import
-        // a new type.
-        
-        if (ImportProgressTracker.Instance.IsNewImportStep())
-            ImportProgressTracker.Instance.AddLine(message);
-        else
-            ImportProgressTracker.Instance.ReplaceLastLine(message);
-
-        Debug.Log(message);
-    }
-
     public void OnValidate()
     {
         if (ModelSize < 0.001f)

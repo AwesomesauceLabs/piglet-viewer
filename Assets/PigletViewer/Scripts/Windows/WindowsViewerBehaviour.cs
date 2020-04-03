@@ -73,7 +73,8 @@ public class WindowsViewerBehaviour : MonoBehaviour
             "piglet-1.0.0.glb"));
         
         ImportTask importTask = GLTFRuntimeImporter
-            .GetImportTask(uri, GameManager.Instance.OnImportProgress);
+            .GetImportTask(uri,
+                ImportProgressTracker.Instance.OnImportProgress);
 
         for (int i = 0; i < args.Length; ++i)
         {
@@ -91,7 +92,8 @@ public class WindowsViewerBehaviour : MonoBehaviour
                 // in place of the default Piglet model.
                 uri = new Uri(args[i + 1]);
                 importTask = GLTFRuntimeImporter
-                    .GetImportTask(uri, GameManager.Instance.OnImportProgress);
+                    .GetImportTask(uri,
+                        ImportProgressTracker.Instance.OnImportProgress);
             }
             else if (args[i] == "--no-load")
             {
