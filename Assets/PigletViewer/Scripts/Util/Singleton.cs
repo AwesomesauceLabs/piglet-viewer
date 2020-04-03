@@ -54,11 +54,21 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
         }
     }
  
+    /// <summary>
+    /// Unity callback that is invoked when a standalone
+    /// build exits, or when the user exits Play Mode
+    /// inside the Editor.
+    /// </summary>
     private void OnApplicationQuit()
     {
         m_ShuttingDown = true;
     }
  
+    /// <summary>
+    /// Unity callback that is invoked when a standalone
+    /// build exits, when a new scene is loaded, or when
+    /// the user exits Play Mode inside the Editor.
+    /// </summary>
     private void OnDestroy()
     {
         m_ShuttingDown = true;
