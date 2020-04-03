@@ -17,7 +17,7 @@ namespace Piglet
         /// The list of progress messages generated for the
         /// current glTF import.
         /// </summary>
-        public List<string> Log;
+        public List<string> Lines;
 
         public struct ProgressStep
         {
@@ -64,7 +64,7 @@ namespace Piglet
         /// </summary>
         protected ImportLog()
         {
-            Log = new List<string>();
+            Lines = new List<string>();
             _progressSteps = new List<ProgressStep>();
             _stopwatch = new Stopwatch();
         }
@@ -77,7 +77,7 @@ namespace Piglet
 #if UNITY_WEBGL && !UNITY_EDITOR
             JsLib.AppendLogLine(line);
 #else
-            Log.Add(line);
+            Lines.Add(line);
 #endif
         }
 
@@ -89,7 +89,7 @@ namespace Piglet
 #if UNITY_WEBGL && !UNITY_EDITOR
             JsLib.UpdateTailLogLine(line);
 #else
-            Log[Log.Count - 1] = line;
+            Lines[Lines.Count - 1] = line;
 #endif
         }
 
@@ -99,7 +99,7 @@ namespace Piglet
         /// </summary>
         public void StartImport()
         {
-            Log.Clear();
+            Lines.Clear();
             _progressSteps.Clear();
             _stopwatch.Restart();
         }
