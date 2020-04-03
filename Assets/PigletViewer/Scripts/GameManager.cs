@@ -69,10 +69,10 @@ public class GameManager : Singleton<GameManager>
     {
         Uri uri = new Uri(filename);
 
-        ImportTask importJob = GLTFRuntimeImporter
+        ImportTask importTask = GLTFRuntimeImporter
             .GetImportTask(data, OnImportProgress);
 
-        StartImport(importJob, uri);
+        StartImport(importTask, uri);
     }
 
     /// <summary>
@@ -88,10 +88,10 @@ public class GameManager : Singleton<GameManager>
     {
         Uri uri = new Uri(uriStr);
         
-        ImportTask importJob = GLTFRuntimeImporter
+        ImportTask importTask = GLTFRuntimeImporter
             .GetImportTask(uri, OnImportProgress);
 
-        StartImport(importJob, uri);
+        StartImport(importTask, uri);
     }
 
     public void StartImport(ImportTask importTask, Uri uri)
