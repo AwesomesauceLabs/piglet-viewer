@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Piglet;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -36,12 +37,6 @@ public class ViewerGUI : Singleton<ViewerGUI>
     public string DefaultFooterMessage;
     
     /// <summary>
-    /// The list of progress messages generated for the
-    /// current glTF import.
-    /// </summary>
-    public List<string> Log;
-
-    /// <summary>
     /// Enscapsulates GUIStyles that control GUI rendering (e.g.
     /// font sizes, text alignment).
     /// </summary>
@@ -68,11 +63,6 @@ public class ViewerGUI : Singleton<ViewerGUI>
         SpinY = 0;
     }
 
-    public void ResetLog()
-    {
-        Log = new List<string>();
-    }
-
     public void ResetFooterMessage()
     {
         FooterMessage = DefaultFooterMessage;
@@ -81,7 +71,6 @@ public class ViewerGUI : Singleton<ViewerGUI>
     public void Reset()
     {
         ResetSpin();
-        ResetLog();
         ResetFooterMessage();
     }
 
@@ -144,10 +133,10 @@ public class ViewerGUI : Singleton<ViewerGUI>
             Screen.height - 2 * padding));
         
             // progress log messages
-            foreach (var line in Log)
-               GUILayout.Label(line, _styles.Text);
-        
-        GUILayout.EndArea();
+            foreach (var line in ImportProgressTracker.Instance.Log)
+                GUILayout.Label(line, _styles.Text);
+
+            GUILayout.EndArea();
 #endif
 
         // footer message and "Spin X" / "Spin Y" sliders

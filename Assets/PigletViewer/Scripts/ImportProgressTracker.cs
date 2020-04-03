@@ -10,8 +10,14 @@ namespace Piglet
     /// Times the various steps/substeps of a glTF import and generates
     /// nicely formatted progress messages.
     /// </summary>
-    public class ImportProgressTracker
+    public class ImportProgressTracker : Singleton<ImportProgressTracker>
     {
+        /// <summary>
+        /// The list of progress messages generated for the
+        /// current glTF import.
+        /// </summary>
+        public List<string> Log;
+
         public struct ProgressStep
         {
             /// <summary>
@@ -57,6 +63,7 @@ namespace Piglet
         /// </summary>
         public ImportProgressTracker()
         {
+            Log = new List<string>();
             _progressSteps = new List<ProgressStep>();
             _stopwatch = new Stopwatch();
         }
@@ -67,6 +74,7 @@ namespace Piglet
         /// </summary>
         public void StartImport()
         {
+            Log.Clear();
             _progressSteps.Clear();
             _stopwatch.Restart();
         }

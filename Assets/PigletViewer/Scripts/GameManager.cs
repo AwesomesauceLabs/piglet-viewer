@@ -45,29 +45,11 @@ public class GameManager : Singleton<GameManager>
     private ImportTask _importTask;
     
     /// <summary>
-    /// Times import steps, and generates nicely formatted
-    /// progress messages.
-    /// </summary>
-    private ImportProgressTracker _progressTracker;
-
-    /// <summary>
-    /// Reset state variables before importing a new
-    /// glTF model.
-    /// </summary>
-    private void ResetImportState()
-    {
-        ViewerGUI.Instance.ResetLog();
-        _progressTracker = new ImportProgressTracker();
-    }
-    
-    /// <summary>
     /// Unity callback that is invoked before the first frame update
     /// and prior to Start().
     /// </summary>
     private void Awake()
     {
-        ResetImportState();
-        
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
         gameObject.AddComponent<WindowsViewerBehaviour>();
 #elif UNITY_ANDROID
@@ -122,14 +104,12 @@ public class GameManager : Singleton<GameManager>
 
     public void StartImport(ImportTask importTask, Uri uri)
     {
-        ResetImportState();
-
         string basename = uri.Segments[uri.Segments.Length - 1];
         string message = String.Format("Loading \"{0}\"...", basename);
-        ViewerGUI.Instance.Log.Add(message);
+        ImportProgressTracker.Instance.Log.Add(message);
         
-        _progressTracker.StartImport();
-        
+        ImportProgressTracker.Instance.StartImport();
+
         _importTask = importTask;
     }
 
@@ -168,9 +148,8 @@ public class GameManager : Singleton<GameManager>
     
     public void OnImportProgress(GLTFImporter.ImportStep importStep, int numCompleted, int total)
     {
-        _progressTracker.UpdateProgress(importStep, numCompleted, total);
-
-        string message = _progressTracker.GetProgressMessage();
+        ImportProgressTracker.Instance.UpdateProgress(importStep, numCompleted, total);
+        string message = ImportProgressTracker.Instance.GetProgressMessage();
 
         // Update existing tail log line if we are still importing
         // the same type of glTF entity (e.g. textures), or
@@ -183,8 +162,8 @@ public class GameManager : Singleton<GameManager>
         else
             JsLib.UpdateTailLogLine(message);
 #else
-        List<string> log = ViewerGUI.Instance.Log;
-        if (_progressTracker.IsNewImportStep())
+        List<string> log = ImportProgressTracker.Instance.Log;
+        if (ImportProgressTracker.Instance.IsNewImportStep())
             log.Add(message);
         else
             log[log.Count - 1] = message;
