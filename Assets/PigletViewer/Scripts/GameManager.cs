@@ -72,10 +72,6 @@ public class GameManager : Singleton<GameManager>
         ImportTask importJob = GLTFRuntimeImporter
             .GetImportTask(data, OnImportProgress);
 
-        importJob.OnCompleted += OnImportCompleted;
-        importJob.OnException += OnImportException;
-        importJob.RethrowExceptionAfterCallbacks = false;
-
         StartImport(importJob, uri);
     }
 
@@ -95,10 +91,6 @@ public class GameManager : Singleton<GameManager>
         ImportTask importJob = GLTFRuntimeImporter
             .GetImportTask(uri, OnImportProgress);
 
-        importJob.OnCompleted += OnImportCompleted;
-        importJob.OnException += OnImportException;
-        importJob.RethrowExceptionAfterCallbacks = false;
-        
         StartImport(importJob, uri);
     }
 
@@ -110,6 +102,10 @@ public class GameManager : Singleton<GameManager>
         
         ImportProgressTracker.Instance.StartImport();
 
+        importTask.OnCompleted += OnImportCompleted;
+        importTask.OnException += OnImportException;
+        importTask.RethrowExceptionAfterCallbacks = false;
+        
         _importTask = importTask;
     }
 
