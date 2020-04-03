@@ -96,12 +96,12 @@ public class GameManager : Singleton<GameManager>
 
     public void StartImport(ImportTask importTask, Uri uri)
     {
+        ImportProgressTracker.Instance.StartImport();
+
         string basename = uri.Segments[uri.Segments.Length - 1];
         string message = String.Format("Loading \"{0}\"...", basename);
         ImportProgressTracker.Instance.Log.Add(message);
         
-        ImportProgressTracker.Instance.StartImport();
-
         importTask.OnCompleted += OnImportCompleted;
         importTask.OnException += OnImportException;
         importTask.RethrowExceptionAfterCallbacks = false;
