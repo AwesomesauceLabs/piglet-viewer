@@ -130,13 +130,8 @@ public class WindowsViewerBehaviour : MonoBehaviour
         if (profile)
             importTask.OnCompleted += _ => importTask.LogProfilingData();
 
-        importTask.OnCompleted += GameManager.Instance.OnImportCompleted;
-
         if (quitAfterLoad)
             importTask.OnCompleted += _ => Application.Quit(0);
-        
-        importTask.OnException += GameManager.Instance.OnImportException;
-        importTask.RethrowExceptionAfterCallbacks = false;
 
         GameManager.Instance.StartImport(importTask, uri);
     }
