@@ -65,5 +65,13 @@ public static class JsLib
     /// </summary>
     [DllImport("__Internal")]
     public static extern void UpdateTailLogLine(string line);
+
+    /// <summary>
+    /// Return a localhost URL through which the given data
+    /// (byte[] array) can be read.  This method is a wrapper
+    /// around the Javascript method `URL.createObjectURL`.
+    /// </summary>
+    [DllImport("__Internal")]
+    public static extern string CreateObjectUrl(byte[] data, int size);
 }
 #endif
