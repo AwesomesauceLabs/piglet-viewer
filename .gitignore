@@ -8,12 +8,13 @@
 /Assets/ShaderForge*
 /Assets/VSCode*
 
-# I keep my build scripts (.do files) under
+# I keep my build scripts under
 # Builds, and this is also where the build
 # artifacts are generated.
 
-.redo
 /[Bb]uilds/[Aa]ndroid/piglet.apk
+/[Bb]uilds/WebGL/dist*
+/[Bb]uilds/Windows
 
 # JetBrains (Rider IDE)
 /Assets/Plugins/Editor/JetBrains/
