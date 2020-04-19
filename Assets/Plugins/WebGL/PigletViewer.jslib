@@ -111,7 +111,11 @@ var JsLib = {
 	// texture has finished loading, invoke a Unity C# callback so
 	// that a corresponding Unity Texture2D object can be created using
 	// Texture2D.CreateExternalTexture.
-	LoadTexture: function(array, size, callbackId)
+	//
+	// Note: `textureId` identifies the texture on the
+	// Unity/C# side and `nativeTextureId` identifies the texture
+	// on the Javascript/WebGL side.
+	LoadTexture: function(array, size, textureId)
 	{
 		// Copy the input PNG data (`array`) from the heap to
 		// a separate array (`copy`).  This is necessary
@@ -138,9 +142,9 @@ var JsLib = {
 
 			// Find a texture id that isn't already used by Unity
 
-			window.textureId = 0;
-			while (window.textureId in GL.textures)
-				window.textureId++;
+			var nativeTextureId = 0;
+			while (nativeTextureId in GL.textures)
+				nativeTextureId++;
 
 			// Create a new WebGL texture and add it to Unity's
 			// `GL.textures` array, so that it can later be
@@ -148,8 +152,8 @@ var JsLib = {
 			// See: https://forum.unity.com/threads/video-player-render-to-texture-performance-issue-in-webgl-on-chrome.735701/#post-5520109
 
 			var texture = GLctx.createTexture();
-			texture.name = window.textureId;
-			GL.textures[window.textureId] = texture;
+			texture.name = nativeTextureId;
+			GL.textures[nativeTextureId] = texture;
 
 			// Allocate memory for the texture.
 			// Note: This creates an "immutable" texture.
@@ -166,7 +170,7 @@ var JsLib = {
 			// Invoke Unity C# callback for creating texture
 			// on the Unity side, using Texture2D.CreateExternalTexture.
 
-			var args = [callbackId, window.textureId, image.width, image.height].join(':');
+			var args = [textureId, nativeTextureId, image.width, image.height].join(':');
 			SendMessage("Piglet.WebGlTextureImporter (Singleton)", "OnLoadTexture", args);
 
 		};
