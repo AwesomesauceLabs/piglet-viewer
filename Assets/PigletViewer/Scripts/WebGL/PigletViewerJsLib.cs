@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 ///
 /// The definitions for these functions are in PigletViewer.jslib.
 /// </summary>
-public static class JsLib
+public static class PigletViewerJsLib
 {
     /// <summary>
     /// Performs one-time Javascript initialization

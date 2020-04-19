@@ -2,7 +2,7 @@
 // See `JavascriptAPI.cs` for the corresponding `extern`
 // method declarations in the C# code.
 
-var JsLib = {
+var PigletViewerJsLib = {
 
 	Init: function() {
 		var root = window.document;
@@ -179,4 +179,4 @@ var JsLib = {
 	},
 };
 
-mergeInto(LibraryManager.library, JsLib);
+mergeInto(LibraryManager.library, PigletViewerJsLib);

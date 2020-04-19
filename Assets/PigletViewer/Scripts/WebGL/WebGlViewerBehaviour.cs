@@ -20,7 +20,7 @@ public class WebGlViewerBehaviour : MonoBehaviour
         
         // run javascript startup tasks (e.g. register event
         // handlers for drag-and-drop)
-        JsLib.Init();
+        PigletViewerJsLib.Init();
         
         // load default model (Piglet mascot) 
         GameManager.Instance.StartImport(Path.Combine(
@@ -48,13 +48,13 @@ public class WebGlViewerBehaviour : MonoBehaviour
     /// </param>
     public void ImportFileWebGl(string filename)
     {
-        var size = JsLib.GetFileSize(filename);
-        var jsData = JsLib.GetFileData(filename);
+        var size = PigletViewerJsLib.GetFileSize(filename);
+        var jsData = PigletViewerJsLib.GetFileData(filename);
 
         var data = new byte[size];
         Marshal.Copy(jsData, data, 0, size);
 
-        JsLib.FreeFileData(filename);
+        PigletViewerJsLib.FreeFileData(filename);
 
         GameManager.Instance.StartImport(data, filename);
     }
