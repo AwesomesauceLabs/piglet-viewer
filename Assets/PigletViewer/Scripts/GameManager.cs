@@ -52,7 +52,7 @@ public class GameManager : Singleton<GameManager>
     /// </summary>
     public void StartImport(byte[] data, string filename)
     {
-        Uri uri = new Uri(filename);
+        Uri uri = new Uri(filename, UriKind.Relative);
 
         ImportTask importTask = GLTFRuntimeImporter
             .GetImportTask(data,
