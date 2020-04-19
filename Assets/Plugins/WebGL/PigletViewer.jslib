@@ -1,5 +1,5 @@
 // Javascript methods that are callable from C# code.
-// See `JavascriptAPI.cs` for the corresponding `extern`
+// See `PigletViewerJsLib.cs` for the corresponding `extern`
 // method declarations in the C# code.
 
 var PigletViewerJsLib = {
