@@ -65,34 +65,5 @@ public static class PigletViewerJsLib
     /// </summary>
     [DllImport("__Internal")]
     public static extern void UpdateTailLogLine(string line);
-
-    /// <summary>
-    /// Return a localhost URL through which the given data
-    /// (byte[] array) can be read.  This method is a wrapper
-    /// around the Javascript method `URL.createObjectURL`.
-    /// </summary>
-    [DllImport("__Internal")]
-    public static extern string CreateObjectUrl(byte[] data, int size);
-
-    /// <summary>
-    /// Load a texture from in-memory PNG/JPG data using
-    /// browser-side scripting (i.e. Javascript/WebGL).  Using
-    /// the browser to load a texture is preferable to standard
-    /// Unity texture-loading methods because it is faster
-    /// and can run in parallel with the main Unity thread.
-    /// Once the texture has been loaded by the browser, the
-    /// Javascript calls back into the Unity C# code
-    /// using the provided `textureId`, so that a
-    /// Texture2D object can be created that links to the native
-    /// WebGL texture (see Texture2D.CreateExternalTexture).
-    /// </summary>
-    /// <param name="data">raw PNG/JPG image data</param>
-    /// <param name="size">the size of the data array, in bytes</param>
-    /// <param name="textureId">
-    /// Uniquely identifies the Unity Texture2D object that corresponds
-    /// the native WebGL texture.
-    /// </param>
-    [DllImport("__Internal")]
-    public static extern void LoadTexture(byte[] data, int size, int textureId);
 }
 #endif
