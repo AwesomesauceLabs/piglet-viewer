@@ -106,6 +106,73 @@ var JsLib = {
 
 		return buffer;
 	},
+
+	// Create a WebGL texture from in-memory PNG data.  When the
+	// texture has finished loading, invoke a Unity C# callback so
+	// that a corresponding Unity Texture2D object can be created using
+	// Texture2D.CreateExternalTexture.
+	LoadTexture: function(array, size, callbackId)
+	{
+		// Copy the input PNG data (`array`) from the heap to
+		// a separate array (`copy`).  This is necessary
+		// because any views on the heap (e.g. `slice` below)
+		// are invalidated whenever the heap size grows.
+		//
+		// For background info, see:
+		// https://emscripten.org/docs/porting/connecting_cpp_and_javascript/Interacting-with-code.html#access-memory-from-javascript
+
+		var slice = new Uint8Array(HEAPU8.buffer, array, size);
+		var copy = new Uint8Array(slice);
+		var blob = new Blob([copy], {type: 'image/png'});
+
+		// Make the data available through a (temporary) localhost URL,
+		// so that it can be assigned to an image element.
+
+		var url = URL.createObjectURL(blob);
+
+		// Create an image element and load the PNG data into it.
+
+		var image = new Image();
+
+		image.onload = function() {
+
+			// Find a texture id that isn't already used by Unity
+
+			window.textureId = 0;
+			while (window.textureId in GL.textures)
+				window.textureId++;
+
+			// Create a new WebGL texture and add it to Unity's
+			// `GL.textures` array, so that it can later be
+			// found/used by `Texture2D.CreateExternalTexture`.
+			// See: https://forum.unity.com/threads/video-player-render-to-texture-performance-issue-in-webgl-on-chrome.735701/#post-5520109
+
+			var texture = GLctx.createTexture();
+			texture.name = window.textureId;
+			GL.textures[window.textureId] = texture;
+
+			// Allocate memory for the texture.
+			// Note: This creates an "immutable" texture.
+
+			GLctx.bindTexture(GLctx.TEXTURE_2D, texture);
+			var format = GLctx.RGBA8;
+			GLctx.texStorage2D(GLctx.TEXTURE_2D, 1, format, image.width, image.height);
+
+			// Load the PNG data into the texture.
+
+			GLctx.texSubImage2D(GLctx.TEXTURE_2D, 0, 0, 0, GLctx.RGBA,
+					GLctx.UNSIGNED_BYTE, image);
+
+			// Invoke Unity C# callback for creating texture
+			// on the Unity side, using Texture2D.CreateExternalTexture.
+
+			var args = [callbackId, window.textureId, image.width, image.height].join(':');
+			SendMessage("Piglet.WebGlTextureImporter (Singleton)", "OnLoadTexture", args);
+
+		};
+
+		image.src = url;
+	},
 };
 
 mergeInto(LibraryManager.library, JsLib);
