@@ -41,10 +41,12 @@ var PigletJsLib = {
 	// that a corresponding Unity Texture2D object can be created using
 	// Texture2D.CreateExternalTexture.
 	//
-	// Note: `textureId` identifies the texture on the
+	// Note 1: `textureId` identifies the texture on the
 	// Unity/C# side and `nativeTextureId` identifies the texture
 	// on the Javascript/WebGL side.
-	LoadTexture: function(array, size, textureId)
+    //
+    // Note 2: `mimeType` is typically "image/png" or "image/jpeg".
+	LoadTexture: function(array, size, mimeType, textureId)
 	{
 		// Copy the input PNG data (`array`) from the heap to
 		// a separate array (`copy`).  This is necessary
@@ -56,7 +58,7 @@ var PigletJsLib = {
 
 		var slice = new Uint8Array(HEAPU8.buffer, array, size);
 		var copy = new Uint8Array(slice);
-		var blob = new Blob([copy], {type: 'image/png'});
+		var blob = new Blob([copy], {type: mimeType});
 
 		// Make the data available through a (temporary) localhost URL,
 		// so that it can be assigned to an image element.
