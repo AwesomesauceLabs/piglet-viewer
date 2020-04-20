@@ -71,18 +71,14 @@ var PigletJsLib = {
 
 		image.onload = function() {
 
-			// Find a texture id that isn't already used by Unity
-
-			var nativeTextureId = 0;
-			while (nativeTextureId in GL.textures)
-				nativeTextureId++;
-
-			// Create a new WebGL texture and add it to Unity's
+			// Create a new WebGL texture and add it to emscripten's
 			// `GL.textures` array, so that it can later be
 			// found/used by `Texture2D.CreateExternalTexture`.
 			// See: https://forum.unity.com/threads/video-player-render-to-texture-performance-issue-in-webgl-on-chrome.735701/#post-5520109
+			// and https://github.com/emscripten-core/emscripten/issues/6103#issuecomment-358916669
 
 			var texture = GLctx.createTexture();
+			var nativeTextureId = GL.getNewId(GL.textures);
 			texture.name = nativeTextureId;
 			GL.textures[nativeTextureId] = texture;
 
