@@ -130,12 +130,17 @@
           Piglet glTF Importer for Unity. Browse for a .glb/.zip file
           below or drag a .glb/.zip onto the view area.
         </p>
-        <p>
-          To load a model, select a .glb/.zip file below or
-          drag a .glb/.zip onto the view area. It is possible to drag
-          URLs onto the view area as well.
-        </p>
-        <input id="inputFile" type="file">
+        <!--
+        I use two <input> elements here to better control the styling of the
+        the browse-for-file button.  In particular, I wanted to disable display
+        of the selected file name beside the browse button. For discussion,
+        see: https://stackoverflow.com/a/14806776/12989671
+
+        For discussion of the `accept` attribute, see:
+        https://stackoverflow.com/a/23706177/12989671
+        -->
+        <input type="file" id="inputFile" accept=".glb,.zip" style="display: none;" />
+        <input type="button" value="Browse..." onclick="document.getElementById('inputFile').click();" />
         <header>
           <h1>Sample Models</h1>
         </header>
