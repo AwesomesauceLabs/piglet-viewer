@@ -170,8 +170,8 @@ public class GameManager : Singleton<GameManager>
     /// </summary>
     public void OnImportException(Exception e)
     {
-        ViewerGUI.Instance.FooterMessage = string.Format(
-            "error: {0}", e.Message);
+        ViewerGUI.Instance.ShowDialogBox("Failed to Load Model",
+            StringUtil.WrapText(e.Message, 40));
         
         _importTask = null;
     }
