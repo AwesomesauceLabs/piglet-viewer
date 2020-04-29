@@ -34,7 +34,7 @@ function ImportUrl(url)
 {
 	console.log("loading url: " + url);
     ClearImportLog();
-	SendMessage("GameManager", "StartImport", url);
+	SendMessage("GameManager", "ImportUrlWebGl", url);
 }
 
 // Event handler that is called when something (e.g. a file) is dragged

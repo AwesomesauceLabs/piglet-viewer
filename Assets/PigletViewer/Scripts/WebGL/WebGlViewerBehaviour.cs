@@ -58,5 +58,19 @@ public class WebGlViewerBehaviour : MonoBehaviour
 
         GameManager.Instance.StartImport(data, filename);
     }
+
+    /// <summary>
+    /// Import a model from a .glb/.zip URL that is dragged
+    /// onto the HTML canvas.  This wrapper method around
+    /// GameManager.StartImport is necessary because there
+    /// are multiple versions of GameManager.StartImport
+    /// with different arguments, and SendMessage
+    /// doesn't correctly handle method overloading.
+    /// See: https://answers.unity.com/questions/285988/sendmessage-and-method-overload-dont-get-well-toge.html
+    /// </summary>
+    public void ImportUrlWebGl(string url)
+    {
+        GameManager.Instance.StartImport(url);
+    }
 }
 #endif
