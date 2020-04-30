@@ -171,7 +171,7 @@ public class GameManager : Singleton<GameManager>
     public void OnImportException(Exception e)
     {
         ViewerGUI.Instance.ShowDialogBox("Failed to Load Model",
-            StringUtil.WrapText(e.Message, 40));
+            StringUtil.WrapText(e.Message, 50));
         
         _importTask = null;
     }

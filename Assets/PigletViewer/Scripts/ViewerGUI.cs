@@ -164,22 +164,22 @@ public class ViewerGUI : Singleton<ViewerGUI>
         _styles.DialogHeading.normal.background = roundedRectDarkGray;
         _styles.DialogHeading.border = new RectOffset(10, 10, 10, 10);
         _styles.DialogHeading.alignment = TextAnchor.MiddleLeft;
-        _styles.DialogHeading.margin = new RectOffset(10, 10, 10, 10);
-        _styles.DialogHeading.padding = new RectOffset(15, 15, 15, 15);
+        _styles.DialogHeading.margin = new RectOffset(15, 15, 15, 15);
+        _styles.DialogHeading.padding = new RectOffset(15, 15, 11, 11);
         _styles.DialogHeading.fontSize = 24;
 
         _styles.DialogText = new GUIStyle(GUI.skin.label);
         _styles.DialogText.alignment = TextAnchor.MiddleLeft;
-        _styles.DialogText.margin = new RectOffset(10, 10, 10, 10);
+        _styles.DialogText.margin = new RectOffset(15, 15, 15, 15);
         _styles.DialogText.padding = new RectOffset(10, 10, 0, 0);
-        _styles.DialogText.fontSize = 18;
+        _styles.DialogText.fontSize = 20;
         
         _styles.DialogButton = new GUIStyle(GUI.skin.button);
         _styles.DialogButton.normal.background = roundedRectDarkGray;
         _styles.DialogButton.hover.background = roundedRectWhite;
         _styles.DialogButton.active.background = roundedRectWhite;
         _styles.DialogButton.border = new RectOffset(10, 10, 10, 10);
-        _styles.DialogButton.margin = new RectOffset(10, 10, 10, 10);
+        _styles.DialogButton.margin = new RectOffset(15, 15, 15, 15);
         _styles.DialogButton.padding = new RectOffset(30, 30, 11, 11);
         _styles.DialogButton.alignment = TextAnchor.MiddleCenter;
         _styles.DialogButton.fontSize = 18;
