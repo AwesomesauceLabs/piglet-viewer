@@ -128,11 +128,9 @@ public class ViewerGUI : Singleton<ViewerGUI>
         if (_styles != null)
             return;
 
-        Texture2D roundedRectWhite = Resources.Load<Texture2D>("RoundedRect");
-        Texture2D roundedRectLightGray = TintTexture(roundedRectWhite,
-            new Color(0.95f, 0.95f, 0.95f, 1.0f));
-        Texture2D roundedRectDarkGray = TintTexture(roundedRectWhite,
-            new Color(0.86f, 0.86f, 0.86f, 1.0f));
+        Texture2D roundedRectWhite = Resources.Load<Texture2D>("RoundedRectWhite");
+        Texture2D roundedRectLightGray = Resources.Load<Texture2D>("RoundedRectLightGray");
+        Texture2D roundedRectDarkGray = Resources.Load<Texture2D>("RoundedRectDarkGray");
 
         _styles = new Styles();
         
@@ -174,7 +172,7 @@ public class ViewerGUI : Singleton<ViewerGUI>
         _styles.DialogText.alignment = TextAnchor.MiddleLeft;
         _styles.DialogText.margin = new RectOffset(10, 10, 10, 10);
         _styles.DialogText.padding = new RectOffset(10, 10, 0, 0);
-        _styles.DialogText.fontSize = 22;
+        _styles.DialogText.fontSize = 18;
         
         _styles.DialogButton = new GUIStyle(GUI.skin.button);
         _styles.DialogButton.normal.background = roundedRectDarkGray;
@@ -185,24 +183,6 @@ public class ViewerGUI : Singleton<ViewerGUI>
         _styles.DialogButton.padding = new RectOffset(30, 30, 11, 11);
         _styles.DialogButton.alignment = TextAnchor.MiddleCenter;
         _styles.DialogButton.fontSize = 18;
-    }
-
-    /// <summary>
-    /// Tint the input texture with the given color and return the
-    /// result as new texture.
-    /// </summary>
-    private Texture2D TintTexture(Texture2D texture, Color color)
-    {
-        Color[] pixels = texture.GetPixels();
-        for (var i = 0; i < pixels.Length; ++i)
-            pixels[i] = pixels[i] * color;
-        
-        Texture2D tintedTexture = new Texture2D(
-            texture.width, texture.height, texture.format, false);
-        tintedTexture.SetPixels(pixels);
-        tintedTexture.Apply();
-        
-        return tintedTexture;
     }
 
     /// <summary>
