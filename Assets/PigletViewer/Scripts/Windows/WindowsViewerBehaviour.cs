@@ -72,7 +72,7 @@ public class WindowsViewerBehaviour : MonoBehaviour
         Uri uri = new Uri(Path.Combine(Application.streamingAssetsPath,
             "piglet-1.0.0.glb"));
         
-        ImportTask importTask = GLTFRuntimeImporter
+        GltfImportTask importTask = GLTFRuntimeImporter
             .GetImportTask(uri,
                 ImportLog.Instance.OnImportProgress);
 

@@ -27,7 +27,7 @@ public class GameManager : Singleton<GameManager>
     /// incrementally advanced by calling
     /// `PumpImportJob` in `Update`.
     /// </summary>
-    private ImportTask _importTask;
+    private GltfImportTask _importTask;
     
     /// <summary>
     /// Unity callback that is invoked before the first frame update
@@ -54,7 +54,7 @@ public class GameManager : Singleton<GameManager>
     {
         Uri uri = new Uri(filename, UriKind.Relative);
 
-        ImportTask importTask = GLTFRuntimeImporter
+        GltfImportTask importTask = GLTFRuntimeImporter
             .GetImportTask(data,
                 ImportLog.Instance.OnImportProgress);
 
@@ -74,14 +74,14 @@ public class GameManager : Singleton<GameManager>
     {
         Uri uri = new Uri(uriStr);
         
-        ImportTask importTask = GLTFRuntimeImporter
+        GltfImportTask importTask = GLTFRuntimeImporter
             .GetImportTask(uri,
                 ImportLog.Instance.OnImportProgress);
 
         StartImport(importTask, uri);
     }
 
-    public void StartImport(ImportTask importTask, Uri uri)
+    public void StartImport(GltfImportTask importTask, Uri uri)
     {
         ImportLog.Instance.StartImport();
 
