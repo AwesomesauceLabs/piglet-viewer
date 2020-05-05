@@ -54,7 +54,7 @@ public class GameManager : Singleton<GameManager>
     {
         Uri uri = new Uri(filename, UriKind.Relative);
 
-        GltfImportTask importTask = GLTFRuntimeImporter
+        GltfImportTask importTask = RuntimeGltfImporter
             .GetImportTask(data,
                 ImportLog.Instance.OnImportProgress);
 
@@ -74,7 +74,7 @@ public class GameManager : Singleton<GameManager>
     {
         Uri uri = new Uri(uriStr);
         
-        GltfImportTask importTask = GLTFRuntimeImporter
+        GltfImportTask importTask = RuntimeGltfImporter
             .GetImportTask(uri,
                 ImportLog.Instance.OnImportProgress);
 

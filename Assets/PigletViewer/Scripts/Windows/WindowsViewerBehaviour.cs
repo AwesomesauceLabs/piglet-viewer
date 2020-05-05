@@ -72,7 +72,7 @@ public class WindowsViewerBehaviour : MonoBehaviour
         Uri uri = new Uri(Path.Combine(Application.streamingAssetsPath,
             "piglet-1.0.0.glb"));
         
-        GltfImportTask importTask = GLTFRuntimeImporter
+        GltfImportTask importTask = RuntimeGltfImporter
             .GetImportTask(uri,
                 ImportLog.Instance.OnImportProgress);
 
@@ -91,7 +91,7 @@ public class WindowsViewerBehaviour : MonoBehaviour
                 // Specify a model to load at startup,
                 // in place of the default Piglet model.
                 uri = new Uri(args[i + 1]);
-                importTask = GLTFRuntimeImporter
+                importTask = RuntimeGltfImporter
                     .GetImportTask(uri,
                         ImportLog.Instance.OnImportProgress);
             }
