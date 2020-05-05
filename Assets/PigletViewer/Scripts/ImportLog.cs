@@ -29,7 +29,7 @@ namespace Piglet
             /// time that type on a single line of the progress
             /// log.
             /// </summary>
-            public GLTFImporter.ImportStep Step;
+            public GltfImporter.ImportStep Step;
             /// <summary>
             /// Number of glTF entities imported so far for the
             /// current import step (e.g. textures, meshes).
@@ -104,7 +104,7 @@ namespace Piglet
             Stopwatch.Restart();
         }
 
-        public void OnImportProgress(GLTFImporter.ImportStep importStep, int numCompleted, int total)
+        public void OnImportProgress(GltfImporter.ImportStep importStep, int numCompleted, int total)
         {
             UpdateProgress(importStep, numCompleted, total);
             string message = GetProgressMessage();
@@ -125,7 +125,7 @@ namespace Piglet
         /// <summary>
         /// Record a new progress step.
         /// </summary>
-       public void UpdateProgress(GLTFImporter.ImportStep importStep,
+       public void UpdateProgress(GltfImporter.ImportStep importStep,
             int numCompleted, int numTotal)
         {
             _progressSteps.Add(new ProgressStep
@@ -145,7 +145,7 @@ namespace Piglet
         public long GetMillisecondsForCurrentImportStep()
         {
             ProgressStep progressStep = _progressSteps[_progressSteps.Count - 1];
-            GLTFImporter.ImportStep importStep = progressStep.Step;
+            GltfImporter.ImportStep importStep = progressStep.Step;
             
             long endTime = progressStep.ElapsedMilliseconds;
             long startTime = 0;
@@ -189,19 +189,19 @@ namespace Piglet
             string message;
             switch (progressStep.Step)
             {
-                case GLTFImporter.ImportStep.Read:
+                case GltfImporter.ImportStep.Read:
                     float kb = progressStep.NumCompleted / 1024f;
                     float totalKb = progressStep.NumTotal / 1024f;
                     message = string.Format(
                         "Reading {0:D}/{1:D} KB...",
                         (int)Mathf.Round(kb), (int)Mathf.Round(totalKb));
                     break;
-                case GLTFImporter.ImportStep.Parse:
+                case GltfImporter.ImportStep.Parse:
                     message = string.Format(
                         "Parsing json {0}/{1}...", currentStep,
                         progressStep.NumTotal);
                     break;
-                case GLTFImporter.ImportStep.MorphTarget:
+                case GltfImporter.ImportStep.MorphTarget:
                     message = string.Format(
                         "Loading morph targets {0}/{1}...",
                         currentStep, progressStep.NumTotal);
