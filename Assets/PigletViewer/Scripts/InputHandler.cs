@@ -1,5 +1,6 @@
 ﻿using System;
 using Piglet;
+using PigletViewer;
 using UnityEngine;
 
 /// <summary>
@@ -206,10 +207,10 @@ public class InputHandler : Singleton<InputHandler>
             GameManager.Instance.RotateModel(new Vector3(-deltaY, -deltaX, 0));
 
         if (mouseActions.HasFlag(MouseAction.Pan))
-            GameManager.Instance.PanCamera(new Vector3(-deltaX, deltaY, 0));
+            CameraBehaviour.Instance.PanCamera(new Vector3(-deltaX, deltaY, 0));
 
         if (mouseActions.HasFlag(MouseAction.Zoom))
-            GameManager.Instance.ZoomCamera(deltaZ);
+            CameraBehaviour.Instance.ZoomCamera(deltaZ);
 
         _prevTouchState.TouchCount = Input.touchCount;
     }
@@ -300,12 +301,12 @@ public class InputHandler : Singleton<InputHandler>
             GameManager.Instance.RotateModel(new Vector3(deltaY, -deltaX, 0));
 
         if (mouseActions.HasFlag(MouseAction.Pan))
-            GameManager.Instance.PanCamera(new Vector3(-deltaX, -deltaY, 0));
+            CameraBehaviour.Instance.PanCamera(new Vector3(-deltaX, -deltaY, 0));
 
         if (mouseActions.HasFlag(MouseAction.Zoom))
-            GameManager.Instance.ZoomCamera(deltaZ);
+            CameraBehaviour.Instance.ZoomCamera(deltaZ);
 
-        // Record current mouse position and button states 
+        // Record current mouse position and button states
         // for use in the next frame, so that we can detect when
         // button states have changed.
         

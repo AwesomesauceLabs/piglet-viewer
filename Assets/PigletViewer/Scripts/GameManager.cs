@@ -109,26 +109,6 @@ public class GameManager : Singleton<GameManager>
             rotation * MouseRotateSpeed);
     }
 
-    /// <summary>
-    /// Move the camera as per the given displacement vector.
-    /// </summary>
-    public void PanCamera(Vector3 pan)
-    {
-        if (Camera == null)
-            return;
-
-        Camera.transform.Translate(pan * MousePanSpeed, Space.Self);
-    }
-
-    /// <summary>
-    /// Move the camera along the Z-axis, towards/away from the model.
-    /// </summary>
-    public void ZoomCamera(float deltaZ)
-    {
-        Vector3 zoom = new Vector3(0, 0, deltaZ);
-        Camera.transform.Translate(zoom * MouseZoomSpeed, Space.Self);
-    }
-    
     public void OnValidate()
     {
         if (ModelSize < 0.001f)
