@@ -40,7 +40,7 @@ public class ViewerGUI : Singleton<ViewerGUI>
     /// glTF model has been loaded.
     /// </summary>
     public string DefaultFooterMessage;
-    
+
     /// <summary>
     /// Enscapsulates GUIStyles that control GUI rendering (e.g.
     /// font sizes, text alignment).
@@ -80,11 +80,11 @@ public class ViewerGUI : Singleton<ViewerGUI>
     /// displayed.
     /// </summary>
     private DialogBoxContent _dialogBoxContent;
-    
+
     public ViewerGUI()
     {
         _styles = null;
-        
+
         Reset();
     }
 
@@ -113,7 +113,7 @@ public class ViewerGUI : Singleton<ViewerGUI>
     {
         _dialogBoxContent = null;
     }
-    
+
     /// <summary>
     /// Display a dialog box with the given title and body text.
     /// The dialog box will be dismissed when the user presses the
@@ -138,7 +138,7 @@ public class ViewerGUI : Singleton<ViewerGUI>
         Texture2D roundedRectDarkGray = Resources.Load<Texture2D>("RoundedRectDarkGray");
 
         _styles = new Styles();
-        
+
         _styles.Title = new GUIStyle(GUI.skin.label);
         _styles.Title.alignment = TextAnchor.MiddleLeft;
         _styles.Title.margin = new RectOffset(
@@ -155,16 +155,16 @@ public class ViewerGUI : Singleton<ViewerGUI>
         _styles.SliderLabel = new GUIStyle(GUI.skin.label);
         _styles.SliderLabel.alignment = TextAnchor.MiddleCenter;
         _styles.SliderLabel.fontSize = 24;
-        
+
         _styles.FooterText = new GUIStyle(GUI.skin.label);
         _styles.FooterText.alignment = TextAnchor.MiddleCenter;
         _styles.FooterText.fontStyle = FontStyle.Italic;
         _styles.FooterText.fontSize = 24;
-        
+
         _styles.DialogBox = new GUIStyle(GUI.skin.window);
         _styles.DialogBox.normal.background = roundedRectLightGray;
         _styles.DialogBox.border = new RectOffset(20, 20, 20, 20);
-        
+
         _styles.DialogHeading = new GUIStyle(GUI.skin.label);
         _styles.DialogHeading.normal.background = roundedRectDarkGray;
         _styles.DialogHeading.border = new RectOffset(10, 10, 10, 10);
@@ -178,7 +178,7 @@ public class ViewerGUI : Singleton<ViewerGUI>
         _styles.DialogText.margin = new RectOffset(15, 15, 15, 15);
         _styles.DialogText.padding = new RectOffset(10, 10, 0, 0);
         _styles.DialogText.fontSize = 20;
-        
+
         _styles.DialogButton = new GUIStyle(GUI.skin.button);
         _styles.DialogButton.normal.background = roundedRectDarkGray;
         _styles.DialogButton.hover.background = roundedRectWhite;
@@ -205,15 +205,15 @@ public class ViewerGUI : Singleton<ViewerGUI>
         //
         // On Windows, the import log is drawn on top
         // of the window, in the upper left hand corner.
-        
+
 #if !UNITY_WEBGL || UNITY_EDITOR
         float padding = 25;
-        
+
         GUILayout.BeginArea(new Rect(
             padding, padding,
             Screen.width - 2 * padding,
             Screen.height - 2 * padding));
-        
+
             // progress log messages
             foreach (var line in ImportLog.Instance.Lines)
                 GUILayout.Label(line, _styles.Text);
@@ -224,7 +224,7 @@ public class ViewerGUI : Singleton<ViewerGUI>
         // footer message and "Spin X" / "Spin Y" sliders
 
         float footerAreaHeight = 100;
-        
+
         float labelWidth = 100;
         float sliderWidth = 100;
         float sliderAreaWidth = 2 * labelWidth + 2 * sliderWidth;
@@ -232,17 +232,17 @@ public class ViewerGUI : Singleton<ViewerGUI>
         Rect footerAreaRect = new Rect(
             0, Screen.height - footerAreaHeight,
             Screen.width, footerAreaHeight);
-        
+
         GUILayout.BeginArea(footerAreaRect);
 
             GUILayout.FlexibleSpace();
-            
+
             GUILayout.BeginHorizontal();
                 GUILayout.FlexibleSpace();
                 GUILayout.Label(FooterMessage, _styles.FooterText);
                 GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
-            
+
             GUILayout.FlexibleSpace();
 
             // We don't show the "Spin X" / "Spin Y" sliders
@@ -252,41 +252,41 @@ public class ViewerGUI : Singleton<ViewerGUI>
             if (Application.platform != RuntimePlatform.Android)
             {
                 GUILayout.BeginHorizontal();
-                
+
                     GUILayout.FlexibleSpace();
-                    
+
                     GUILayout.BeginVertical();
                         GUILayout.FlexibleSpace();
                         GUILayout.Label("Spin X", _styles.SliderLabel,
                             GUILayout.Width(labelWidth));
                         GUILayout.FlexibleSpace();
                     GUILayout.EndVertical();
-                    
+
                     GUILayout.BeginVertical();
                         GUILayout.FlexibleSpace();
                         SpinX = GUILayout.HorizontalSlider(
                             SpinX, 0, 1, GUILayout.Width(sliderWidth));
                         GUILayout.FlexibleSpace();
                     GUILayout.EndVertical();
-                    
+
                     GUILayout.BeginVertical();
                         GUILayout.FlexibleSpace();
                         GUILayout.Label("Spin Y", _styles.SliderLabel,
                             GUILayout.Width(labelWidth));
                         GUILayout.FlexibleSpace();
                     GUILayout.EndVertical();
-                    
+
                     GUILayout.BeginVertical();
                         GUILayout.FlexibleSpace();
                         SpinY = GUILayout.HorizontalSlider(
                             SpinY, 0, 1, GUILayout.Width(sliderWidth));
                         GUILayout.FlexibleSpace();
                     GUILayout.EndVertical();
-                    
+
                     GUILayout.FlexibleSpace();
-                    
+
                 GUILayout.EndHorizontal();
-                
+
                 GUILayout.FlexibleSpace();
             }
 
@@ -305,7 +305,7 @@ public class ViewerGUI : Singleton<ViewerGUI>
             return;
 
         GUIContent content;
-        
+
         content = new GUIContent(_dialogBoxContent.Title);
         Vector2 headingSize = _styles.DialogHeading.CalcSize(content);
 
@@ -318,7 +318,7 @@ public class ViewerGUI : Singleton<ViewerGUI>
         var headingMargin = _styles.DialogHeading.margin;
         var textMargin = _styles.DialogText.margin;
         var buttonMargin = _styles.DialogButton.margin;
-        
+
         var dialogHeight =
             headingMargin.top
             + headingSize.y
@@ -332,7 +332,7 @@ public class ViewerGUI : Singleton<ViewerGUI>
             headingMargin.left + headingSize.x + headingMargin.right,
             textMargin.left + textSize.x + textMargin.right,
             buttonMargin.left + buttonSize.x + buttonMargin.right);
-            
+
         var rect = new Rect(
             (Screen.width - dialogWidth) / 2,
             (Screen.height - dialogHeight) / 2,
@@ -341,15 +341,15 @@ public class ViewerGUI : Singleton<ViewerGUI>
         GUI.Box(rect, "", _styles.DialogBox);
 
         GUILayout.BeginArea(rect);
-        
+
             GUILayout.Space(headingMargin.top);
-            
+
             GUILayout.BeginHorizontal();
                 GUILayout.Space(headingMargin.left);
                 GUILayout.Label(_dialogBoxContent.Title, _styles.DialogHeading);
                 GUILayout.Space(headingMargin.right);
             GUILayout.EndHorizontal();
-            
+
             GUILayout.BeginHorizontal();
                 GUILayout.Space(textMargin.left);
                 GUILayout.Label(_dialogBoxContent.Message, _styles.DialogText);
