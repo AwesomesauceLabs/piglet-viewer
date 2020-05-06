@@ -6,7 +6,6 @@ using UnityGLTF;
 
 public class GameManager : Singleton<GameManager>
 {
-    public Camera Camera;
     public Vector3 ModelPositionRelativeToCamera;
     public float ModelSize;
 

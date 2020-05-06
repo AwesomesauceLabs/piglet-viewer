@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Piglet;
+using PigletViewer;
 using UnityEngine;
 
 public class ModelBehaviour : MonoBehaviour
@@ -10,7 +11,7 @@ public class ModelBehaviour : MonoBehaviour
     /// </summary>
     void Start()
     {
-        InitModelTransformRelativeToCamera(GameManager.Instance.Camera);
+        InitModelTransformRelativeToCamera();
     }
 
     /// <summary>
@@ -53,9 +54,11 @@ public class ModelBehaviour : MonoBehaviour
         transform.SetParent(null, true);
         Destroy(pivot);
     }
-    
-    public void InitModelTransformRelativeToCamera(Camera camera)
+
+    public void InitModelTransformRelativeToCamera()
     {
+        Transform cameraTransform = CameraBehaviour.Instance.transform;
+
         // Scale model up/down to a standard size, so that the
         // largest dimension of its bounding box is equal to `ModelSize`.
 
@@ -73,8 +76,8 @@ public class ModelBehaviour : MonoBehaviour
 
         // Rotate model to face camera.
 
-        transform.up = camera.transform.up;
-        transform.forward = camera.transform.forward;
+        transform.up = cameraTransform.up;
+        transform.forward = cameraTransform.forward;
 
         // Translate model at standard offset from camera.
 
@@ -82,7 +85,7 @@ public class ModelBehaviour : MonoBehaviour
         if (!bounds.HasValue)
             return;
 
-        transform.Translate(camera.transform.position
+        transform.Translate(cameraTransform.position
             + GameManager.Instance.ModelPositionRelativeToCamera
             - bounds.Value.center);
     }
