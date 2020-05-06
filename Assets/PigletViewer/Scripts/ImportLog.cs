@@ -47,12 +47,12 @@ namespace Piglet
             /// </summary>
             public long ElapsedMilliseconds;
         }
-        
+
         /// <summary>
         /// A progress history
         /// </summary>
         private readonly List<ProgressStep> _progressSteps;
-        
+
         /// <summary>
         /// A stopwatch used to track the time used for importing
         /// individual glTF entities (e.g. textures, meshes).
@@ -113,7 +113,7 @@ namespace Piglet
             // the same type of glTF entity (e.g. textures), or
             // add a new line if we have started to import
             // a new type.
-            
+
             if (IsNewImportStep())
                 AddLine(message);
             else
@@ -146,10 +146,10 @@ namespace Piglet
         {
             ProgressStep progressStep = _progressSteps[_progressSteps.Count - 1];
             GltfImporter.ImportStep importStep = progressStep.Step;
-            
+
             long endTime = progressStep.ElapsedMilliseconds;
             long startTime = 0;
-            
+
             for (int i = _progressSteps.Count - 1; i >= 0; --i)
             {
                 if (_progressSteps[i].Step != importStep)
@@ -174,7 +174,7 @@ namespace Piglet
             return _progressSteps[_progressSteps.Count - 1].Step
                != _progressSteps[_progressSteps.Count - 2].Step;
         }
-        
+
         /// <summary>
         /// Generate a progress message for the most
         /// recent progress step.
@@ -182,10 +182,10 @@ namespace Piglet
         public string GetProgressMessage()
         {
             ProgressStep progressStep = _progressSteps[_progressSteps.Count - 1];
-            
+
             int currentStep = Math.Min(
                 progressStep.NumCompleted + 1, progressStep.NumTotal);
-            
+
             string message;
             switch (progressStep.Step)
             {
