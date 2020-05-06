@@ -10,10 +10,6 @@ public class GameManager : Singleton<GameManager>
     public Vector3 ModelPositionRelativeToCamera;
     public float ModelSize;
 
-    public float MouseRotateSpeed;
-    public float MousePanSpeed;
-    public float MouseZoomSpeed;
-
     public float SpinSpeed;
 
     /// <summary>
@@ -105,17 +101,13 @@ public class GameManager : Singleton<GameManager>
         if (_model == null)
             return;
 
-        _model.GetComponent<ModelBehaviour>().RotateAboutCenter(
-            rotation * MouseRotateSpeed);
+        _model.GetComponent<ModelBehaviour>().RotateAboutCenter(rotation);
     }
 
     public void OnValidate()
     {
         if (ModelSize < 0.001f)
             ModelSize = 0.001f;
-
-        if (MouseRotateSpeed < 0.01f)
-            MouseRotateSpeed = 0.01f;
     }
 
     /// <summary>

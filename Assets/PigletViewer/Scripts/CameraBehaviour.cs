@@ -10,8 +10,7 @@ namespace PigletViewer
         /// </summary>
         public void PanCamera(Vector3 pan)
         {
-            transform.Translate(pan * GameManager.Instance.MousePanSpeed,
-                Space.Self);
+            transform.Translate(pan, Space.Self);
         }
 
         /// <summary>
@@ -20,8 +19,7 @@ namespace PigletViewer
         public void ZoomCamera(float deltaZ)
         {
             Vector3 zoom = new Vector3(0, 0, deltaZ);
-            transform.Translate(zoom * GameManager.Instance.MouseZoomSpeed,
-                Space.Self);
+            transform.Translate(zoom, Space.Self);
         }
     }
 }

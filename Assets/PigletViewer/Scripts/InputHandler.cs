@@ -10,6 +10,23 @@ using UnityEngine;
 public class InputHandler : Singleton<InputHandler>
 {
     /// <summary>
+    /// Controls the speed of model rotation relative to mouse drag / touch drag.
+    /// </summary>
+    public float MouseRotateSpeed;
+
+    /// <summary>
+    /// Controls the speed of camera panning relative to mouse drag / touch drag.
+    /// </summary>
+    ///
+    public float MousePanSpeed;
+
+    /// <summary>
+    /// Controls the speed of camera zooming relative to middle mouse wheel
+    /// scroll / two-finger pinch.
+    /// </summary>
+    public float MouseZoomSpeed;
+
+    /// <summary>
     /// Describes the state of touchscreen input (e.g. Android)
     /// for a single frame.
     /// </summary>
@@ -204,13 +221,15 @@ public class InputHandler : Singleton<InputHandler>
             ViewerGUI.Instance.ResetSpin();
 
         if (mouseActions.HasFlag(MouseAction.Rotate))
-            GameManager.Instance.RotateModel(new Vector3(-deltaY, -deltaX, 0));
+            GameManager.Instance.RotateModel(
+                new Vector3(-deltaY, -deltaX, 0) * MouseRotateSpeed);
 
         if (mouseActions.HasFlag(MouseAction.Pan))
-            CameraBehaviour.Instance.PanCamera(new Vector3(-deltaX, deltaY, 0));
+            CameraBehaviour.Instance.PanCamera(
+                new Vector3(-deltaX, deltaY, 0) * MousePanSpeed);
 
         if (mouseActions.HasFlag(MouseAction.Zoom))
-            CameraBehaviour.Instance.ZoomCamera(deltaZ);
+            CameraBehaviour.Instance.ZoomCamera(deltaZ * MouseZoomSpeed);
 
         _prevTouchState.TouchCount = Input.touchCount;
     }
@@ -298,13 +317,15 @@ public class InputHandler : Singleton<InputHandler>
         }
 
         if (mouseActions.HasFlag(MouseAction.Rotate))
-            GameManager.Instance.RotateModel(new Vector3(deltaY, -deltaX, 0));
+            GameManager.Instance.RotateModel(
+                new Vector3(deltaY, -deltaX, 0) * MouseRotateSpeed);
 
         if (mouseActions.HasFlag(MouseAction.Pan))
-            CameraBehaviour.Instance.PanCamera(new Vector3(-deltaX, -deltaY, 0));
+            CameraBehaviour.Instance.PanCamera(
+                new Vector3(-deltaX, -deltaY, 0) * MousePanSpeed);
 
         if (mouseActions.HasFlag(MouseAction.Zoom))
-            CameraBehaviour.Instance.ZoomCamera(deltaZ);
+            CameraBehaviour.Instance.ZoomCamera(deltaZ * MouseZoomSpeed);
 
         // Record current mouse position and button states
         // for use in the next frame, so that we can detect when

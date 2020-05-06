@@ -205,9 +205,6 @@ MonoBehaviour:
   Camera: {fileID: 1744033486}
   ModelPositionRelativeToCamera: {x: 0, y: 0, z: 2}
   ModelSize: 1
-  MouseRotateSpeed: 1
-  MousePanSpeed: 0.0025
-  MouseZoomSpeed: 0.1
   SpinSpeed: 200
 --- !u!1 &600789648
 GameObject:
@@ -365,6 +362,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05e9b0a44f1a7734d81c72a27fffc6b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MouseRotateSpeed: 1
+  MousePanSpeed: 0.0025
+  MouseZoomSpeed: 0.1
 --- !u!4 &687880229
 Transform:
   m_ObjectHideFlags: 0
