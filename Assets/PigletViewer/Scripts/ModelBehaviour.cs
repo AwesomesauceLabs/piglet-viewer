@@ -21,17 +21,17 @@ public class ModelBehaviour : MonoBehaviour
     {
         SpinModel();
     }
-    
+
     /// <summary>
     /// Auto-rotate model as per "Spin X" / "Spin Y" sliders in GUI.
     /// </summary>
     public void SpinModel()
     {
         ViewerGUI gui = ViewerGUI.Instance;
-        
+
         Vector3 rotation = new Vector3(gui.SpinY, -gui.SpinX, 0)
            * Time.deltaTime * GameManager.Instance.SpinSpeed;
-        
+
         RotateAboutCenter(rotation);
     }
 
