@@ -9,8 +9,6 @@ public class GameManager : Singleton<GameManager>
     public Vector3 ModelPositionRelativeToCamera;
     public float ModelSize;
 
-    public float SpinSpeed;
-
     /// <summary>
     /// Root game object for the currently loaded model.
     /// </summary>

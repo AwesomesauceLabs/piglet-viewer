@@ -15,11 +15,16 @@ public class ViewerGUI : Singleton<ViewerGUI>
     /// Speed to auto-spin model left-to-right.
     /// </summary>
     public float SpinX;
-    
+
     /// <summary>
     /// Speed to auto-spin model down-to-up.
     /// </summary>
     public float SpinY;
+
+    /// <summary>
+    /// Controls speed of model rotation relative to SpinX/SpinY slider values.
+    /// </summary>
+    public float SpinSpeed;
 
     /// <summary>
     /// Message shown along the bottom of the view area.

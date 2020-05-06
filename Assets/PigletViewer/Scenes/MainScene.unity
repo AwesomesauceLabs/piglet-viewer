@@ -143,6 +143,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SpinX: 0
   SpinY: 0
+  SpinSpeed: 200
   FooterMessage: 
   DefaultFooterMessage: 
 --- !u!4 &437713557
@@ -202,10 +203,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98e0216e46f7ee544aa97b67a1db7ca6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Camera: {fileID: 1744033486}
   ModelPositionRelativeToCamera: {x: 0, y: 0, z: 2}
   ModelSize: 1
-  SpinSpeed: 200
 --- !u!1 &600789648
 GameObject:
   m_ObjectHideFlags: 0
@@ -318,7 +317,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27e60d043f4eb4f46af666145a135ea8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Lines: []
 --- !u!4 &631251704
 Transform:
   m_ObjectHideFlags: 0
