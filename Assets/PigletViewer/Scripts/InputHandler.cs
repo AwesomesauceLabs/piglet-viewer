@@ -19,14 +19,14 @@ public class InputHandler : Singleton<InputHandler>
         /// The number fingers in contact with the touch screen.
         /// </summary>
         public int TouchCount;
-        
+
         /// <summary>
         /// The distance between the two fingers touching
         /// the screen, or null if there aren't two fingers
         /// touching the screen.
         /// </summary>
         public float? PinchDist;
-        
+
         /// <summary>
         /// The midpoint between the two fingers touching
         /// the screen, or null if there aren't two fingers
@@ -53,7 +53,7 @@ public class InputHandler : Singleton<InputHandler>
         Pan = 1 << 1,
         Zoom = 1 << 2,
     };
-    
+
     /// <summary>
     /// Flags indicating which mouse buttons are currently pressed.
     /// </summary>
@@ -127,7 +127,7 @@ public class InputHandler : Singleton<InputHandler>
         // if touch screen input is not supported on the current platform
         if (!Input.touchSupported)
             return;
-        
+
         MouseAction mouseActions = MouseAction.None;
         bool mouseDown = false;
         float deltaX = 0f;
@@ -139,7 +139,7 @@ public class InputHandler : Singleton<InputHandler>
         {
             _prevTouchState.PinchDist = null;
             _prevTouchState.PinchMidpoint = null;
-            
+
             // perform mouse click actions when finger(s) first touch screen
             if (_prevTouchState.TouchCount == 0)
                 mouseDown = true;
@@ -152,9 +152,9 @@ public class InputHandler : Singleton<InputHandler>
             if (Input.touchCount == 1)
             {
                 // one-finger drag -> rotate model
-                
+
                 Touch touch = Input.GetTouch(0);
-                
+
                 deltaX = touch.deltaPosition.x * 0.3f;
                 deltaY = -touch.deltaPosition.y * 0.3f;
 
@@ -172,15 +172,15 @@ public class InputHandler : Singleton<InputHandler>
                 if (_prevTouchState.PinchDist.HasValue)
                 {
                     mouseActions |= MouseAction.Zoom;
-                    
+
                     float pinchDelta = pinchDist - _prevTouchState.PinchDist.Value;
                     deltaZ = pinchDelta * 0.03f;
                 }
 
                 _prevTouchState.PinchDist = pinchDist;
-                
+
                 // two-finger drag -> pan
-                
+
                 Vector2 pinchMidpoint = (touch0.position + touch1.position) / 2.0f;
                 if (_prevTouchState.PinchMidpoint.HasValue)
                 {
@@ -188,7 +188,7 @@ public class InputHandler : Singleton<InputHandler>
 
                     Vector2 deltaMidpoint
                         = pinchMidpoint - _prevTouchState.PinchMidpoint.Value;
-                    
+
                     deltaX = deltaMidpoint.x * 0.3f;
                     deltaY = -deltaMidpoint.y * 0.3f;
                 }
@@ -217,7 +217,7 @@ public class InputHandler : Singleton<InputHandler>
 
     /// <summary>
     /// Rotate/pan/zoom model in response to mouse input.
-    /// 
+    ///
     /// Note: This code uses Unity's Input Manager
     /// (`Input`) to read mouse input, whereas previous revisions
     /// used IMGUI events such as `EventType.MouseDown`.
@@ -238,7 +238,7 @@ public class InputHandler : Singleton<InputHandler>
         // Note: The test for Input.touchCount != 0 ensures
         // that the code is only run in response to input from a
         // *real* mouse, rather than mouse events simulated from
-        // a touch screen. It would be better/cleaner to set 
+        // a touch screen. It would be better/cleaner to set
         // Input.simulateMouseWithTouches to false to achieve this
         // separation, but I found that the setting has no effect
         // (in Unity 2018.3). Moreover, there is a bug where
@@ -285,11 +285,11 @@ public class InputHandler : Singleton<InputHandler>
             deltaX = mouseDelta.x;
             deltaY = mouseDelta.y;
         }
-        
+
         // Stop auto-spin ("Spin X" / "Spin Y")
         // whenever the user clicks on the
         // model/background.
-        
+
         if (Input.GetMouseButtonDown(0)
             || Input.GetMouseButtonDown(1)
             || Input.GetMouseButtonDown(2))
@@ -309,7 +309,7 @@ public class InputHandler : Singleton<InputHandler>
         // Record current mouse position and button states
         // for use in the next frame, so that we can detect when
         // button states have changed.
-        
+
         _prevMouseState.Buttons = buttons;
         _prevMouseState.Position = Input.mousePosition;
     }
