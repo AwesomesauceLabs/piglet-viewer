@@ -17,7 +17,7 @@ namespace Piglet
         /// The list of progress messages generated for the
         /// current glTF import.
         /// </summary>
-        public List<string> Lines;
+        [NonSerialized] public List<string> Lines;
 
         public struct ProgressStep
         {
