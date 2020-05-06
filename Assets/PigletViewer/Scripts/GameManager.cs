@@ -28,7 +28,7 @@ public class GameManager : Singleton<GameManager>
     /// `PumpImportJob` in `Update`.
     /// </summary>
     private GltfImportTask _importTask;
-    
+
     /// <summary>
     /// Unity callback that is invoked before the first frame update
     /// and prior to Start().
@@ -73,7 +73,7 @@ public class GameManager : Singleton<GameManager>
     public void StartImport(string uriStr)
     {
         Uri uri = new Uri(uriStr);
-        
+
         GltfImportTask importTask = RuntimeGltfImporter
             .GetImportTask(uri,
                 ImportLog.Instance.OnImportProgress);
@@ -88,11 +88,11 @@ public class GameManager : Singleton<GameManager>
         string basename = Path.GetFileName(uri.ToString());
         string message = String.Format("Loading {0}...", basename);
         ImportLog.Instance.AddLine(message);
-        
+
         importTask.OnCompleted += OnImportCompleted;
         importTask.OnException += OnImportException;
         importTask.RethrowExceptionAfterCallbacks = false;
-        
+
         _importTask = importTask;
     }
 
@@ -104,7 +104,7 @@ public class GameManager : Singleton<GameManager>
     {
         if (_model == null)
             return;
-        
+
         _model.GetComponent<ModelBehaviour>().RotateAboutCenter(
             rotation * MouseRotateSpeed);
     }
@@ -152,10 +152,10 @@ public class GameManager : Singleton<GameManager>
     {
         ViewerGUI.Instance.ShowDialogBox("Failed to Load Model",
             StringUtil.WrapText(e.Message, 50));
-        
+
         _importTask = null;
     }
-    
+
     /// <summary>
     /// Unity callback that is invoked once per frame.
     /// </summary>
