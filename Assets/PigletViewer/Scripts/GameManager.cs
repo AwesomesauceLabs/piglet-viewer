@@ -7,10 +7,10 @@ using UnityGLTF;
 public class GameManager : Singleton<GameManager>
 {
     /// <summary>
-    /// Handle to the currently running glTF import job.
+    /// Handle to the currently running glTF import task.
     /// This task runs in the background and is
     /// incrementally advanced by calling
-    /// `PumpImportJob` in `Update`.
+    /// `MoveNext` in `Update`.
     /// </summary>
     private GltfImportTask _importTask;
 
