@@ -23,12 +23,12 @@ public class ModelManager : Singleton<ModelManager>
     }
 
     /// <summary>
-    /// Set the current model (if any), with the given model
-    /// and make it a child of this game object.
+    /// Destroy the current model (if any) and update the
+    /// current model to the given game object.
     ///
-    /// Adjust the transform of this game object so that the
-    /// model has a standard size, distance, and orientation
-    /// relative to the main camera.
+    /// Adjust the root transform of the game object so that the
+    /// model has a standard size, distance, and rotation
+    /// relative to the camera.
     /// </summary>
     /// <param name="model"></param>
     public void SetModel(GameObject model)
@@ -42,9 +42,6 @@ public class ModelManager : Singleton<ModelManager>
         }
 
         _model = model;
-
-        // Attach the model to this game object
-        // (the ModelManager singleton).
 
         if (model == null)
             return;
