@@ -13,7 +13,7 @@ namespace PigletViewer
     /// handle import errors/successes. At most one glTF import
     /// task can be running at any given time. In addition,
     /// this class handles loading of MonoBehaviours for platform-specific
-    /// application behaviour (e.g. AndroidViewerBehaviour) at
+    /// application behaviour (e.g. AndroidGameManager) at
     /// startup time.
     /// </summary>
     public class GameManager : Singleton<GameManager>
@@ -35,7 +35,7 @@ namespace PigletViewer
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
             gameObject.AddComponent<WindowsViewerBehaviour>();
 #elif UNITY_ANDROID
-        gameObject.AddComponent<AndroidViewerBehaviour>();
+        gameObject.AddComponent<AndroidGameManager>();
 #elif UNITY_WEBGL
         gameObject.AddComponent<WebGlViewerBehaviour>();
 #endif

@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using PigletViewer;
 using UnityEngine;
 
 /// <summary>
@@ -6,7 +7,7 @@ using UnityEngine;
 /// such as reading "intent URIs" (Android lingo for file associations) and
 /// sending the application to the background/foreground.
 /// </summary>
-public class AndroidViewerBehaviour : MonoBehaviour
+public class AndroidGameManager : MonoBehaviour
 {
     /// <summary>
     /// Unity callback that is invoked before the first frame update.
@@ -14,10 +15,10 @@ public class AndroidViewerBehaviour : MonoBehaviour
     void Start()
     {
         string uri = GetAndroidIntentUri();
- 
+
         if (string.IsNullOrEmpty(uri))
             uri = Path.Combine(Application.streamingAssetsPath, "piglet-1.0.0.glb");
-        
+
         GameManager.Instance.StartImport(uri);
     }
 
@@ -29,15 +30,15 @@ public class AndroidViewerBehaviour : MonoBehaviour
     private string GetAndroidIntentUri()
     {
         AndroidJavaClass player
-            = new AndroidJavaClass("com.unity3d.player.UnityPlayer"); 
+            = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
         AndroidJavaObject currentActivity
             = player.GetStatic<AndroidJavaObject>("currentActivity");
         AndroidJavaObject intent
             = currentActivity.Call<AndroidJavaObject>("getIntent");
-                 
+
         return intent.Call<string> ("getDataString");
     }
-    
+
     /// <summary>
     /// Unity callback that is invoked when the application gains
     /// or loses focus.
@@ -49,13 +50,13 @@ public class AndroidViewerBehaviour : MonoBehaviour
            return;
 
         string uri = GetAndroidIntentUri();
-        
+
         // if Unity Player is regaining focus without a new model URI
         // to load (e.g. user selected Piglet Viewer in Android app
         // switcher)
         if (string.IsNullOrEmpty(uri))
             return;
-        
+
         GameManager.Instance.StartImport(uri);
     }
 
