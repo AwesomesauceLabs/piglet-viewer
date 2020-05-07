@@ -33,7 +33,7 @@ namespace PigletViewer
         private void Awake()
         {
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-            gameObject.AddComponent<WindowsViewerBehaviour>();
+            gameObject.AddComponent<WindowsGameManager>();
 #elif UNITY_ANDROID
         gameObject.AddComponent<AndroidGameManager>();
 #elif UNITY_WEBGL

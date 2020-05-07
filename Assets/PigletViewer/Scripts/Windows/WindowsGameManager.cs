@@ -12,7 +12,7 @@ using UnityGLTF;
 /// Implements PigletViewer behaviour that is specific to the Win64 platform,
 /// such as drag-and-drop and parsing of command-line arguments.
 /// </summary>
-public class WindowsViewerBehaviour : MonoBehaviour
+public class WindowsGameManager : MonoBehaviour
 {
     /// <summary>
     /// Drag-and-drop implementation for Unity player on Windows.
