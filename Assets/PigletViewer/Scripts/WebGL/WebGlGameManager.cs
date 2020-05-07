@@ -8,7 +8,7 @@ using UnityEngine;
 /// Implements PigletViewer behaviour that is specific to the WebGL platform,
 /// such as invoking Javascript methods from C#.
 /// </summary>
-public class WebGlViewerBehaviour : MonoBehaviour
+public class WebGlGameManager : MonoBehaviour
 {
     /// <summary>
     /// Unity callback that is invoked before the first frame update.

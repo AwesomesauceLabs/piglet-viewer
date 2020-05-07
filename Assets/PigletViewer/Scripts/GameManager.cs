@@ -37,7 +37,7 @@ namespace PigletViewer
 #elif UNITY_ANDROID
         gameObject.AddComponent<AndroidGameManager>();
 #elif UNITY_WEBGL
-        gameObject.AddComponent<WebGlViewerBehaviour>();
+        gameObject.AddComponent<WebGlGameManager>();
 #endif
         }
 
