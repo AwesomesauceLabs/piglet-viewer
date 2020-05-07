@@ -43,9 +43,6 @@ public class ModelManager : Singleton<ModelManager>
 
         _model = model;
 
-        if (model == null)
-            return;
-
         // Initialize the transform of the model so that:
         //
         // (1) the model is a standard size
