@@ -6,9 +6,10 @@ using System.Runtime.InteropServices;
 namespace PigletViewer
 {
     /// <summary>
-    /// Javascript methods that are callable from C#.
+    /// Declarations of Javascript methods that make them callable from C#.
     ///
-    /// The definitions for these functions are in PigletViewer.jslib.
+    /// The Javascript code for these functions is found in
+    /// Assets/Plugins/WebGL/PigletViewer.jslib.
     /// </summary>
     public static class JsLib
     {
