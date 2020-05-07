@@ -6,9 +6,6 @@ using UnityGLTF;
 
 public class GameManager : Singleton<GameManager>
 {
-    public Vector3 ModelPositionRelativeToCamera;
-    public float ModelSize;
-
     /// <summary>
     /// Handle to the currently running glTF import job.
     /// This task runs in the background and is
@@ -91,12 +88,6 @@ public class GameManager : Singleton<GameManager>
     public void RotateModel(Vector3 rotation)
     {
         ModelManager.Instance.RotateAboutCenter(rotation);
-    }
-
-    public void OnValidate()
-    {
-        if (ModelSize < 0.001f)
-            ModelSize = 0.001f;
     }
 
     /// <summary>

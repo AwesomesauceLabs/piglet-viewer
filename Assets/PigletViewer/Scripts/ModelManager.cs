@@ -18,6 +18,20 @@ using UnityEngine;
 public class ModelManager : Singleton<ModelManager>
 {
     /// <summary>
+    /// Determines the initial position of a model
+    /// relative to the camera.
+    /// </summary>
+    public Vector3 ModelPositionRelativeToCamera;
+
+    /// <summary>
+    /// Determines the default size of a model when it is first
+    /// loaded.  More specifically, this sets the length
+    /// of the longest dimension of the model's
+    /// world-space-axis-aligned bounding box.
+    /// </summary>
+    public float ModelSize;
+
+    /// <summary>
     /// The root GameObject of the most recently loaded model,
     /// i.e. the model that is currently being viewed by
     /// the user. (This application only allows viewing one
@@ -125,7 +139,7 @@ public class ModelManager : Singleton<ModelManager>
             return;
 
         Vector3 scale = _model.transform.localScale;
-        float scaleFactor = GameManager.Instance.ModelSize / size;
+        float scaleFactor = ModelSize / size;
         _model.transform.localScale = scale * scaleFactor;
 
         // Rotate model to face camera.
@@ -140,7 +154,7 @@ public class ModelManager : Singleton<ModelManager>
             return;
 
         _model.transform.Translate(cameraTransform.position
-            + GameManager.Instance.ModelPositionRelativeToCamera
+            + ModelPositionRelativeToCamera
             - bounds.Value.center);
     }
 
