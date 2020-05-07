@@ -4,7 +4,7 @@ using Piglet;
 using PigletViewer;
 using UnityEngine;
 
-public class ModelBehaviour : Singleton<ModelBehaviour>
+public class ModelManager : Singleton<ModelManager>
 {
     /// <summary>
     /// The root GameObject of the most recently loaded model,
@@ -44,7 +44,7 @@ public class ModelBehaviour : Singleton<ModelBehaviour>
         _model = model;
 
         // Attach the model to this game object
-        // (the ModelBehaviour singleton).
+        // (the ModelManager singleton).
 
         if (model == null)
             return;

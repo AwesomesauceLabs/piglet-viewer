@@ -90,7 +90,7 @@ public class GameManager : Singleton<GameManager>
     /// </summary>
     public void RotateModel(Vector3 rotation)
     {
-        ModelBehaviour.Instance.RotateAboutCenter(rotation);
+        ModelManager.Instance.RotateAboutCenter(rotation);
     }
 
     public void OnValidate()
@@ -117,7 +117,7 @@ public class GameManager : Singleton<GameManager>
 
         ImportLog.Instance.AddLine("Success!");
 
-        ModelBehaviour.Instance.SetModel(model);
+        ModelManager.Instance.SetModel(model);
 
         _importTask = null;
     }
