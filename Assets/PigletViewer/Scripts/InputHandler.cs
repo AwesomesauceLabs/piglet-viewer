@@ -221,7 +221,7 @@ public class InputHandler : Singleton<InputHandler>
             ViewerGUI.Instance.ResetSpin();
 
         if (mouseActions.HasFlag(MouseAction.Rotate))
-            GameManager.Instance.RotateModel(
+            ModelManager.Instance.RotateAboutCenter(
                 new Vector3(-deltaY, -deltaX, 0) * MouseRotateSpeed);
 
         if (mouseActions.HasFlag(MouseAction.Pan))
@@ -317,7 +317,7 @@ public class InputHandler : Singleton<InputHandler>
         }
 
         if (mouseActions.HasFlag(MouseAction.Rotate))
-            GameManager.Instance.RotateModel(
+            ModelManager.Instance.RotateAboutCenter(
                 new Vector3(deltaY, -deltaX, 0) * MouseRotateSpeed);
 
         if (mouseActions.HasFlag(MouseAction.Pan))

@@ -82,15 +82,6 @@ public class GameManager : Singleton<GameManager>
     }
 
     /// <summary>
-    /// Rotate the current loaded model (if any) about
-    /// its center, as per the given Euler angles.
-    /// </summary>
-    public void RotateModel(Vector3 rotation)
-    {
-        ModelManager.Instance.RotateAboutCenter(rotation);
-    }
-
-    /// <summary>
     /// Invoked after a model has been successfully imported.
     /// </summary>
     public void OnImportCompleted(GameObject model)
