@@ -4,6 +4,17 @@ using Piglet;
 using PigletViewer;
 using UnityEngine;
 
+/// <summary>
+/// Store a reference to the most recently loaded glTF model.
+/// This application (PigletViewer) can only load/view a
+/// single model at any given time.
+///
+/// This class initializes transform of a model when it is
+/// first loaded, so that models always have a standard size,
+/// distance, and rotation relative to the camera.  It
+/// also provides methods for rotating the model about
+/// the center of its bounding box.
+/// </summary>
 public class ModelManager : Singleton<ModelManager>
 {
     /// <summary>
