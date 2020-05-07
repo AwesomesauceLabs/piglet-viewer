@@ -35,9 +35,9 @@ namespace PigletViewer
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
             gameObject.AddComponent<WindowsGameManager>();
 #elif UNITY_ANDROID
-        gameObject.AddComponent<AndroidGameManager>();
+            gameObject.AddComponent<AndroidGameManager>();
 #elif UNITY_WEBGL
-        gameObject.AddComponent<WebGlGameManager>();
+            gameObject.AddComponent<WebGlGameManager>();
 #endif
         }
 
