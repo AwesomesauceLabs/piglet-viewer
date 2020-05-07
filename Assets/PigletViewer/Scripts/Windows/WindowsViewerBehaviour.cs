@@ -33,7 +33,7 @@ public class WindowsViewerBehaviour : MonoBehaviour
         ViewerGUI.Instance.DefaultFooterMessage
             = "drag .gltf/.glb/.zip onto window to view";
         ViewerGUI.Instance.ResetFooterMessage();
-        
+
         // By default, the Windows Unity Player will pause
         // execution when it loses focus.  Setting
         // `Application.runInBackground` to true overrides
@@ -48,9 +48,9 @@ public class WindowsViewerBehaviour : MonoBehaviour
         // and the user will have to additionally click
         // the window to give it focus again, before the
         // glTF import will start running.
-        
+
         Application.runInBackground = true;
-        
+
         ParseCommandLineArgs();
     }
 
@@ -61,17 +61,17 @@ public class WindowsViewerBehaviour : MonoBehaviour
     private void ParseCommandLineArgs()
     {
         string[] args = Environment.GetCommandLineArgs();
-        
+
         bool profile = false;
         bool quitAfterLoad = false;
         long delayLoadMilliseconds = 0;
-        
+
         // default model to load at startup, unless
         // --load or --no-load is used
 
         Uri uri = new Uri(Path.Combine(Application.streamingAssetsPath,
             "piglet-1.0.0.glb"));
-        
+
         GltfImportTask importTask = RuntimeGltfImporter
             .GetImportTask(uri,
                 ImportLog.Instance.OnImportProgress);
@@ -83,7 +83,7 @@ public class WindowsViewerBehaviour : MonoBehaviour
                 // Delay initial model import at startup.
                 // I added this option so that I could prevent
                 // Unity player loading/initialization from affecting
-                // my profiling results. 
+                // my profiling results.
                 delayLoadMilliseconds = Int64.Parse(args[i + 1]);
             }
             else if (args[i] == "--load")
@@ -126,7 +126,7 @@ public class WindowsViewerBehaviour : MonoBehaviour
         if (delayLoadMilliseconds > 0)
             importTask.PushTask(SleepUtil.SleepEnum(
                 delayLoadMilliseconds));
-            
+
         if (profile)
             importTask.OnCompleted += _ => importTask.LogProfilingData();
 
@@ -139,7 +139,7 @@ public class WindowsViewerBehaviour : MonoBehaviour
     /// <summary>
     /// Unity callback that is invoked when this MonoBehaviour is destroyed
     /// (e.g. exiting Play mode).
-    /// 
+    ///
     /// It is important to tear down drag-and-drop here, otherwise
     /// we will have dangling memory pointers and will get a segfault when we exit
     /// Play Mode, which crashes the Unity Editor.
