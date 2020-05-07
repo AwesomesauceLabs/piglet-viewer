@@ -75,7 +75,7 @@ namespace Piglet
         public void AddLine(string line)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
-            PigletViewerJsLib.AppendLogLine(line);
+            JsLib.AppendLogLine(line);
 #else
             Lines.Add(line);
 #endif
@@ -87,7 +87,7 @@ namespace Piglet
         public void ReplaceLastLine(string line)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
-            PigletViewerJsLib.UpdateTailLogLine(line);
+            JsLib.UpdateTailLogLine(line);
 #else
             Lines[Lines.Count - 1] = line;
 #endif

@@ -10,7 +10,7 @@ namespace PigletViewer
     ///
     /// The definitions for these functions are in PigletViewer.jslib.
     /// </summary>
-    public static class PigletViewerJsLib
+    public static class JsLib
     {
         /// <summary>
         /// Performs one-time Javascript initialization

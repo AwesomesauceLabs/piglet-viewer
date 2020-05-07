@@ -22,7 +22,7 @@ namespace PigletViewer
 
             // run javascript startup tasks (e.g. register event
             // handlers for drag-and-drop)
-            PigletViewerJsLib.Init();
+            JsLib.Init();
 
             // load default model (Piglet mascot)
             GameManager.Instance.StartImport(Path.Combine(
@@ -50,13 +50,13 @@ namespace PigletViewer
         /// </param>
         public void ImportFileWebGl(string filename)
         {
-            var size = PigletViewerJsLib.GetFileSize(filename);
-            var jsData = PigletViewerJsLib.GetFileData(filename);
+            var size = JsLib.GetFileSize(filename);
+            var jsData = JsLib.GetFileData(filename);
 
             var data = new byte[size];
             Marshal.Copy(jsData, data, 0, size);
 
-            PigletViewerJsLib.FreeFileData(filename);
+            JsLib.FreeFileData(filename);
 
             GameManager.Instance.StartImport(data, filename);
         }
