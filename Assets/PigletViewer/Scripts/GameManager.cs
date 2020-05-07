@@ -4,6 +4,16 @@ using Piglet;
 using UnityEngine;
 using UnityGLTF;
 
+/// <summary>
+/// Singleton that controls overall application behaviour.
+/// The main responsibility of this class is to start glTF
+/// import tasks, track their progress, and appropriately
+/// handle import errors/successes. At most one glTF import
+/// task can be running at any given time. In addition,
+/// this class handles loading of MonoBehaviours for platform-specific
+/// application behaviour (e.g. AndroidViewerBehaviour) at
+/// startup time.
+/// </summary>
 public class GameManager : Singleton<GameManager>
 {
     /// <summary>
