@@ -1,4 +1,5 @@
 ﻿#if UNITY_WEBGL
+using PigletViewer;
 using System.IO;
 using System.Runtime.InteropServices;
 using UnityEngine;
