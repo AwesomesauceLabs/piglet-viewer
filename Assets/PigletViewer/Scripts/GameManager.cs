@@ -10,11 +10,6 @@ public class GameManager : Singleton<GameManager>
     public float ModelSize;
 
     /// <summary>
-    /// Root game object for the currently loaded model.
-    /// </summary>
-    private GameObject _model;
-
-    /// <summary>
     /// Handle to the currently running glTF import job.
     /// This task runs in the background and is
     /// incrementally advanced by calling
@@ -95,10 +90,7 @@ public class GameManager : Singleton<GameManager>
     /// </summary>
     public void RotateModel(Vector3 rotation)
     {
-        if (_model == null)
-            return;
-
-        _model.GetComponent<ModelBehaviour>().RotateAboutCenter(rotation);
+        ModelBehaviour.Instance.RotateAboutCenter(rotation);
     }
 
     public void OnValidate()
@@ -125,11 +117,7 @@ public class GameManager : Singleton<GameManager>
 
         ImportLog.Instance.AddLine("Success!");
 
-        if (_model != null)
-            Destroy(_model);
-
-        _model = model;
-        _model.AddComponent<ModelBehaviour>();
+        ModelBehaviour.Instance.SetModel(model);
 
         _importTask = null;
     }
