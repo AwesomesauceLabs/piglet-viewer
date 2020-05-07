@@ -18,12 +18,12 @@ public class WebGlViewerBehaviour : MonoBehaviour
         ViewerGUI.Instance.DefaultFooterMessage
             = "drag .glb/.zip onto window to view";
         ViewerGUI.Instance.ResetFooterMessage();
-        
+
         // run javascript startup tasks (e.g. register event
         // handlers for drag-and-drop)
         PigletViewerJsLib.Init();
-        
-        // load default model (Piglet mascot) 
+
+        // load default model (Piglet mascot)
         GameManager.Instance.StartImport(Path.Combine(
             Application.streamingAssetsPath, "piglet-1.0.0.glb"));
     }
@@ -34,7 +34,7 @@ public class WebGlViewerBehaviour : MonoBehaviour
     ///
     /// Reading the user's chosen glTF file is a bit tricky in the case of
     /// WebGL. Although the javascript code is allowed
-    /// to read the contents of the user-selected glTF file, 
+    /// to read the contents of the user-selected glTF file,
     /// it is not provided with the path to the file on the local
     /// filesystem, nor is it allowed to read any files on the local
     /// filesystem. Instead, we must read the byte content of the file
