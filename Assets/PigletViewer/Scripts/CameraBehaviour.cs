@@ -3,6 +3,10 @@ using UnityEngine;
 
 namespace PigletViewer
 {
+    /// <summary>
+    /// MonoBehaviour for controlling camera movement in response
+    /// to the user's mouse/touch input.
+    /// </summary>
     public class CameraBehaviour : Singleton<CameraBehaviour>
     {
         /// <summary>
