@@ -203,8 +203,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98e0216e46f7ee544aa97b67a1db7ca6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ModelPositionRelativeToCamera: {x: 0, y: 0, z: 2}
-  ModelSize: 1
 --- !u!1 &600789648
 GameObject:
   m_ObjectHideFlags: 0
@@ -360,6 +358,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a91ed5bbe87aa0647a3b1b1361bc9bc2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ModelPositionRelativeToCamera: {x: 0, y: 0, z: 2}
+  ModelSize: 1
 --- !u!4 &678983082
 Transform:
   m_ObjectHideFlags: 0

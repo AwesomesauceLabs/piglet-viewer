@@ -21,7 +21,7 @@ public class ModelManager : Singleton<ModelManager>
     /// Determines the initial position of a model
     /// relative to the camera.
     /// </summary>
-    public Vector3 ModelPositionRelativeToCamera;
+    public Vector3 DefaultModelOffsetFromCamera;
 
     /// <summary>
     /// Determines the default size of a model when it is first
@@ -29,7 +29,7 @@ public class ModelManager : Singleton<ModelManager>
     /// of the longest dimension of the model's
     /// world-space-axis-aligned bounding box.
     /// </summary>
-    public float ModelSize;
+    public float DefaultModelSize;
 
     /// <summary>
     /// The root GameObject of the most recently loaded model,
@@ -128,7 +128,7 @@ public class ModelManager : Singleton<ModelManager>
         Transform cameraTransform = CameraBehaviour.Instance.transform;
 
         // Scale model up/down to a standard size, so that the
-        // largest dimension of its bounding box is equal to `ModelSize`.
+        // largest dimension of its bounding box is equal to `DefaultModelSize`.
 
         Bounds? bounds = BoundsUtil.GetRendererBoundsForHierarchy(_model);
         if (!bounds.HasValue)
@@ -139,7 +139,7 @@ public class ModelManager : Singleton<ModelManager>
             return;
 
         Vector3 scale = _model.transform.localScale;
-        float scaleFactor = ModelSize / size;
+        float scaleFactor = DefaultModelSize / size;
         _model.transform.localScale = scale * scaleFactor;
 
         // Rotate model to face camera.
@@ -154,7 +154,7 @@ public class ModelManager : Singleton<ModelManager>
             return;
 
         _model.transform.Translate(cameraTransform.position
-            + ModelPositionRelativeToCamera
+            + DefaultModelOffsetFromCamera
             - bounds.Value.center);
     }
 
