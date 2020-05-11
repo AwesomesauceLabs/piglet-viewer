@@ -32,6 +32,19 @@ namespace PigletViewer
         /// </summary>
         private void Awake()
         {
+            // Set up callbacks for logging progress messages during
+            // glTF imports. The default behaviour is to render
+            // progress messages directly on top of the window using
+            // IMGUI methods, whereas the WebGL build renders the progress
+            // messages as HTML as part of the main web page,
+            // outside of the Unity WebGL canvas.
+
+            ProgressLogManager.Instance.AddLineCallback =
+                message => ProgressLogManager.Instance.Lines.Add(message);
+            ProgressLogManager.Instance.UpdateLineCallback =
+                message => ProgressLogManager.Instance.Lines[
+                    ProgressLogManager.Instance.Lines.Count - 1] = message;
+
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
             gameObject.AddComponent<WindowsGameManager>();
 #elif UNITY_ANDROID
@@ -84,7 +97,7 @@ namespace PigletViewer
 
             string basename = Path.GetFileName(uri.ToString());
             string message = String.Format("Loading {0}...", basename);
-            ProgressLogManager.Instance.AddLine(message);
+            ProgressLogManager.Instance.AddLineCallback(message);
 
             importTask.OnCompleted += OnImportCompleted;
             importTask.OnException += OnImportException;
@@ -101,15 +114,15 @@ namespace PigletViewer
             ViewerGUI.Instance.ResetSpin();
             ViewerGUI.Instance.ResetFooterMessage();
 
-            ProgressLogManager.Instance.AddLine(
+            ProgressLogManager.Instance.AddLineCallback(
                 String.Format("Total import time: {0} ms",
                     ProgressLogManager.Instance.Stopwatch.ElapsedMilliseconds));
 
-            ProgressLogManager.Instance.AddLine(
+            ProgressLogManager.Instance.AddLineCallback(
                 String.Format("Longest Unity thread stall: {0} ms",
                     _importTask.LongestStepInMilliseconds()));
 
-            ProgressLogManager.Instance.AddLine("Success!");
+            ProgressLogManager.Instance.AddLineCallback("Success!");
 
             ModelManager.Instance.SetModel(model);
 
