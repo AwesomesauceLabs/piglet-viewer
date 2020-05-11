@@ -125,17 +125,31 @@ public class ViewerGUI : Singleton<ViewerGUI>
         _progressLog = new List<string>();
     }
 
+    /// <summary>
+    /// Reset the "Spin X" / "Spin Y" sliders to zero, so
+    /// that the model does not spin automatically (like a
+    /// record turntable).
+    /// </summary>
     public void ResetSpin()
     {
         SpinX = 0;
         SpinY = 0;
     }
 
+    /// <summary>
+    /// Reset the text message shown along the bottom of the
+    /// window to the default message.  (This message may
+    /// be used to show status, give the user hints/instructions,
+    /// or to display error messages.)
+    /// </summary>
     public void ResetFooterMessage()
     {
         FooterMessage = DefaultFooterMessage;
     }
 
+    /// <summary>
+    /// Reset all elements of the GUI to their default states.
+    /// </summary>
     public void Reset()
     {
         ResetProgressLog();
