@@ -13,12 +13,6 @@ using UnityGLTF;
 public class ViewerGUI : Singleton<ViewerGUI>
 {
     /// <summary>
-    /// The list of progress messages generated for the
-    /// current glTF import.
-    /// </summary>
-    private List<string> _progressLog;
-
-    /// <summary>
     /// Speed to auto-spin model left-to-right.
     /// </summary>
     public float SpinX;
@@ -63,6 +57,12 @@ public class ViewerGUI : Singleton<ViewerGUI>
         public GUIStyle DialogText;
         public GUIStyle DialogButton;
     }
+
+    /// <summary>
+    /// The list of progress messages generated for the
+    /// current glTF import.
+    /// </summary>
+    private List<string> _progressLog;
 
     /// <summary>
     /// Encapsulates style variables (e.g. font size)
