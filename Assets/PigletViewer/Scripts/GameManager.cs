@@ -39,11 +39,11 @@ namespace PigletViewer
             // messages as HTML as part of the main web page,
             // outside of the Unity WebGL canvas.
 
-            ProgressLogManager.Instance.AddLineCallback =
-                message => ProgressLogManager.Instance.Lines.Add(message);
-            ProgressLogManager.Instance.UpdateLineCallback =
-                message => ProgressLogManager.Instance.Lines[
-                    ProgressLogManager.Instance.Lines.Count - 1] = message;
+            ProgressLog.Instance.AddLineCallback =
+                message => ProgressLog.Instance.Lines.Add(message);
+            ProgressLog.Instance.UpdateLineCallback =
+                message => ProgressLog.Instance.Lines[
+                    ProgressLog.Instance.Lines.Count - 1] = message;
 
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
             gameObject.AddComponent<WindowsGameManager>();
@@ -66,7 +66,7 @@ namespace PigletViewer
 
             GltfImportTask importTask = RuntimeGltfImporter
                 .GetImportTask(data,
-                    ProgressLogManager.Instance.OnImportProgress);
+                    ProgressLog.Instance.OnImportProgress);
 
             StartImport(importTask, uri);
         }
@@ -86,18 +86,18 @@ namespace PigletViewer
 
             GltfImportTask importTask = RuntimeGltfImporter
                 .GetImportTask(uri,
-                    ProgressLogManager.Instance.OnImportProgress);
+                    ProgressLog.Instance.OnImportProgress);
 
             StartImport(importTask, uri);
         }
 
         public void StartImport(GltfImportTask importTask, Uri uri)
         {
-            ProgressLogManager.Instance.StartImport();
+            ProgressLog.Instance.StartImport();
 
             string basename = Path.GetFileName(uri.ToString());
             string message = String.Format("Loading {0}...", basename);
-            ProgressLogManager.Instance.AddLineCallback(message);
+            ProgressLog.Instance.AddLineCallback(message);
 
             importTask.OnCompleted += OnImportCompleted;
             importTask.OnException += OnImportException;
@@ -114,15 +114,15 @@ namespace PigletViewer
             ViewerGUI.Instance.ResetSpin();
             ViewerGUI.Instance.ResetFooterMessage();
 
-            ProgressLogManager.Instance.AddLineCallback(
+            ProgressLog.Instance.AddLineCallback(
                 String.Format("Total import time: {0} ms",
-                    ProgressLogManager.Instance.Stopwatch.ElapsedMilliseconds));
+                    ProgressLog.Instance.Stopwatch.ElapsedMilliseconds));
 
-            ProgressLogManager.Instance.AddLineCallback(
+            ProgressLog.Instance.AddLineCallback(
                 String.Format("Longest Unity thread stall: {0} ms",
                     _importTask.LongestStepInMilliseconds()));
 
-            ProgressLogManager.Instance.AddLineCallback("Success!");
+            ProgressLog.Instance.AddLineCallback("Success!");
 
             ModelManager.Instance.SetModel(model);
 

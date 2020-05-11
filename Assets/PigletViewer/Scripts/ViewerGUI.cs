@@ -215,7 +215,7 @@ public class ViewerGUI : Singleton<ViewerGUI>
             Screen.height - 2 * padding));
 
             // progress log messages
-            foreach (var line in ProgressLogManager.Instance.Lines)
+            foreach (var line in ProgressLog.Instance.Lines)
                 GUILayout.Label(line, _styles.Text);
 
             GUILayout.EndArea();
