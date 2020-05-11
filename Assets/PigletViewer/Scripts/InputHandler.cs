@@ -218,7 +218,7 @@ public class InputHandler : Singleton<InputHandler>
         // whenever the user clicks on the
         // model/background.
         if (mouseDown)
-            ViewerGUI.Instance.ResetSpin();
+            Gui.Instance.ResetSpin();
 
         if (mouseActions.HasFlag(MouseAction.Rotate))
             ModelManager.Instance.RotateAboutCenter(
@@ -313,7 +313,7 @@ public class InputHandler : Singleton<InputHandler>
             || Input.GetMouseButtonDown(1)
             || Input.GetMouseButtonDown(2))
         {
-            ViewerGUI.Instance.ResetSpin();
+            Gui.Instance.ResetSpin();
         }
 
         if (mouseActions.HasFlag(MouseAction.Rotate))

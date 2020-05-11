@@ -18,9 +18,9 @@ namespace PigletViewer
         /// </summary>
         void Start()
         {
-            ViewerGUI.Instance.DefaultFooterMessage
+            Gui.Instance.DefaultFooterMessage
                 = "drag .glb/.zip onto window to view";
-            ViewerGUI.Instance.ResetFooterMessage();
+            Gui.Instance.ResetFooterMessage();
 
             // run javascript startup tasks (e.g. register event
             // handlers for drag-and-drop)

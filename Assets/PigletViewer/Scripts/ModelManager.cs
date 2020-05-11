@@ -82,10 +82,10 @@ public class ModelManager : Singleton<ModelManager>
     /// </summary>
     public void SpinModel()
     {
-        ViewerGUI gui = ViewerGUI.Instance;
+        Gui gui = Gui.Instance;
 
         Vector3 rotation = new Vector3(gui.SpinY, -gui.SpinX, 0)
-           * Time.deltaTime * ViewerGUI.Instance.SpinSpeed;
+           * Time.deltaTime * Gui.Instance.SpinSpeed;
 
         RotateAboutCenter(rotation);
     }

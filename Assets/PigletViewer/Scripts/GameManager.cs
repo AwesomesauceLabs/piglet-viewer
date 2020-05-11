@@ -40,9 +40,9 @@ namespace PigletViewer
             // outside of the Unity WebGL canvas.
 
             ProgressLog.Instance.AddLineCallback =
-                ViewerGUI.Instance.AddProgressLogLine;
+                Gui.Instance.AddProgressLogLine;
             ProgressLog.Instance.UpdateLineCallback =
-                ViewerGUI.Instance.UpdateProgressLogLine;
+                Gui.Instance.UpdateProgressLogLine;
 
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
             gameObject.AddComponent<WindowsGameManager>();
@@ -110,8 +110,8 @@ namespace PigletViewer
         /// </summary>
         public void OnImportCompleted(GameObject model)
         {
-            ViewerGUI.Instance.ResetSpin();
-            ViewerGUI.Instance.ResetFooterMessage();
+            Gui.Instance.ResetSpin();
+            Gui.Instance.ResetFooterMessage();
 
             ProgressLog.Instance.AddLineCallback(
                 String.Format("Total import time: {0} ms",
@@ -133,7 +133,7 @@ namespace PigletViewer
         /// </summary>
         public void OnImportException(Exception e)
         {
-            ViewerGUI.Instance.ShowDialogBox("Failed to Load Model",
+            Gui.Instance.ShowDialogBox("Failed to Load Model",
                 StringUtil.WrapText(e.Message, 50));
 
             _importTask = null;

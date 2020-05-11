@@ -31,9 +31,9 @@ namespace PigletViewer
             _dragAndDropHook.InstallHook();
             _dragAndDropHook.OnDroppedFiles += OnDropFiles;
 
-            ViewerGUI.Instance.DefaultFooterMessage
+            Gui.Instance.DefaultFooterMessage
                 = "drag .gltf/.glb/.zip onto window to view";
-            ViewerGUI.Instance.ResetFooterMessage();
+            Gui.Instance.ResetFooterMessage();
 
             // By default, the Windows Unity Player will pause
             // execution when it loses focus.  Setting
