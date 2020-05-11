@@ -60,14 +60,14 @@ namespace PigletViewer
         /// of the web page.
         /// </summary>
         [DllImport("__Internal")]
-        public static extern void AppendLogLine(string line);
+        public static extern void AddProgressLogLine(string line);
 
         /// <summary>
         /// Replace the last line of the Import Log, located in the
         /// left panel of the web page.
         /// </summary>
         [DllImport("__Internal")]
-        public static extern void UpdateTailLogLine(string line);
+        public static extern void UpdateProgressLogLine(string line);
     }
 }
 

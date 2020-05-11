@@ -33,8 +33,8 @@ namespace PigletViewer
             // as part of the containing web page (outside of the Unity WebGL canvas),
             // whereas on Windows/Android the progress messages are rendered
             // directly on top of the view using IMGUI methods.
-            ProgressLog.Instance.AddLineCallback = JsLib.AppendLogLine;
-            ProgressLog.Instance.UpdateLineCallback = JsLib.UpdateTailLogLine;
+            ProgressLog.Instance.AddLineCallback = JsLib.AddProgressLogLine;
+            ProgressLog.Instance.UpdateLineCallback = JsLib.UpdateProgressLogLine;
 
             // load default model (Piglet mascot)
             GameManager.Instance.StartImport(Path.Combine(

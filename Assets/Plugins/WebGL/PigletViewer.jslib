@@ -48,7 +48,7 @@ var PigletViewerJsLib = {
 
     // Append a line to the Import Log, located in the left panel
     // of the web page.
-	AppendLogLine: function(stringPtr)
+	AddProgressLogLine: function(stringPtr)
 	{
 		var string = Pointer_stringify(stringPtr);
 		window.logArray = window.logArray || new Array();
@@ -59,7 +59,7 @@ var PigletViewerJsLib = {
 
     // Replace the last line of the Import Log, located in the
     // left panel of the web page.
-	UpdateTailLogLine: function(stringPtr)
+	UpdateProgressLogLine: function(stringPtr)
 	{
 		window.logArray = window.logArray || new Array();
 
