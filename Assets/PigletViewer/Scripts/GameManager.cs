@@ -53,7 +53,7 @@ namespace PigletViewer
 
             GltfImportTask importTask = RuntimeGltfImporter
                 .GetImportTask(data,
-                    ImportLog.Instance.OnImportProgress);
+                    ProgressLogManager.Instance.OnImportProgress);
 
             StartImport(importTask, uri);
         }
@@ -73,18 +73,18 @@ namespace PigletViewer
 
             GltfImportTask importTask = RuntimeGltfImporter
                 .GetImportTask(uri,
-                    ImportLog.Instance.OnImportProgress);
+                    ProgressLogManager.Instance.OnImportProgress);
 
             StartImport(importTask, uri);
         }
 
         public void StartImport(GltfImportTask importTask, Uri uri)
         {
-            ImportLog.Instance.StartImport();
+            ProgressLogManager.Instance.StartImport();
 
             string basename = Path.GetFileName(uri.ToString());
             string message = String.Format("Loading {0}...", basename);
-            ImportLog.Instance.AddLine(message);
+            ProgressLogManager.Instance.AddLine(message);
 
             importTask.OnCompleted += OnImportCompleted;
             importTask.OnException += OnImportException;
@@ -101,15 +101,15 @@ namespace PigletViewer
             ViewerGUI.Instance.ResetSpin();
             ViewerGUI.Instance.ResetFooterMessage();
 
-            ImportLog.Instance.AddLine(
+            ProgressLogManager.Instance.AddLine(
                 String.Format("Total import time: {0} ms",
-                    ImportLog.Instance.Stopwatch.ElapsedMilliseconds));
+                    ProgressLogManager.Instance.Stopwatch.ElapsedMilliseconds));
 
-            ImportLog.Instance.AddLine(
+            ProgressLogManager.Instance.AddLine(
                 String.Format("Longest Unity thread stall: {0} ms",
                     _importTask.LongestStepInMilliseconds()));
 
-            ImportLog.Instance.AddLine("Success!");
+            ProgressLogManager.Instance.AddLine("Success!");
 
             ModelManager.Instance.SetModel(model);
 

@@ -75,7 +75,7 @@ namespace PigletViewer
 
             GltfImportTask importTask = RuntimeGltfImporter
                 .GetImportTask(uri,
-                    ImportLog.Instance.OnImportProgress);
+                    ProgressLogManager.Instance.OnImportProgress);
 
             for (int i = 0; i < args.Length; ++i)
             {
@@ -94,7 +94,7 @@ namespace PigletViewer
                     uri = new Uri(args[i + 1]);
                     importTask = RuntimeGltfImporter
                         .GetImportTask(uri,
-                            ImportLog.Instance.OnImportProgress);
+                            ProgressLogManager.Instance.OnImportProgress);
                 }
                 else if (args[i] == "--no-load")
                 {
