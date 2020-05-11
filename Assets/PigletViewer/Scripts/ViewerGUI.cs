@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Piglet;
 using UnityEditor;
 using UnityEngine;
@@ -11,6 +12,12 @@ using UnityGLTF;
 /// </summary>
 public class ViewerGUI : Singleton<ViewerGUI>
 {
+    /// <summary>
+    /// The list of progress messages generated for the
+    /// current glTF import.
+    /// </summary>
+    private List<string> _progressLog;
+
     /// <summary>
     /// Speed to auto-spin model left-to-right.
     /// </summary>
@@ -88,6 +95,36 @@ public class ViewerGUI : Singleton<ViewerGUI>
         Reset();
     }
 
+    /// <summary>
+    /// Append a new line to the progress log.
+    /// </summary>
+    public void AddProgressLogLine(string message)
+    {
+        _progressLog.Add(message);
+    }
+
+    /// <summary>
+    /// Replace the most recent line of the progress log.
+    /// </summary>
+    public void UpdateProgressLogLine(string message)
+    {
+        if (_progressLog.Count == 0)
+        {
+            AddProgressLogLine(message);
+            return;
+        }
+
+        _progressLog[_progressLog.Count - 1] = message;
+    }
+
+    /// <summary>
+    /// Clear the progress log.
+    /// </summary>
+    public void ResetProgressLog()
+    {
+        _progressLog = new List<string>();
+    }
+
     public void ResetSpin()
     {
         SpinX = 0;
@@ -101,6 +138,7 @@ public class ViewerGUI : Singleton<ViewerGUI>
 
     public void Reset()
     {
+        ResetProgressLog();
         ResetSpin();
         ResetFooterMessage();
         CloseDialogBox();
@@ -215,7 +253,7 @@ public class ViewerGUI : Singleton<ViewerGUI>
             Screen.height - 2 * padding));
 
             // progress log messages
-            foreach (var line in ProgressLog.Instance.Lines)
+            foreach (var line in _progressLog)
                 GUILayout.Label(line, _styles.Text);
 
             GUILayout.EndArea();

@@ -40,10 +40,9 @@ namespace PigletViewer
             // outside of the Unity WebGL canvas.
 
             ProgressLog.Instance.AddLineCallback =
-                message => ProgressLog.Instance.Lines.Add(message);
+                ViewerGUI.Instance.AddProgressLogLine;
             ProgressLog.Instance.UpdateLineCallback =
-                message => ProgressLog.Instance.Lines[
-                    ProgressLog.Instance.Lines.Count - 1] = message;
+                ViewerGUI.Instance.UpdateProgressLogLine;
 
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
             gameObject.AddComponent<WindowsGameManager>();
