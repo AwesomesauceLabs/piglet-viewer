@@ -1,161 +1,163 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Piglet;
-using PigletViewer;
 using UnityEngine;
 
-/// <summary>
-/// Store a reference to the most recently loaded glTF model.
-/// This application (PigletViewer) can only load/view a
-/// single model at any given time.
-///
-/// This class initializes transform of a model when it is
-/// first loaded, so that models always have a standard size,
-/// distance, and rotation relative to the camera.  It
-/// also provides methods for rotating the model about
-/// the center of its bounding box.
-/// </summary>
-public class ModelManager : Singleton<ModelManager>
+namespace PigletViewer
 {
     /// <summary>
-    /// Determines the initial position of a model
-    /// relative to the camera.
-    /// </summary>
-    public Vector3 DefaultModelOffsetFromCamera;
-
-    /// <summary>
-    /// Determines the default size of a model when it is first
-    /// loaded.  More specifically, this sets the length
-    /// of the longest dimension of the model's
-    /// world-space-axis-aligned bounding box.
-    /// </summary>
-    public float DefaultModelSize;
-
-    /// <summary>
-    /// The root GameObject of the most recently loaded model,
-    /// i.e. the model that is currently being viewed by
-    /// the user. (This application only allows viewing one
-    /// model at a time.)
-    /// </summary>
-    private GameObject _model;
-
-    /// <summary>
-    /// Unity callback that is invoked once per frame.
-    /// </summary>
-    void Update()
-    {
-        SpinModel();
-    }
-
-    /// <summary>
-    /// Destroy the current model (if any) and update the
-    /// current model to the given game object.
+    /// Store a reference to the most recently loaded glTF model.
+    /// This application (PigletViewer) can only load/view a
+    /// single model at any given time.
     ///
-    /// Adjust the root transform of the game object so that the
-    /// model has a standard size, distance, and rotation
-    /// relative to the camera.
+    /// This class initializes transform of a model when it is
+    /// first loaded, so that models always have a standard size,
+    /// distance, and rotation relative to the camera.  It
+    /// also provides methods for rotating the model about
+    /// the center of its bounding box.
     /// </summary>
-    /// <param name="model"></param>
-    public void SetModel(GameObject model)
+    public class ModelManager : Singleton<ModelManager>
     {
-        if (_model != null)
+        /// <summary>
+        /// Determines the initial position of a model
+        /// relative to the camera.
+        /// </summary>
+        public Vector3 DefaultModelOffsetFromCamera;
+
+        /// <summary>
+        /// Determines the default size of a model when it is first
+        /// loaded.  More specifically, this sets the length
+        /// of the longest dimension of the model's
+        /// world-space-axis-aligned bounding box.
+        /// </summary>
+        public float DefaultModelSize;
+
+        /// <summary>
+        /// The root GameObject of the most recently loaded model,
+        /// i.e. the model that is currently being viewed by
+        /// the user. (This application only allows viewing one
+        /// model at a time.)
+        /// </summary>
+        private GameObject _model;
+
+        /// <summary>
+        /// Unity callback that is invoked once per frame.
+        /// </summary>
+        void Update()
         {
-            if (Application.isPlaying)
-                Destroy(_model);
-            else
-                DestroyImmediate(_model);
+            SpinModel();
         }
 
-        _model = model;
+        /// <summary>
+        /// Destroy the current model (if any) and update the
+        /// current model to the given game object.
+        ///
+        /// Adjust the root transform of the game object so that the
+        /// model has a standard size, distance, and rotation
+        /// relative to the camera.
+        /// </summary>
+        /// <param name="model"></param>
+        public void SetModel(GameObject model)
+        {
+            if (_model != null)
+            {
+                if (Application.isPlaying)
+                    Destroy(_model);
+                else
+                    DestroyImmediate(_model);
+            }
 
-        // Initialize the transform of the model so that:
-        //
-        // (1) the model is a standard size
-        // (2) the model is a standard distance from the main camera
-        // (3) the model is facing the camera
+            _model = model;
 
-        InitModelTransformRelativeToCamera();
+            // Initialize the transform of the model so that:
+            //
+            // (1) the model is a standard size
+            // (2) the model is a standard distance from the main camera
+            // (3) the model is facing the camera
+
+            InitModelTransformRelativeToCamera();
+        }
+
+        /// <summary>
+        /// Auto-rotate model as per "Spin X" / "Spin Y" sliders in GUI.
+        /// </summary>
+        public void SpinModel()
+        {
+            Gui gui = Gui.Instance;
+
+            Vector3 rotation = new Vector3(gui.SpinY, -gui.SpinX, 0)
+                               * Time.deltaTime * Gui.Instance.SpinSpeed;
+
+            RotateAboutCenter(rotation);
+        }
+
+        /// <summary>
+        /// Rotate a GameObject hierarchy about its center, as determined
+        /// by the MeshRenderer bounds of the GameObjects in the hierarchy.
+        /// </summary>
+        public void RotateAboutCenter(Vector3 rotation)
+        {
+            if (_model == null)
+                return;
+
+            Bounds? bounds = BoundsUtil.GetRendererBoundsForHierarchy(_model);
+            if (!bounds.HasValue)
+                return;
+
+            GameObject pivot = new GameObject("pivot");
+            pivot.transform.position = bounds.Value.center;
+            _model.transform.SetParent(pivot.transform, true);
+
+            pivot.transform.Rotate(rotation);
+
+            _model.transform.SetParent(null, true);
+            Destroy(pivot);
+        }
+
+        /// <summary>
+        /// Adjust the root transform of the model when it is
+        /// first loaded, so that every model: (1) has the same
+        /// initial size, (2) has the same initial distance from
+        /// the camera, and (3) is initially rotated to face the
+        /// camera.
+        /// </summary>
+        public void InitModelTransformRelativeToCamera()
+        {
+            if (_model == null)
+                return;
+
+            Transform cameraTransform = CameraBehaviour.Instance.transform;
+
+            // Scale model up/down to a standard size, so that the
+            // largest dimension of its bounding box is equal to `DefaultModelSize`.
+
+            Bounds? bounds = BoundsUtil.GetRendererBoundsForHierarchy(_model);
+            if (!bounds.HasValue)
+                return;
+
+            float size = bounds.Value.extents.MaxComponent();
+            if (size < 0.000001f)
+                return;
+
+            Vector3 scale = _model.transform.localScale;
+            float scaleFactor = DefaultModelSize / size;
+            _model.transform.localScale = scale * scaleFactor;
+
+            // Rotate model to face camera.
+
+            _model.transform.up = cameraTransform.up;
+            _model.transform.forward = cameraTransform.forward;
+
+            // Translate model at standard offset from camera.
+
+            bounds = BoundsUtil.GetRendererBoundsForHierarchy(_model);
+            if (!bounds.HasValue)
+                return;
+
+            _model.transform.Translate(cameraTransform.position
+                                       + DefaultModelOffsetFromCamera
+                                       - bounds.Value.center);
+        }
+
     }
-
-    /// <summary>
-    /// Auto-rotate model as per "Spin X" / "Spin Y" sliders in GUI.
-    /// </summary>
-    public void SpinModel()
-    {
-        Gui gui = Gui.Instance;
-
-        Vector3 rotation = new Vector3(gui.SpinY, -gui.SpinX, 0)
-           * Time.deltaTime * Gui.Instance.SpinSpeed;
-
-        RotateAboutCenter(rotation);
-    }
-
-    /// <summary>
-    /// Rotate a GameObject hierarchy about its center, as determined
-    /// by the MeshRenderer bounds of the GameObjects in the hierarchy.
-    /// </summary>
-    public void RotateAboutCenter(Vector3 rotation)
-    {
-        if (_model == null)
-            return;
-
-        Bounds? bounds = BoundsUtil.GetRendererBoundsForHierarchy(_model);
-        if (!bounds.HasValue)
-            return;
-
-        GameObject pivot = new GameObject("pivot");
-        pivot.transform.position = bounds.Value.center;
-        _model.transform.SetParent(pivot.transform, true);
-
-        pivot.transform.Rotate(rotation);
-
-        _model.transform.SetParent(null, true);
-        Destroy(pivot);
-    }
-
-    /// <summary>
-    /// Adjust the root transform of the model when it is
-    /// first loaded, so that every model: (1) has the same
-    /// initial size, (2) has the same initial distance from
-    /// the camera, and (3) is initially rotated to face the
-    /// camera.
-    /// </summary>
-    public void InitModelTransformRelativeToCamera()
-    {
-        if (_model == null)
-            return;
-
-        Transform cameraTransform = CameraBehaviour.Instance.transform;
-
-        // Scale model up/down to a standard size, so that the
-        // largest dimension of its bounding box is equal to `DefaultModelSize`.
-
-        Bounds? bounds = BoundsUtil.GetRendererBoundsForHierarchy(_model);
-        if (!bounds.HasValue)
-            return;
-
-        float size = bounds.Value.extents.MaxComponent();
-        if (size < 0.000001f)
-            return;
-
-        Vector3 scale = _model.transform.localScale;
-        float scaleFactor = DefaultModelSize / size;
-        _model.transform.localScale = scale * scaleFactor;
-
-        // Rotate model to face camera.
-
-        _model.transform.up = cameraTransform.up;
-        _model.transform.forward = cameraTransform.forward;
-
-        // Translate model at standard offset from camera.
-
-        bounds = BoundsUtil.GetRendererBoundsForHierarchy(_model);
-        if (!bounds.HasValue)
-            return;
-
-        _model.transform.Translate(cameraTransform.position
-            + DefaultModelOffsetFromCamera
-            - bounds.Value.center);
-    }
-
 }
