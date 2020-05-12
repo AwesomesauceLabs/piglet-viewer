@@ -38,7 +38,7 @@ namespace PigletViewer
 
             // load default model (Piglet mascot)
             GameManager.Instance.StartImport(Path.Combine(
-                Application.streamingAssetsPath, "piglet-1.0.0.glb"));
+                Application.streamingAssetsPath, "piggleston.glb"));
         }
 
         /// <summary>

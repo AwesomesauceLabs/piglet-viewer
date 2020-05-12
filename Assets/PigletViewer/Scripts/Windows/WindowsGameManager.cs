@@ -71,7 +71,7 @@ namespace PigletViewer
             // --load or --no-load is used
 
             Uri uri = new Uri(Path.Combine(Application.streamingAssetsPath,
-                "piglet-1.0.0.glb"));
+                "piggleston.glb"));
 
             GltfImportTask importTask = RuntimeGltfImporter
                 .GetImportTask(uri,
