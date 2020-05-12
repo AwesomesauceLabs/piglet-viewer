@@ -133,8 +133,21 @@ namespace PigletViewer
         /// </summary>
         public void OnImportException(Exception e)
         {
-            Gui.Instance.ShowDialogBox("Failed to Load Model",
-                StringUtil.WrapText(e.Message, 50));
+            if (e is Newtonsoft.Json.JsonException)
+            {
+                Gui.Instance.ShowDialogBox(
+                    "Failed to Load Model",
+                    StringUtil.WrapText("Sorry, the input file does not appear "
+                        + "to be a valid glTF file (i.e. a .glb or .gltf file), "
+                        + "nor is it a zip archive containing a valid glTF file.",
+                        50));
+            }
+            else
+            {
+                Gui.Instance.ShowDialogBox("Failed to Load Model",
+                    StringUtil.WrapText(e.Message, 50));
+            }
+
 
             _importTask = null;
         }
