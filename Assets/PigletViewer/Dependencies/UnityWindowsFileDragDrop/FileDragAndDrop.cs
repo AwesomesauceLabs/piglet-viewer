@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using B83.Win32;
@@ -28,3 +29,4 @@ public class FileDragAndDrop : MonoBehaviour
             aFiles.Aggregate((a, b) => a + "\n" + b));
     }
 }
+#endif
