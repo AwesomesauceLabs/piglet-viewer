@@ -16,7 +16,7 @@ namespace PigletViewer
     /// application behaviour (e.g. AndroidGameManager) at
     /// startup time.
     /// </summary>
-    public class GameManager : Singleton<GameManager>
+    public class GameManager : SingletonBehaviour<GameManager>
     {
         /// <summary>
         /// Handle to the currently running glTF import task.

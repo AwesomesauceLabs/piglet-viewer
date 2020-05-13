@@ -16,7 +16,7 @@ namespace PigletViewer
     /// also provides methods for rotating the model about
     /// the center of its bounding box.
     /// </summary>
-    public class ModelManager : Singleton<ModelManager>
+    public class ModelManager : SingletonBehaviour<ModelManager>
     {
         /// <summary>
         /// Determines the initial position of a model

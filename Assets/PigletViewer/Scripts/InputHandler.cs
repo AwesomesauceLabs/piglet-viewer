@@ -8,7 +8,7 @@ namespace PigletViewer
     /// Maps mouse input and touchscreen input to corresponding actions in the
     /// viewer (e.g. rotate model).
     /// </summary>
-    public class InputHandler : Singleton<InputHandler>
+    public class InputHandler : SingletonBehaviour<InputHandler>
     {
         /// <summary>
         /// Controls the speed of model rotation relative to mouse drag / touch drag.

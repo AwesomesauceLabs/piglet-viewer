@@ -7,7 +7,7 @@ namespace PigletViewer
     /// MonoBehaviour for controlling camera movement in response
     /// to the user's mouse/touch input.
     /// </summary>
-    public class CameraBehaviour : Singleton<CameraBehaviour>
+    public class CameraBehaviour : SingletonBehaviour<CameraBehaviour>
     {
         /// <summary>
         /// Move the camera as per the given displacement vector.

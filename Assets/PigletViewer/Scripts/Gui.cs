@@ -12,7 +12,7 @@ namespace PigletViewer
     /// Draws the UI elements (e.g. progress messages, checkboxes)
     /// on top of the model viewer window.
     /// </summary>
-    public class Gui : Singleton<Gui>
+    public class Gui : SingletonBehaviour<Gui>
     {
         /// <summary>
         /// Speed to auto-spin model left-to-right.
