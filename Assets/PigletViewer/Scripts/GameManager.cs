@@ -43,6 +43,8 @@ namespace PigletViewer
                 Gui.Instance.AddProgressLogLine;
             ProgressLog.Instance.UpdateLineCallback =
                 Gui.Instance.UpdateProgressLogLine;
+            ProgressLog.Instance.ResetLogCallback =
+                Gui.Instance.ResetProgressLog;
 
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
             gameObject.AddComponent<WindowsGameManager>();

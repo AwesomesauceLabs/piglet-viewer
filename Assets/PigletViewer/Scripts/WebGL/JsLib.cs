@@ -68,6 +68,13 @@ namespace PigletViewer
         /// </summary>
         [DllImport("__Internal")]
         public static extern void UpdateProgressLogLine(string line);
+
+        /// <summary>
+        /// Clear the Import Log, located in the left panel of the
+        /// web page.
+        /// </summary>
+        [DllImport("__Internal")]
+        public static extern void ResetProgressLog();
     }
 }
 

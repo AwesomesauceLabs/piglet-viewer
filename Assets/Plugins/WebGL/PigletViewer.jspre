@@ -22,7 +22,6 @@ function ImportFile(file)
 		window.fileData = window.fileData || {};
 		window.fileData[reader.filename] = reader.result;
 
-        ClearImportLog();
 		SendMessage("GameManager", "ImportFileWebGl", reader.filename);
 
 	};
@@ -33,7 +32,6 @@ function ImportFile(file)
 function ImportUrl(url)
 {
 	console.log("loading url: " + url);
-    ClearImportLog();
 	SendMessage("GameManager", "ImportUrlWebGl", url);
 }
 
@@ -77,13 +75,6 @@ function OnCanvasDrop(event)
 			break;
 		}
 	}
-}
-
-// Remove all text (progress messages) from the import log.
-function ClearImportLog()
-{
-    window.logArray = new Array();
-    RebuildLogHtml();
 }
 
 // Rebuild the html content of the Import Log, located in the

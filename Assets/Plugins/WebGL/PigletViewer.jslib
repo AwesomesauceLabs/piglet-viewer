@@ -73,6 +73,14 @@ var PigletViewerJsLib = {
 
 		RebuildLogHtml();
 	},
+
+	// Clear the Import Log, located in the left panel of the
+	// web page.
+	ResetProgressLog: function()
+	{
+		window.logArray = new Array();
+		RebuildLogHtml();
+	},
 };
 
 mergeInto(LibraryManager.library, PigletViewerJsLib);
