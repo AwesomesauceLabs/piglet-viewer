@@ -207,8 +207,8 @@ namespace PigletViewer
                         Vector2 deltaMidpoint
                             = pinchMidpoint - _prevTouchState.PinchMidpoint.Value;
 
-                        deltaX = deltaMidpoint.x * 0.3f;
-                        deltaY = -deltaMidpoint.y * 0.3f;
+                        deltaX = deltaMidpoint.x * 1.0f;
+                        deltaY = -deltaMidpoint.y * 1.0f;
                     }
 
                     _prevTouchState.PinchMidpoint = pinchMidpoint;
