@@ -10,17 +10,19 @@ namespace PigletViewer
     /// </summary>
     public class AndroidGameManager : MonoBehaviour
     {
+        private string _intentUri;
+
         /// <summary>
         /// Unity callback that is invoked before the first frame update.
         /// </summary>
         void Start()
         {
-            string uri = GetAndroidIntentUri();
+            _intentUri = GetAndroidIntentUri();
 
-            if (string.IsNullOrEmpty(uri))
-                uri = Path.Combine(Application.streamingAssetsPath, "piggleston.glb");
+            if (string.IsNullOrEmpty(_intentUri))
+                _intentUri = Path.Combine(Application.streamingAssetsPath, "piggleston.glb");
 
-            GameManager.Instance.StartImport(uri);
+            GameManager.Instance.StartImport(_intentUri);
         }
 
         /// <summary>
@@ -52,13 +54,17 @@ namespace PigletViewer
 
             string uri = GetAndroidIntentUri();
 
-            // if Unity Player is regaining focus without a new model URI
-            // to load (e.g. user selected Piglet Viewer in Android app
-            // switcher)
-            if (string.IsNullOrEmpty(uri))
+            // Check that the intent URI has changed.  This
+            // prevents the app from reloading the current model
+            // every time the user switches focus to the
+            // app.
+
+            if (string.IsNullOrEmpty(uri) || uri == _intentUri)
                 return;
 
-            GameManager.Instance.StartImport(uri);
+            _intentUri = uri;
+
+            GameManager.Instance.StartImport(_intentUri);
         }
 
         /// <summary>
