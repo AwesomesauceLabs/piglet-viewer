@@ -138,7 +138,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 437713555}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25baed61027b484297ae3bd91a288a74, type: 3}
+  m_Script: {fileID: 11500000, guid: ee583556db60dfb41a9ef52c5710a1b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   SpinX: 0
@@ -312,7 +312,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 678983080}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a91ed5bbe87aa0647a3b1b1361bc9bc2, type: 3}
+  m_Script: {fileID: 11500000, guid: b86daa065addc354b8d5b4ebbf7f2219, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   DefaultModelOffsetFromCamera: {x: 0, y: 0, z: 2}
@@ -700,7 +700,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1744033484}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4606fb74074ce954b92b9b5653871be8, type: 3}
+  m_Script: {fileID: 11500000, guid: 70c0768febda04948bc65436e741437e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!4 &1936820390 stripped
