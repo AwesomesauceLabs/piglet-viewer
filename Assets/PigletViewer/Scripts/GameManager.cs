@@ -64,11 +64,7 @@ namespace PigletViewer
         public void StartImport(byte[] data, string filename)
         {
             Uri uri = new Uri(filename, UriKind.Relative);
-
-            GltfImportTask importTask = RuntimeGltfImporter
-                .GetImportTask(data,
-                    ProgressLog.Instance.OnImportProgress);
-
+            GltfImportTask importTask = RuntimeGltfImporter.GetImportTask(data);
             StartImport(importTask, uri);
         }
 
@@ -84,11 +80,7 @@ namespace PigletViewer
         public void StartImport(string uriStr)
         {
             Uri uri = new Uri(uriStr);
-
-            GltfImportTask importTask = RuntimeGltfImporter
-                .GetImportTask(uri,
-                    ProgressLog.Instance.OnImportProgress);
-
+            GltfImportTask importTask = RuntimeGltfImporter.GetImportTask(uri);
             StartImport(importTask, uri);
         }
 
@@ -100,6 +92,7 @@ namespace PigletViewer
             string message = String.Format("Loading {0}...", basename);
             ProgressLog.Instance.AddLineCallback(message);
 
+            importTask.OnProgress += ProgressLog.Instance.OnImportProgress;
             importTask.OnCompleted += OnImportCompleted;
             importTask.OnException += OnImportException;
             importTask.RethrowExceptionAfterCallbacks = false;
