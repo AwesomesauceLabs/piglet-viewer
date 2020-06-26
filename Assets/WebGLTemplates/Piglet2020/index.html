@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<!--
+This file is a modified version of the index.html file provided by
+https://github.com/greggman/better-unity-webgl-template.  The original file
+is released to the public domain under the Creative Commons "CC0" license
+(https://creativecommons.org/publicdomain/zero/1.0/).
+-->
+<html lang="en-us">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Piglet WebGL Demo</title>
+    <style>
+      html {
+        box-sizing: border-box;
+      }
+      *, *:before, *:after {
+        box-sizing: inherit;
+      }
+      header {
+        background-color: #dededf;
+      }
+      header h1 {
+        text-align: center;
+      }
+      body {
+        margin: 0;
+        background: #f2f2f2;
+      }
+      #contentContainer {
+        display: flex;
+        height: 100vh;
+      }
+      #textContainer {
+        flex: 0 0 25%;
+        padding-left: 25px;
+        padding-right: 25px;
+      }
+      #importLog {
+        overflow: scroll;
+        background-color: white;
+        border-style: solid;
+        border-width: 1px;
+        border-color: lightgray;
+        padding: 10px;
+        height: 200px;
+      }
+      #viewArea {
+        flex: 1;
+      }
+      #gameContainer {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+        background: #dcdedf;
+      }
+      /* try to handle mobile dialog */
+      canvas + * {
+        z-index: 2;
+      }
+      .progress {
+          margin: 1.5em;
+          border: 1px solid white;
+          width: 50%;
+          display: none;
+      }
+      .progress .full {
+          margin: 2px;
+          background: white;
+          height: 1em;
+          transform-origin: top left;
+      }
+
+      #loader {
+        position: absolute;
+        left: 25%;
+        top: 0;
+        width: 75%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .spinner,
+      .spinner:after {
+        border-radius: 50%;
+        width: 5em;
+        height: 5em;
+      }
+      .spinner {
+        margin: 10px;
+        font-size: 10px;
+        position: relative;
+        text-indent: -9999em;
+        border-top: 1.1em solid rgba(255, 255, 255, 0.2);
+        border-right: 1.1em solid rgba(255, 255, 255, 0.2);
+        border-bottom: 1.1em solid rgba(255, 255, 255, 0.2);
+        border-left: 1.1em solid #ffffff;
+        transform: translateZ(0);
+        animation: spinner-spin 1.1s infinite linear;
+      }
+      @keyframes spinner-spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+    </style>
+  </head>
+
+  <body>
+    <section id="contentContainer">
+      <div id="textContainer">
+        <header>
+          <h1>Load a Model</h1>
+        </header>
+        <p>
+          This page allows users test their 3D models with the
+          Piglet glTF Importer for Unity. Browse for a .glb/.zip file
+          below or drag a .glb/.zip onto the view area.
+        </p>
+        <!--
+        I use two <input> elements here to better control the styling of the
+        the browse-for-file button.  In particular, I wanted to disable display
+        of the selected file name beside the browse button. For discussion,
+        see: https://stackoverflow.com/a/14806776/12989671
+
+        For discussion of the `accept` attribute, see:
+        https://stackoverflow.com/a/23706177/12989671
+        -->
+        <input type="file" id="inputFile" accept=".glb,.zip" style="display: none;" />
+        <input type="button" value="Browse..." onclick="document.getElementById('inputFile').click();" />
+        <header>
+          <h1>Sample Models</h1>
+        </header>
+        <p>
+          Drag .glb/.zip links onto view area to load.
+          <p>
+            <a href="StreamingAssets/piggleston.glb">Sir Piggleston</a>
+            by <a href="https://awesomesaucelabs.github.io">Awesomesauce Labs</a>
+            (0.5 MB)
+            <br>
+            <a href="Models/viking_room.zip">Viking Room</a>
+            by <a href="https://sketchfab.com/nigelgoh">nigelgoh@sketchfab</a>
+            (1.1 MB)
+            <br>
+            <a href="Models/scifi_gun.zip">SciFi Gun</a>
+            by <a href="https://sketchfab.com/mrfetch">mrfetch@sketchfab</a>
+            (2.1 MB)
+            <br>
+            <a href="Models/skull_salazar.zip">Skull Salazar</a>
+            by <a href="https://sketchfab.com/jvitorsouzadesign">jvitorsouzadesign@sketchfab</a>
+            (11.7 MB)
+            <br>
+          </p>
+        </p>
+        </p>
+        <header>
+          <h1>Import Log</h1>
+        </header>
+        <div id="importLog">
+        </div>
+      </div>
+      <div id="viewArea">
+        <div id="gameContainer">
+          <canvas id="unity-canvas"></canvas>
+        </div>
+        <div id="loader">
+          <div class="spinner"></div>
+          <div class="progress"><div class="full"></div></div>
+        </div>
+      </div>
+    </section>
+  </body>
+
+  <script>
+   var buildUrl = "Build";
+   var loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}";
+   var config = {
+       dataUrl: buildUrl + "/{{{ DATA_FILENAME }}}",
+       frameworkUrl: buildUrl + "/{{{ FRAMEWORK_FILENAME }}}",
+       codeUrl: buildUrl + "/{{{ CODE_FILENAME }}}",
+       #if MEMORY_FILENAME
+       memoryUrl: buildUrl + "/{{{ MEMORY_FILENAME }}}",
+       #endif
+       #if SYMBOLS_FILENAME
+       symbolsUrl: buildUrl + "/{{{ SYMBOLS_FILENAME }}}",
+       #endif
+       streamingAssetsUrl: "StreamingAssets",
+       companyName: "{{{ COMPANY_NAME }}}",
+       productName: "{{{ PRODUCT_NAME }}}",
+       productVersion: "{{{ PRODUCT_VERSION }}}",
+   };
+
+   var container = document.querySelector("#gameContainer");
+   var canvas = document.querySelector("#unity-canvas");
+
+   var script = document.createElement("script");
+   script.src = loaderUrl;
+   script.onload = () => {
+       createUnityInstance(canvas, config, (progress) => {
+
+           document.querySelector(".progress").style.display = "block";
+           document.querySelector(".spinner").style.display = "none";
+           document.querySelector(".full").style.transform = `scaleX(${progress})`;
+
+       }).then((unityInstance) => {
+
+           document.querySelector("#loader").style.display = "none";
+
+       }).catch((message) => {
+           alert(message);
+       });
+   };
+   document.body.appendChild(script);
+  </script>
+
+</html>
