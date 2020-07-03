@@ -8,14 +8,6 @@
 /Assets/ShaderForge*
 /Assets/VSCode*
 
-# I keep my build scripts under
-# Builds, and this is also where the build
-# artifacts are generated.
-
-/[Bb]uilds/[Aa]ndroid/piglet.apk
-/[Bb]uilds/WebGL/dist*
-/[Bb]uilds/Windows
-
 # JetBrains (Rider IDE)
 /Assets/Plugins/Editor/JetBrains/
 /.idea/
@@ -54,6 +46,3 @@ sysinfo.txt
 *.unitypackage
 
 /www/node_modules/
-
-# directory that I use for testing glTF imports
-/Assets/Imported/
