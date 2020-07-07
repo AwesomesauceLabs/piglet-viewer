@@ -76,11 +76,12 @@ Once the build has completed, Unity will open the WebGL version of PigletViewer 
 You can build the Windows version of PigletViewer by the following steps:
 
 1. Double-click `Assets/PigletViewer/Scenes/MainScene.unity` to open the PigletViewer scene.
-2. Click `File -> Build Settings...` in the Unity menu.
-3. Click `PC, Mac & Linux Standalone` on the left side of the `Build Settings` dialog. If there is a `Build` button in the bottom right corner, then PC/Mac/Linux is already the active build target. If not, click `Switch Platform` to make PC/Mac/Linux the active build target.
-4. Click `Add Open Scenes` in the top right corner to add the current scene to the build.
-5. Click `Build And Run` in the bottom right corner.
-6. Select a location to save the build files and click `OK` to start the build.
+2. Change `Fullscreen Window` to `Windowed` under `Edit -> Project Settings... -> Player -> PC, Mac & Linux Standalone tab -> Resolution and Presentation -> Fullscreen Mode`. This step is optional but will make it easier to drag glTF files into the PigletViewer window (especially if you only have one monitor).
+3. Click `File -> Build Settings...` in the Unity menu.
+4. Click `PC, Mac & Linux Standalone` on the left side of the `Build Settings` dialog. If there is a `Build` button in the bottom right corner, then PC/Mac/Linux is already the active build target. If not, click `Switch Platform` to make PC/Mac/Linux the active build target.
+5. Click `Add Open Scenes` in the top right corner to add the current scene to the build.
+6. Click `Build And Run` in the bottom right corner.
+7. Select a location to save the build files and click `OK` to start the build.
 
 Once the build has completed, the PigletViewer application will open on your Windows desktop. To view glTF models in the Windows version of PigletViewer, drag-and-drop `.gltf`/`.glb`/`.zip` files from Windows File Explorer onto the PigletViewer window.
 
