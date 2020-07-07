@@ -17,13 +17,13 @@
 <br>
 *Viewing ["SciFi Gun"](https://sketchfab.com/3d-models/scifi-gun-04a9f3ccb5b14dc38a28b27c1916e18e) by [mrfetch@sketchfab](https://sketchfab.com/mrfetch) in the [live PigletViewer demo](https://awesomesaucelabs.github.io/piglet-webgl-demo/).*
 
-PigletViewer is a Unity application which uses the [Piglet glTF Importer](https://assetstore.unity.com/packages/slug/173425) to load and view 3D models from glTF files (`.gltf`, `.glb`, or `.zip`) [1][1]. It is designed to run on multiple platforms and currently supports builds for Android, WebGL, and Windows (see [Build Instructions](#build-instructions)). 
+PigletViewer is a Unity application which uses the [Piglet glTF Importer](https://assetstore.unity.com/packages/slug/173425) to load and view 3D models from glTF files (`.gltf`, `.glb`, or `.zip`)<sup>[1](#footnote1)</sup>. It is designed to run on multiple platforms and currently supports builds for Android, WebGL, and Windows (see [Build Instructions](#build-instructions)).
 
 PigletViewer is provided as an example application for customers of the [Piglet glTF Importer](https://assetstore.unity.com/packages/slug/173425). As such, building the application requires purchasing and installing Piglet from the Unity Asset Store. For new users of Piglet, I recommend watching the [Runtime Import Tutorial video](https://youtu.be/f66wmgSTPI0) and/or reading the [Runtime Import Tutorial section of the manual](https://awesomesaucelabs.github.io/piglet-manual/#runtime-import-tutorial) before exploring the PigletViewer code, as the tutorial provides a much quicker and simpler introduction to the API.
 
 # Live Demo
 
-A live demo for the WebGL version of PigletViewer is available at: [https://awesomesaucelabs.github.io/piglet-webgl-demo/](https://awesomesaucelabs.github.io/piglet-webgl-demo/). I have tested the demo in Firefox and Google Chrome[2][2], on Windows 10 64-bit.
+A live demo for the WebGL version of PigletViewer is available at: [https://awesomesaucelabs.github.io/piglet-webgl-demo/](https://awesomesaucelabs.github.io/piglet-webgl-demo/). I have tested the demo in Firefox and Google Chrome<sup>[2](#footnote2)</sup>, on Windows 10 64-bit.
 
 # Build Instructions
 
@@ -53,7 +53,7 @@ Once you have completed the basic setup for Android development, you can build t
 
 The app will automatically open on your Android phone/tablet once the build has completed, although you may have to wake/unlock your Android device before you see it.
 
-The Android version of PigletViewer registers a file association for the `.glb` extension, so that opening a `.glb` file in an Android file browser app will load the model with PigletViewer [3][3].  This file association is configured in `Assets/Plugins/Android/AndroidManifest.xml`.
+You can open different glTF models on Android by opening `.glb` files in a file browser app<sup>[3](#footnote3)</sup>.
 
 ## WebGL Build Instructions
 
@@ -61,7 +61,7 @@ Before you can build WebGL apps, you will need to install the **WebGL Build Supp
 
 Once you have installed WebGL Build Support, you can build the WebGL version of PigletViewer by the following steps:
 
-1. Change the active WebGL Template under `Edit => Project Settings... => Player => WebGL settings tab => Resolution and Presentation => WebGL Template`. If you are using Unity 2018 or Unity 2019, use the `Piglet2018` template.  If you are using Unity 2020 or newer, use the `Piglet2020` template [4][4].
+1. Change the active WebGL Template under `Edit => Project Settings... => Player => WebGL settings tab => Resolution and Presentation => WebGL Template`. If you are using Unity 2018 or Unity 2019, use the `Piglet2018` template.  If you are using Unity 2020 or newer, use the `Piglet2020` template<sup>[4](#footnote4)</sup>.
 2. Double-click `Assets/PigletViewer/Scenes/MainScene.unity` to open the PigletViewer scene.
 3. Click `File => Build Settings...` in the Unity menu.
 4. Click `WebGL` on the left side of the `Build Settings` dialog. If there is a `Build` button in the bottom right corner, then WebGL is already the active build target. If not, click `Switch Platform` to make WebGL the active build target.
@@ -108,10 +108,10 @@ This repo includes several sample glTF models under `Assets/StreamingAssets`, wh
 
 # Footnotes
 
-[1]: The WebGL build can only load models from `.glb` and `.zip` files (not `.gltf` files). The main issue with loading `.gltf` files in a web browser is that they typically reference other files on the user's hard drive (e.g. PNG files for textures), and web browsers aren't allowed to load arbitrary files from the user's hard drive, for security reasons.  There is a similar issue for opening `.gltf` files on Android [3][3].
+<a name="footnote1">1</a>. The WebGL build can only load models from `.glb` and `.zip` files (not `.gltf` files). The main issue with loading `.gltf` files in a web browser is that they typically reference other files on the user's hard drive (e.g. PNG files for textures), and web browsers aren't allowed to load arbitrary files from the user's hard drive, for security reasons.  There is a similar issue for opening `.gltf` files on Android<sup>[3](#footnote3)</sup>.
 
-[2]: Performance of PigletViewer in Google Chrome can be greatly improved by [enabling hardware acceleration](TODO) (i.e. GPU acceleration) in the browser settings. This option is currently disabled in Chrome by default.
+<a name="footnote2">2</a>. Performance of PigletViewer in Google Chrome can be greatly improved by [enabling hardware acceleration](TODO) (i.e. GPU acceleration) in the browser settings. (This option is currently disabled by default in Chrome.)
 
-[3]: Opening `.gltf` files generally does not work Android. The problem is that the file browser app will pass a [content URI]( https://developer.android.com/guide/topics/providers/content-provider-basics#ContentURIs) for the input `.gltf` file to the PigletViewer app, rather than a real file path.  This is fine, except that PigletViewer cannot resolve any relative file paths that are referenced by the `.gltf` file (e.g. PNG files for textures), because it does not know the path to the input `.gltf`.  There is a similar issue for opening `.gltf` in the WebGL build [1][1].
+<a name="footnote3">3</a>. Opening `.gltf` files from file browser apps does not work on Android. The main problem is that the file browser apps send PigletViewer an opaque [content URI]( https://developer.android.com/guide/topics/providers/content-provider-basics#ContentURIs) for the input `.gltf` file, rather than a file path.  This means that PigletViewer cannot resolve relative file paths used inside the `.gltf` file (e.g. paths to PNG files). There is a similar issue for opening `.gltf` files in the WebGL build<sup>[1](#footnote1)</sup>.
 
-[4]: There are substantial changes to WebGL builds in Unity 2020, which require using a different WebGL template (`Piglet2020`). For a detailed discussion of WebGL-related changes in Unity 2020, see:  [https://forum.unity.com/threads/changes-to-the-webgl-loader-and-templates-introduced-in-unity-2020-1.817698/"](https://forum.unity.com/threads/changes-to-the-webgl-loader-and-templates-introduced-in-unity-2020-1.817698/)
+<a name="footnote4">4</a>. There are substantial changes to WebGL builds in Unity 2020, which require using a different WebGL template (`Piglet2020`). For a detailed discussion of WebGL-related changes in Unity 2020, see:  [https://forum.unity.com/threads/changes-to-the-webgl-loader-and-templates-introduced-in-unity-2020-1.817698/"](https://forum.unity.com/threads/changes-to-the-webgl-loader-and-templates-introduced-in-unity-2020-1.817698/)
