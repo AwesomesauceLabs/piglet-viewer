@@ -128,7 +128,7 @@ namespace PigletViewer
         /// </summary>
         public void OnImportException(Exception e)
         {
-            if (e is Newtonsoft.Json.JsonException)
+            if (e is JsonParseException)
             {
                 Gui.Instance.ShowDialogBox(
                     "Failed to Load Model",
