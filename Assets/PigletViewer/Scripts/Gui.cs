@@ -45,6 +45,11 @@ namespace PigletViewer
         public string DefaultFooterMessage;
 
         /// <summary>
+        /// "Piglet" in fancy writing.
+        /// </summary>
+        private Texture2D _titleImage;
+
+        /// <summary>
         /// Enscapsulates GUIStyles that control GUI rendering (e.g.
         /// font sizes, text alignment).
         /// </summary>
@@ -95,6 +100,11 @@ namespace PigletViewer
             _styles = null;
 
             Reset();
+        }
+
+        public void Start()
+        {
+            _titleImage = Resources.Load<Texture2D>("PigletTitle");
         }
 
         /// <summary>
@@ -253,6 +263,14 @@ namespace PigletViewer
             // set font color to black
             GUI.contentColor = Color.black;
 
+            // Draw title image ("Piglet" in fancy writing).
+
+            var titleRect = new Rect(
+                (Screen.width - _titleImage.width) / 2.0f, 30,
+                _titleImage.width, _titleImage.height);
+
+            GUI.DrawTexture(titleRect, _titleImage);
+
             // In the WebGL build, the import log is shown
             // in the left panel as part of the main web
             // page.
@@ -350,7 +368,7 @@ namespace PigletViewer
         }
 
         /// <summary>
-        /// Drag a dialog box, using IMGUI functions, which is automatically
+        /// Draw a dialog box, using IMGUI functions, which is automatically
         /// sized to its text content.
         /// </summary>
         public void DialogBoxOnGui()
