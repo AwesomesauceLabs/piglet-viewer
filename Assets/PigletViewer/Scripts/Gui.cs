@@ -293,77 +293,81 @@ namespace PigletViewer
             GUILayout.EndArea();
 #endif
 
-            // footer message and "Spin X" / "Spin Y" sliders
+            // Display help message along bottom of window,
+            // e.g. "drag .gltf/.glb/.zip onto window to view".
 
-            float footerAreaHeight = 100;
+            float footerMessageOffset = 150;
 
-            float labelWidth = 100;
-            float sliderWidth = 100;
+            Rect footerMessageRect = new Rect(
+                0, Screen.height - footerMessageOffset,
+                Screen.width, footerMessageOffset);
 
-            Rect footerAreaRect = new Rect(
-                0, Screen.height - footerAreaHeight,
-                Screen.width, footerAreaHeight);
+            GUI.Label(footerMessageRect, FooterMessage, _styles.FooterText);
 
-            GUILayout.BeginArea(footerAreaRect);
+            SpinControlsOnGui();
+            DialogBoxOnGui();
+        }
 
-            GUILayout.FlexibleSpace();
-
-            GUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-            GUILayout.Label(FooterMessage, _styles.FooterText);
-            GUILayout.FlexibleSpace();
-            GUILayout.EndHorizontal();
-
-            GUILayout.FlexibleSpace();
-
+        /// <summary>
+        /// Draws "Spin X"/"Spin Y" sliders that auto-spin
+        /// the currently displayed model, as if it was on
+        /// a record turntable.
+        /// </summary>
+        public void SpinControlsOnGui()
+        {
             // We don't show the "Spin X" / "Spin Y" sliders
             // on Android because they are tiny and difficult to
             // interact with.
+            if (Application.platform == RuntimePlatform.Android)
+                return;
 
-            if (Application.platform != RuntimePlatform.Android)
-            {
-                GUILayout.BeginHorizontal();
+            const float labelWidth = 100;
+            const float sliderWidth = 100;
+            const float sliderAreaHeight = 50;
 
-                GUILayout.FlexibleSpace();
+            GUILayout.BeginArea(new Rect(
+                0,
+                Screen.height - sliderAreaHeight,
+                Screen.width,
+                sliderAreaHeight));
 
-                GUILayout.BeginVertical();
-                GUILayout.FlexibleSpace();
-                GUILayout.Label("Spin X", _styles.SliderLabel,
-                    GUILayout.Width(labelWidth));
-                GUILayout.FlexibleSpace();
-                GUILayout.EndVertical();
+            GUILayout.BeginHorizontal();
 
-                GUILayout.BeginVertical();
-                GUILayout.FlexibleSpace();
-                SpinX = GUILayout.HorizontalSlider(
-                    SpinX, 0, 1, GUILayout.Width(sliderWidth));
-                GUILayout.FlexibleSpace();
-                GUILayout.EndVertical();
+            GUILayout.FlexibleSpace();
 
-                GUILayout.BeginVertical();
-                GUILayout.FlexibleSpace();
-                GUILayout.Label("Spin Y", _styles.SliderLabel,
-                    GUILayout.Width(labelWidth));
-                GUILayout.FlexibleSpace();
-                GUILayout.EndVertical();
+            GUILayout.BeginVertical();
+            GUILayout.FlexibleSpace();
+            GUILayout.Label("Spin X", _styles.SliderLabel,
+                GUILayout.Width(labelWidth));
+            GUILayout.FlexibleSpace();
+            GUILayout.EndVertical();
 
-                GUILayout.BeginVertical();
-                GUILayout.FlexibleSpace();
-                SpinY = GUILayout.HorizontalSlider(
-                    SpinY, 0, 1, GUILayout.Width(sliderWidth));
-                GUILayout.FlexibleSpace();
-                GUILayout.EndVertical();
+            GUILayout.BeginVertical();
+            GUILayout.FlexibleSpace();
+            SpinX = GUILayout.HorizontalSlider(
+                SpinX, 0, 1, GUILayout.Width(sliderWidth));
+            GUILayout.FlexibleSpace();
+            GUILayout.EndVertical();
 
-                GUILayout.FlexibleSpace();
+            GUILayout.BeginVertical();
+            GUILayout.FlexibleSpace();
+            GUILayout.Label("Spin Y", _styles.SliderLabel,
+                GUILayout.Width(labelWidth));
+            GUILayout.FlexibleSpace();
+            GUILayout.EndVertical();
 
-                GUILayout.EndHorizontal();
+            GUILayout.BeginVertical();
+            GUILayout.FlexibleSpace();
+            SpinY = GUILayout.HorizontalSlider(
+                SpinY, 0, 1, GUILayout.Width(sliderWidth));
+            GUILayout.FlexibleSpace();
+            GUILayout.EndVertical();
 
-                GUILayout.FlexibleSpace();
-            }
+            GUILayout.FlexibleSpace();
+
+            GUILayout.EndHorizontal();
 
             GUILayout.EndArea();
-
-            DialogBoxOnGui();
         }
 
         /// <summary>
