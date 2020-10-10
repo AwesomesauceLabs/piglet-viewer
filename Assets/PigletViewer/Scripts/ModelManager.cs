@@ -76,6 +76,13 @@ namespace PigletViewer
             // (3) the model is facing the camera
 
             InitModelTransformRelativeToCamera();
+
+            // If the model has one or more animation clips,
+            // start playing the default animation clip.
+
+            var anim = _model.GetComponent<Animation>();
+            if (anim != null)
+                anim.Play();
         }
 
         /// <summary>

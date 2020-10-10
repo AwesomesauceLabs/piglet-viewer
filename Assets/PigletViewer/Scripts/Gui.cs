@@ -66,6 +66,12 @@ namespace PigletViewer
         }
 
         /// <summary>
+        /// Width of padding between screen edges and
+        /// UI text/controls.
+        /// </summary>
+        private float _screenEdgePadding;
+
+        /// <summary>
         /// The list of progress messages generated for the
         /// current glTF import.
         /// </summary>
@@ -98,6 +104,7 @@ namespace PigletViewer
         public Gui()
         {
             _styles = null;
+            _screenEdgePadding = 25;
 
             Reset();
         }
@@ -279,12 +286,10 @@ namespace PigletViewer
             // of the window, in the upper left hand corner.
 
 #if !UNITY_WEBGL || UNITY_EDITOR
-            float padding = 25;
-
             GUILayout.BeginArea(new Rect(
-                padding, padding,
-                Screen.width - 2 * padding,
-                Screen.height - 2 * padding));
+                _screenEdgePadding, _screenEdgePadding,
+                Screen.width - 2 * _screenEdgePadding,
+                Screen.height - 2 * _screenEdgePadding));
 
             // progress log messages
             foreach (var line in _progressLog)
