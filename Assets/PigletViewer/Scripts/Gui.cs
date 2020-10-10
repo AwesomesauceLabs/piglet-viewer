@@ -63,6 +63,9 @@ namespace PigletViewer
             public GUIStyle DialogHeading;
             public GUIStyle DialogText;
             public GUIStyle DialogButton;
+            public GUIStyle DropDownButton;
+            public GUIStyle DropDownList;
+            public GUIStyle DropDownListItem;
         }
 
         /// <summary>
@@ -259,6 +262,30 @@ namespace PigletViewer
             _styles.DialogButton.padding = new RectOffset(30, 30, 11, 11);
             _styles.DialogButton.alignment = TextAnchor.MiddleCenter;
             _styles.DialogButton.fontSize = 18;
+
+            _styles.DropDownButton = new GUIStyle(GUI.skin.label);
+            _styles.DropDownButton.normal.background = roundedRectDarkGray;
+            _styles.DropDownButton.border = new RectOffset(10, 10, 10, 10);
+            _styles.DropDownButton.alignment = TextAnchor.MiddleLeft;
+            _styles.DropDownButton.margin = new RectOffset(15, 15, 15, 15);
+            _styles.DropDownButton.padding = new RectOffset(15, 15, 11, 11);
+            _styles.DropDownButton.fontSize = 24;
+
+            _styles.DropDownList = new GUIStyle(GUI.skin.label);
+            _styles.DropDownList.normal.background = roundedRectDarkGray;
+            _styles.DropDownList.border = new RectOffset(10, 10, 10, 10);
+            _styles.DropDownList.alignment = TextAnchor.MiddleLeft;
+            _styles.DropDownList.margin = new RectOffset(15, 15, 15, 15);
+            _styles.DropDownList.padding = new RectOffset(15, 15, 11, 11);
+            _styles.DropDownList.fontSize = 24;
+
+            _styles.DropDownListItem = new GUIStyle(GUI.skin.label);
+            _styles.DropDownListItem.normal.background = roundedRectDarkGray;
+            _styles.DropDownListItem.border = new RectOffset(10, 10, 10, 10);
+            _styles.DropDownListItem.alignment = TextAnchor.MiddleLeft;
+            _styles.DropDownListItem.margin = new RectOffset(15, 15, 15, 15);
+            _styles.DropDownListItem.padding = new RectOffset(15, 15, 11, 11);
+            _styles.DropDownListItem.fontSize = 24;
         }
 
         /// <summary>
