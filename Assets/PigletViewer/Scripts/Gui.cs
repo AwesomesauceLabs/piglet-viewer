@@ -299,7 +299,6 @@ namespace PigletViewer
 
             float labelWidth = 100;
             float sliderWidth = 100;
-            float sliderAreaWidth = 2 * labelWidth + 2 * sliderWidth;
 
             Rect footerAreaRect = new Rect(
                 0, Screen.height - footerAreaHeight,
