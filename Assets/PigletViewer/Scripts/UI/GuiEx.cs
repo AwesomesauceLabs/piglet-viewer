@@ -102,18 +102,13 @@ namespace PigletViewer
                 foreach (var item in items)
                     listHeight += listItemStyle.CalcSize(new GUIContent(item)).y;
 
-                // draw border and background for drop-down list
+                // draw individual list items and handle mouse clicks
 
                 const float listOffset = 10;
 
                 var listY = buttonRect.y - listOffset - listHeight;
-                var listRect = new Rect(buttonRect.x, listY, buttonRect.width, listHeight);
-
-                GUI.Box(listRect, "", listStyle);
-
-                // draw individual list items and handle mouse clicks
-
                 var y = listY;
+
                 for (var i = 0; i < items.Count; ++i)
                 {
                     var itemHeight = listItemStyle.CalcSize(
@@ -136,6 +131,11 @@ namespace PigletViewer
 
                     y += itemHeight;
                 }
+
+                // draw border around drop-down list
+
+                var listRect = new Rect(buttonRect.x, listY, buttonRect.width, listHeight);
+                GUI.Box(listRect, "", listStyle);
             }
 
             return state;

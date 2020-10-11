@@ -237,9 +237,11 @@ namespace PigletViewer
             if (_styles != null)
                 return;
 
+            Texture2D roundedRectTransparent = Resources.Load<Texture2D>("RoundedRectTransparent");
             Texture2D roundedRectWhite = Resources.Load<Texture2D>("RoundedRectWhite");
             Texture2D roundedRectLightGray = Resources.Load<Texture2D>("RoundedRectLightGray");
             Texture2D roundedRectDarkGray = Resources.Load<Texture2D>("RoundedRectDarkGray");
+            Texture2D roundedRectLightGrayNoBorder = Resources.Load<Texture2D>("RoundedRectLightGrayNoBorder");
 
             _styles = new Styles();
 
@@ -294,7 +296,7 @@ namespace PigletViewer
             _styles.DialogButton.fontSize = 18;
 
             _styles.DropDownButton = new GUIStyle(GUI.skin.label);
-            _styles.DropDownButton.normal.background = roundedRectDarkGray;
+            _styles.DropDownButton.normal.background = roundedRectLightGray;
             _styles.DropDownButton.border = new RectOffset(10, 10, 10, 10);
             _styles.DropDownButton.alignment = TextAnchor.MiddleLeft;
             _styles.DropDownButton.margin = new RectOffset(15, 15, 15, 15);
@@ -302,7 +304,7 @@ namespace PigletViewer
             _styles.DropDownButton.fontSize = 20;
 
             _styles.DropDownList = new GUIStyle(GUI.skin.label);
-            _styles.DropDownList.normal.background = roundedRectDarkGray;
+            _styles.DropDownList.normal.background = roundedRectTransparent;
             _styles.DropDownList.border = new RectOffset(10, 10, 10, 10);
             _styles.DropDownList.alignment = TextAnchor.MiddleLeft;
             _styles.DropDownList.margin = new RectOffset(15, 15, 15, 15);
@@ -310,7 +312,7 @@ namespace PigletViewer
             _styles.DropDownList.fontSize = 20;
 
             _styles.DropDownListItem = new GUIStyle(GUI.skin.label);
-            _styles.DropDownListItem.normal.background = roundedRectDarkGray;
+            _styles.DropDownListItem.hover.background = roundedRectLightGrayNoBorder;
             _styles.DropDownListItem.border = new RectOffset(10, 10, 10, 10);
             _styles.DropDownListItem.alignment = TextAnchor.MiddleLeft;
             _styles.DropDownListItem.margin = new RectOffset(15, 15, 15, 15);
