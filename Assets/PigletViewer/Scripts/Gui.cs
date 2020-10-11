@@ -68,6 +68,10 @@ namespace PigletViewer
             public GUIStyle DropDownListItem;
         }
 
+        private string _animationClipName;
+        private bool _animationDropDownExpanded;
+        private const string STATIC_POSE_CLIP_NAME = "Static Pose";
+
         /// <summary>
         /// Width of padding between screen edges and
         /// UI text/controls.
@@ -169,11 +173,18 @@ namespace PigletViewer
             FooterMessage = DefaultFooterMessage;
         }
 
+        public void ResetAnimationDropDown()
+        {
+            _animationClipName = null;
+            _animationDropDownExpanded = false;
+        }
+
         /// <summary>
         /// Reset all elements of the GUI to their default states.
         /// </summary>
         public void Reset()
         {
+            ResetAnimationDropDown();
             ResetProgressLog();
             ResetSpin();
             ResetFooterMessage();
@@ -336,7 +347,11 @@ namespace PigletViewer
 
             GUI.Label(footerMessageRect, FooterMessage, _styles.FooterText);
 
-            SpinControlsOnGui();
+            if (ModelManager.Instance.Animation != null)
+                AnimationDropDownOnGui();
+            else if (ModelManager.Instance.GetModel() != null)
+                SpinControlsOnGui();
+
             DialogBoxOnGui();
         }
 
@@ -400,6 +415,119 @@ namespace PigletViewer
             GUILayout.EndHorizontal();
 
             GUILayout.EndArea();
+        }
+
+        private void AnimationDropDownOnGui()
+        {
+            var anim = ModelManager.Instance.Animation;
+
+            // if current model does not have animations
+
+            if (anim == null)
+                return;
+
+            // if current drop-down selection is not initialized
+
+            if (_animationClipName == null)
+            {
+                var defaultClip = anim.clip;
+                _animationClipName = defaultClip != null
+                    ? defaultClip.name : STATIC_POSE_CLIP_NAME;
+            }
+
+            // draw drop-down button
+
+            const float animationControlsAreaHeight = 75;
+            const float buttonWidth = 300;
+
+            var buttonHeight = _styles.DropDownButton.CalcSize(
+                new GUIContent(_animationClipName)).y;
+
+            var buttonRect = new Rect(
+                Screen.width - _screenEdgePadding - buttonWidth,
+                Screen.height - animationControlsAreaHeight
+                    + (animationControlsAreaHeight - buttonHeight) / 2,
+                buttonWidth, buttonHeight);
+
+            var buttonContent = new GUIContent(_animationClipName);
+
+            GUI.Label(buttonRect, buttonContent, _styles.DropDownButton);
+
+            // handle mouse clicks on drop-down button
+
+            var controlID = GUIUtility.GetControlID(FocusType.Passive);
+            switch (Event.current.GetTypeForControl(controlID))
+            {
+                case EventType.MouseDown:
+                    if (buttonRect.Contains(Event.current.mousePosition))
+                    {
+                        GUIUtility.hotControl = controlID;
+                        _animationDropDownExpanded = !_animationDropDownExpanded;
+                    }
+                    break;
+
+                case EventType.MouseUp:
+                    if (GUIUtility.hotControl == controlID)
+                        GUIUtility.hotControl = 0;
+                    break;
+            }
+
+            // draw drop-down menu and handle mouse clicks
+
+            if (_animationDropDownExpanded)
+            {
+                // build list of drop-down items (animation clip names)
+
+                var listItems = new List<string> {STATIC_POSE_CLIP_NAME};
+                foreach (AnimationState clip in anim)
+                    listItems.Add(clip.name);
+
+                // calculate total height of drop-down list
+
+                var listHeight = 0f;
+                foreach (var listItem in listItems)
+                {
+                    var itemHeight = _styles.DropDownListItem.CalcSize(
+                        new GUIContent(listItem)).y;
+
+                    listHeight += itemHeight;
+                }
+
+                // draw border and background for drop-down list
+
+                const float listOffset = 10;
+
+                var listY = buttonRect.y - listOffset - listHeight;
+                var listRect = new Rect(buttonRect.x, listY, buttonWidth, listHeight);
+
+                GUI.Box(listRect, "", _styles.DropDownList);
+
+                // draw individual list items and handle mouse clicks
+
+                var y = listY;
+                foreach (var listItem in listItems)
+                {
+                    var itemHeight = _styles.DropDownListItem.CalcSize(
+                        new GUIContent(listItem)).y;
+
+                    var itemRect = new Rect(buttonRect.x, y, buttonRect.width, itemHeight);
+
+                    GUI.Box(itemRect, listItem, _styles.DropDownListItem);
+
+                    switch (Event.current.GetTypeForControl(controlID))
+                    {
+                        case EventType.MouseDown:
+                            if (itemRect.Contains(Event.current.mousePosition))
+                            {
+                                _animationClipName = listItem;
+                                _animationDropDownExpanded = false;
+                            }
+                            break;
+                    }
+
+                    y += itemHeight;
+                }
+            }
         }
 
         /// <summary>
