@@ -33,6 +33,16 @@ namespace PigletViewer
         public float DefaultModelSize;
 
         /// <summary>
+        /// Reference to the Animation component for the
+        /// currently loaded model, which handles storage
+        /// and playback of Legacy animation clips.  This
+        /// variable will be null if either: (1) no model is
+        /// currently loaded, or (2) the currently loaded
+        /// model has no animations.
+        /// </summary>
+        public Animation Animation;
+
+        /// <summary>
         /// The root GameObject of the most recently loaded model,
         /// i.e. the model that is currently being viewed by
         /// the user. (This application only allows viewing one
@@ -77,12 +87,24 @@ namespace PigletViewer
 
             InitModelTransformRelativeToCamera();
 
-            // If the model has one or more animation clips,
-            // start playing the default animation clip.
+            // Store a reference to the current model's
+            // Animation component, which handles storage and
+            // playback of Legacy of animation clips. The
+            // model will not have an Animation component
+            // if the source glTF file did not contain
+            // any valid animations.
 
-            var anim = _model.GetComponent<Animation>();
-            if (anim != null)
-                anim.Play();
+            Animation = _model.GetComponent<Animation>();
+        }
+
+        /// <summary>
+        /// Return a reference to the root GameObject of the currently
+        /// loaded glTF model. If no model is currently loaded, return
+        /// null.
+        /// </summary>
+        public GameObject GetModel()
+        {
+            return _model;
         }
 
         /// <summary>
