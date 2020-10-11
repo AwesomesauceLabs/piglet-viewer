@@ -269,7 +269,7 @@ namespace PigletViewer
             _styles.DropDownButton.alignment = TextAnchor.MiddleLeft;
             _styles.DropDownButton.margin = new RectOffset(15, 15, 15, 15);
             _styles.DropDownButton.padding = new RectOffset(15, 15, 11, 11);
-            _styles.DropDownButton.fontSize = 24;
+            _styles.DropDownButton.fontSize = 20;
 
             _styles.DropDownList = new GUIStyle(GUI.skin.label);
             _styles.DropDownList.normal.background = roundedRectDarkGray;
@@ -277,7 +277,7 @@ namespace PigletViewer
             _styles.DropDownList.alignment = TextAnchor.MiddleLeft;
             _styles.DropDownList.margin = new RectOffset(15, 15, 15, 15);
             _styles.DropDownList.padding = new RectOffset(15, 15, 11, 11);
-            _styles.DropDownList.fontSize = 24;
+            _styles.DropDownList.fontSize = 20;
 
             _styles.DropDownListItem = new GUIStyle(GUI.skin.label);
             _styles.DropDownListItem.normal.background = roundedRectDarkGray;
@@ -285,7 +285,7 @@ namespace PigletViewer
             _styles.DropDownListItem.alignment = TextAnchor.MiddleLeft;
             _styles.DropDownListItem.margin = new RectOffset(15, 15, 15, 15);
             _styles.DropDownListItem.padding = new RectOffset(15, 15, 11, 11);
-            _styles.DropDownListItem.fontSize = 24;
+            _styles.DropDownListItem.fontSize = 20;
         }
 
         /// <summary>
