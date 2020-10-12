@@ -487,7 +487,8 @@ namespace PigletViewer
 
             const float animationControlsAreaHeight = 75;
 
-            // initialize animation clip names and selected clip index
+            // initialize list of animation clip names and
+            // currently selected clip index
 
             if (_animationClipNames == null)
             {
@@ -501,6 +502,14 @@ namespace PigletViewer
                         _dropDownState.selectedIndex = i;
                     ++i;
                 }
+            }
+
+            string selectedClipName = null;
+            AnimationState selectedClip = null;
+            if (_dropDownState.selectedIndex != STATIC_POSE_INDEX)
+            {
+                selectedClipName = _animationClipNames[_dropDownState.selectedIndex];
+                selectedClip = anim[selectedClipName];
             }
 
             // play/pause button
@@ -564,6 +573,31 @@ namespace PigletViewer
 
             if (_dropDownState.selectedIndex != prevSelectedIndex)
                 anim.enabled = _dropDownState.selectedIndex != STATIC_POSE_INDEX;
+
+            // timeline slider
+
+            const float sliderMargin = 20;
+            const float sliderHeight = 10;
+
+            var sliderX1 = playButtonRect.x + playButtonRect.width + sliderMargin;
+            var sliderX2 = buttonRect.x - sliderMargin;
+
+            var sliderRect = new Rect(
+                sliderX1,
+                Screen.height - animationControlsAreaHeight
+                    + (animationControlsAreaHeight - sliderHeight) / 2,
+                sliderX2 - sliderX1,
+                sliderHeight);
+
+            var time = 0f;
+            var length = 0f;
+            if (selectedClip != null)
+            {
+                length = selectedClip.length;
+                time = selectedClip.time % length;
+            }
+
+            GUI.HorizontalSlider(sliderRect, time, 0f, length);
         }
 
         /// <summary>
