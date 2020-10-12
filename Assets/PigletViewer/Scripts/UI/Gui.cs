@@ -523,11 +523,8 @@ namespace PigletViewer
                 playButtonSize,
                 playButtonSize);
 
-            if (GUI.Button(playButtonRect, "", _styles.PlayButton)
-                && _dropDownState.selectedIndex != STATIC_POSE_INDEX)
-            {
-                anim.enabled = !anim.enabled;
-            }
+            if (GUI.Button(playButtonRect, "", _styles.PlayButton) && selectedClip != null)
+                selectedClip.speed = selectedClip.speed == 0f ? 1f : 0f;
 
             var origColor = GUI.color;
             GUI.color = _dropDownState.selectedIndex == STATIC_POSE_INDEX
@@ -569,10 +566,26 @@ namespace PigletViewer
                 _styles.DropDownList,
                 _styles.DropDownListItem);
 
-            // if a new animation clip is selected, automatically start playing it
+            // if a new animation clip has been selected, stop the
+            // current clip and start playing the new one
 
             if (_dropDownState.selectedIndex != prevSelectedIndex)
-                anim.enabled = _dropDownState.selectedIndex != STATIC_POSE_INDEX;
+            {
+                if (selectedClip != null)
+                {
+                    selectedClip.speed = 0f;
+                    selectedClip.time = 0f;
+                }
+
+                var newClipIndex = _dropDownState.selectedIndex;
+                if (newClipIndex != STATIC_POSE_INDEX)
+                {
+                    var newClipName = _animationClipNames[newClipIndex];
+                    var newClip = anim[newClipName];
+                    newClip.time = 0f;
+                    newClip.speed = 1f;
+                }
+            }
 
             // timeline slider
 
