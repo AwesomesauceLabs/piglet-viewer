@@ -538,7 +538,7 @@ namespace PigletViewer
                 playButtonRect.width - 2 * playIconMargin);
 
             GUI.DrawTexture(playIconRect,
-                anim.enabled ? _pauseIcon : _playIcon,
+                selectedClip != null && selectedClip.speed > 0f ? _pauseIcon : _playIcon,
                 ScaleMode.ScaleToFit);
 
             GUI.color = origColor;
