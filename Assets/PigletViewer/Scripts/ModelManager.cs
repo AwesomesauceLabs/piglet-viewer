@@ -95,6 +95,11 @@ namespace PigletViewer
             // any valid animations.
 
             Animation = _model.GetComponent<Animation>();
+
+            // Automatically play the default animation clip.
+            // (Animation.clip), if any.
+            if (Animation != null)
+                Animation.Play();
         }
 
         /// <summary>

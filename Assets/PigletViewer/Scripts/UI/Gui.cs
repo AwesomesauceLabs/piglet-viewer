@@ -66,7 +66,14 @@ namespace PigletViewer
             public GUIStyle DropDownButton;
             public GUIStyle DropDownList;
             public GUIStyle DropDownListItem;
+            public GUIStyle PlayButton;
         }
+
+        /// <summary>
+        /// Index of special "Static Pose" item
+        /// in animation drop-down menu.
+        /// </summary>
+        private const int STATIC_POSE_INDEX = 0;
 
         /// <summary>
         /// The strings that appear in the drop-down
@@ -87,6 +94,16 @@ namespace PigletViewer
         /// side of drop-down button.
         /// </summary>
         private Texture2D _dropDownIcon;
+
+        /// <summary>
+        /// Play icon for play/pause button.
+        /// </summary>
+        private Texture2D _playIcon;
+
+        /// <summary>
+        /// Pause icon for play/pause button.
+        /// </summary>
+        private Texture2D _pauseIcon;
 
         /// <summary>
         /// Width of padding between screen edges and
@@ -244,6 +261,8 @@ namespace PigletViewer
                 return;
 
             _dropDownIcon = Resources.Load<Texture2D>("DropDownIcon");
+            _playIcon = Resources.Load<Texture2D>("PlayIcon");
+            _pauseIcon = Resources.Load<Texture2D>("PauseIcon");
 
             Texture2D roundedRectTransparent = Resources.Load<Texture2D>("RoundedRectTransparent");
             Texture2D roundedRectWhite = Resources.Load<Texture2D>("RoundedRectWhite");
@@ -326,6 +345,15 @@ namespace PigletViewer
             _styles.DropDownListItem.margin = new RectOffset(15, 15, 15, 15);
             _styles.DropDownListItem.padding = new RectOffset(15, 15, 11, 11);
             _styles.DropDownListItem.fontSize = 20;
+
+            _styles.PlayButton = new GUIStyle(GUI.skin.label);
+            _styles.PlayButton.normal.background = roundedRectLightGray;
+            _styles.PlayButton.border = new RectOffset(10, 10, 10, 10);
+            _styles.PlayButton.alignment = TextAnchor.MiddleLeft;
+            _styles.PlayButton.margin = new RectOffset(15, 15, 15, 15);
+            _styles.PlayButton.padding = new RectOffset(15, 15, 11, 11);
+            _styles.PlayButton.fontSize = 20;
+
         }
 
         /// <summary>
@@ -459,11 +487,11 @@ namespace PigletViewer
 
             const float animationControlsAreaHeight = 75;
 
-            // drop-down menu for selecting animation clip
+            // initialize animation clip names and selected clip index
 
             if (_animationClipNames == null)
             {
-                _dropDownState.selectedIndex = 0;
+                _dropDownState.selectedIndex = STATIC_POSE_INDEX;
                 _animationClipNames = new List<string> {"Static Pose"};
                 int i = 1;
                 foreach (AnimationState clip in anim)
@@ -475,6 +503,42 @@ namespace PigletViewer
                 }
             }
 
+            // play/pause button
+
+            const float playButtonSize = 50;
+
+            var playButtonRect = new Rect(
+                _screenEdgePadding,
+                Screen.height - animationControlsAreaHeight
+                    + (animationControlsAreaHeight - playButtonSize) / 2,
+                playButtonSize,
+                playButtonSize);
+
+            if (GUI.Button(playButtonRect, "", _styles.PlayButton)
+                && _dropDownState.selectedIndex != STATIC_POSE_INDEX)
+            {
+                anim.enabled = !anim.enabled;
+            }
+
+            var origColor = GUI.color;
+            GUI.color = _dropDownState.selectedIndex == STATIC_POSE_INDEX
+                ? Color.gray : Color.black;
+
+            const float playIconMargin = 10;
+            var playIconRect = new Rect(
+                playButtonRect.x + playIconMargin,
+                playButtonRect.y + playIconMargin,
+                playButtonRect.width - 2 * playIconMargin,
+                playButtonRect.width - 2 * playIconMargin);
+
+            GUI.DrawTexture(playIconRect,
+                anim.enabled ? _pauseIcon : _playIcon,
+                ScaleMode.ScaleToFit);
+
+            GUI.color = origColor;
+
+            // drop-down menu for selecting animation clip
+
             const float buttonWidth = 300;
             var buttonHeight = _styles.DropDownButton.CalcSize(
                 new GUIContent("Dummy Text")).y;
@@ -485,6 +549,8 @@ namespace PigletViewer
                     + (animationControlsAreaHeight - buttonHeight) / 2,
                 buttonWidth, buttonHeight);
 
+            var prevSelectedIndex = _dropDownState.selectedIndex;
+
             _dropDownState = GuiEx.DropDownMenu(
                 buttonRect,
                 _animationClipNames,
@@ -493,6 +559,11 @@ namespace PigletViewer
                 _styles.DropDownButton,
                 _styles.DropDownList,
                 _styles.DropDownListItem);
+
+            // if a new animation clip is selected, automatically start playing it
+
+            if (_dropDownState.selectedIndex != prevSelectedIndex)
+                anim.enabled = _dropDownState.selectedIndex != STATIC_POSE_INDEX;
         }
 
         /// <summary>
