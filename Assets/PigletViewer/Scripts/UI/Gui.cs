@@ -610,7 +610,10 @@ namespace PigletViewer
                 time = selectedClip.time % length;
             }
 
-            GUI.HorizontalSlider(sliderRect, time, 0f, length);
+            time = GUI.HorizontalSlider(sliderRect, time, 0f, length);
+
+            if (selectedClip != null)
+                selectedClip.time = time;
         }
 
         /// <summary>
