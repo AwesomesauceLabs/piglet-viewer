@@ -527,8 +527,7 @@ namespace PigletViewer
                 selectedClip.speed = selectedClip.speed == 0f ? 1f : 0f;
 
             var origColor = GUI.color;
-            GUI.color = _dropDownState.selectedIndex == STATIC_POSE_INDEX
-                ? Color.gray : Color.black;
+            GUI.color = selectedClip != null ? Color.black : Color.gray;
 
             const float playIconMargin = 10;
             var playIconRect = new Rect(
