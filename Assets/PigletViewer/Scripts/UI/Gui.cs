@@ -609,10 +609,16 @@ namespace PigletViewer
                 time = selectedClip.time % length;
             }
 
+            var prevTime = time;
             time = GUI.HorizontalSlider(sliderRect, time, 0f, length);
 
-            if (selectedClip != null)
+            // if the user clicked on the slider, set the time to
+            // the clicked location and pause playback
+            if (selectedClip != null && time != prevTime)
+            {
                 selectedClip.time = time;
+                selectedClip.speed = 0f;
+            }
         }
 
         /// <summary>
