@@ -83,6 +83,12 @@ namespace PigletViewer
         private GuiEx.DropDownState _dropDownState;
 
         /// <summary>
+        /// Expander icon (arrow) shown on right
+        /// side of drop-down button.
+        /// </summary>
+        private Texture2D _dropDownIcon;
+
+        /// <summary>
         /// Width of padding between screen edges and
         /// UI text/controls.
         /// </summary>
@@ -236,6 +242,8 @@ namespace PigletViewer
         {
             if (_styles != null)
                 return;
+
+            _dropDownIcon = Resources.Load<Texture2D>("DropDownIcon");
 
             Texture2D roundedRectTransparent = Resources.Load<Texture2D>("RoundedRectTransparent");
             Texture2D roundedRectWhite = Resources.Load<Texture2D>("RoundedRectWhite");
@@ -481,6 +489,7 @@ namespace PigletViewer
                 buttonRect,
                 _animationClipNames,
                 _dropDownState,
+                _dropDownIcon,
                 _styles.DropDownButton,
                 _styles.DropDownList,
                 _styles.DropDownListItem);

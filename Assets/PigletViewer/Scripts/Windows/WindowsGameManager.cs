@@ -70,8 +70,11 @@ namespace PigletViewer
             // default model to load at startup, unless
             // --load or --no-load is used
 
+#if false
             Uri uri = new Uri(Path.Combine(Application.streamingAssetsPath,
                 "piggleston.glb"));
+#endif
+            Uri uri = new Uri("C:/Users/Ben/temp/phoenix_bird.zip");
 
             GltfImportTask importTask = RuntimeGltfImporter.GetImportTask(uri);
 

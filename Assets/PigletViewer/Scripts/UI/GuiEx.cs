@@ -46,6 +46,10 @@ namespace PigletViewer
         /// i.e. the currently selected item and whether
         /// or not the drop-down list is expanded.
         /// </param>
+        /// <param name="icon">
+        /// expander icon (arrow) that is drawn
+        /// on the right side of the drop-down button
+        /// </param>
         /// <param name="buttonStyle">
         /// the GUIStyle for the button that opens/closes
         /// the drop-down list
@@ -65,6 +69,7 @@ namespace PigletViewer
             Rect buttonRect,
             List<string> items,
             DropDownState state,
+            Texture2D icon,
             GUIStyle buttonStyle,
             GUIStyle listStyle,
             GUIStyle listItemStyle)
@@ -72,6 +77,26 @@ namespace PigletViewer
             // draw drop-down button
 
             GUI.Label(buttonRect, items[state.selectedIndex], buttonStyle);
+
+            // draw expander icon (arrow)
+
+            var origColor = GUI.color;
+            GUI.color = Color.black;
+
+            const int iconMargin = 10;
+
+            var iconAspect = (float)icon.width / icon.height;
+            var iconHeight = buttonRect.height - 2 * iconMargin;
+            var iconWidth = iconAspect * iconHeight;
+            var iconRect = new Rect(
+                buttonRect.x + buttonRect.width - iconMargin - iconWidth,
+                buttonRect.y + iconMargin,
+                iconWidth,
+                iconHeight);
+
+            GUI.DrawTexture(iconRect, icon, ScaleMode.ScaleToFit);
+
+            GUI.color = origColor;
 
             // handle mouse clicks on drop-down button
 
