@@ -570,9 +570,11 @@ namespace PigletViewer
 
             if (_dropDownState.selectedIndex != prevSelectedIndex)
             {
+                anim.Stop();
+
                 if (selectedClip != null)
                 {
-                    selectedClip.speed = 0f;
+                    selectedClip.speed = 1f;
                     selectedClip.time = 0f;
                 }
 
@@ -583,6 +585,8 @@ namespace PigletViewer
                     var newClip = anim[newClipName];
                     newClip.time = 0f;
                     newClip.speed = 1f;
+
+                    anim.Play(newClipName);
                 }
             }
 
