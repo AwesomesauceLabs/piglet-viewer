@@ -107,6 +107,7 @@ namespace PigletViewer
         {
             Gui.Instance.ResetSpin();
             Gui.Instance.ResetFooterMessage();
+            Gui.Instance.ResetAnimationControls();
 
             ProgressLog.Instance.AddLineCallback(
                 String.Format("Total import time: {0} ms",
