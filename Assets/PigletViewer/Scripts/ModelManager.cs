@@ -118,19 +118,18 @@ namespace PigletViewer
             }
         }
 
+        /// <summary>
+        /// Add a static pose animation clip (a.k.a. bind pose
+        /// or T-pose) for restoring the original pose of a
+        /// model after playing an animation.
+        /// </summary>
         protected void AddStaticPoseAnimationClip()
         {
             Debug.Assert(_model != null);
             Debug.Assert(Animation != null);
             Debug.Assert(AnimationList != null);
 
-            var clip = new AnimationClip { name = "Static Pose", legacy = true };
-			var curve = new AnimationCurve();
-			var localPosition = _model.transform.localPosition;
-			curve.AddKey(0, localPosition.x);
-			curve.AddKey(1, localPosition.x);
-			clip.SetCurve("", typeof(Transform), "m_LocalPosition.x", curve);
-
+            var clip = AnimationUtil.CreateStaticPoseClip(_model, true);
             Animation.AddClip(clip, clip.name);
             AnimationList.clipNames.Insert(0, clip.name);
         }
