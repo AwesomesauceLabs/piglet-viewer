@@ -557,6 +557,19 @@ namespace PigletViewer
                     selectedClip.time = 0f;
                 }
 
+                // Restore the static pose before we start playing the
+                // new animation clip. This is necessary because
+                // an animation clip will not necessarily reset
+                // all position/rotation/scale values for
+                // all game objects in the model. Any unspecified
+                // transform values are assumed to come from the
+                // default static pose.
+
+                anim.Play(clipNames[STATIC_POSE_INDEX]);
+                anim.Sample();
+
+                // start playing the new clip
+
                 var newClipIndex = _dropDownState.selectedIndex;
                 var newClipName = clipNames[newClipIndex];
                 var newClip = anim[newClipName];
