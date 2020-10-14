@@ -76,12 +76,6 @@ namespace PigletViewer
         private const int STATIC_POSE_INDEX = 0;
 
         /// <summary>
-        /// The strings that appear in the drop-down
-        /// menu for selecting the active animation clip.
-        /// </summary>
-        private List<string> _animationClipNames;
-
-        /// <summary>
         /// Holds state information about the
         /// drop-down menu for animation clips
         /// (e.g. the index of the currently
@@ -213,10 +207,9 @@ namespace PigletViewer
         /// </summary>
         public void ResetAnimationControls()
         {
-            _animationClipNames = null;
             _dropDownState = new GuiEx.DropDownState
             {
-                selectedIndex = 0,
+                selectedIndex = STATIC_POSE_INDEX + 1,
                 expanded = false
             };
         }
@@ -484,31 +477,17 @@ namespace PigletViewer
         public void AnimationControlsOnGui()
         {
             Animation anim = ModelManager.Instance.Animation;
+            var clipNames = ModelManager.Instance.AnimationList.clipNames;
 
             const float animationControlsAreaHeight = 75;
 
             // initialize list of animation clip names and
             // currently selected clip index
 
-            if (_animationClipNames == null)
-            {
-                _dropDownState.selectedIndex = STATIC_POSE_INDEX;
-                _animationClipNames = new List<string> {"Static Pose"};
-                int i = 1;
-                foreach (AnimationState clip in anim)
-                {
-                    _animationClipNames.Add(clip.name);
-                    if (clip.name == anim.clip.name)
-                        _dropDownState.selectedIndex = i;
-                    ++i;
-                }
-            }
-
-            string selectedClipName = null;
             AnimationState selectedClip = null;
             if (_dropDownState.selectedIndex != STATIC_POSE_INDEX)
             {
-                selectedClipName = _animationClipNames[_dropDownState.selectedIndex];
+                var selectedClipName = clipNames[_dropDownState.selectedIndex];
                 selectedClip = anim[selectedClipName];
             }
 
@@ -558,7 +537,7 @@ namespace PigletViewer
 
             _dropDownState = GuiEx.DropDownMenu(
                 buttonRect,
-                _animationClipNames,
+                clipNames,
                 _dropDownState,
                 _dropDownIcon,
                 _styles.DropDownButton,
@@ -579,15 +558,13 @@ namespace PigletViewer
                 }
 
                 var newClipIndex = _dropDownState.selectedIndex;
-                if (newClipIndex != STATIC_POSE_INDEX)
-                {
-                    var newClipName = _animationClipNames[newClipIndex];
-                    var newClip = anim[newClipName];
-                    newClip.time = 0f;
-                    newClip.speed = 1f;
+                var newClipName = clipNames[newClipIndex];
+                var newClip = anim[newClipName];
 
-                    anim.Play(newClipName);
-                }
+                newClip.time = 0f;
+                newClip.speed = 1f;
+
+                anim.Play(newClipName);
             }
 
             // timeline slider

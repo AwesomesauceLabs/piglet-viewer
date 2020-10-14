@@ -43,6 +43,18 @@ namespace PigletViewer
         public Animation Animation;
 
         /// <summary>
+        /// Stores the names of the imported animation
+        /// clips, in the original order that they appeared
+        /// in the input glTF file. This component is
+        /// used as a workaround for the fact that
+        /// Unity's Animation component does not preserve
+        /// the order of the clips when they are added
+        /// via `AddClip`. For further explanation, see:
+        /// https://answers.unity.com/questions/8245/how-to-select-an-animation-clip-by-index-number.html
+        /// </summary>
+        public AnimationList AnimationList;
+
+        /// <summary>
         /// The root GameObject of the most recently loaded model,
         /// i.e. the model that is currently being viewed by
         /// the user. (This application only allows viewing one
@@ -95,11 +107,32 @@ namespace PigletViewer
             // any valid animations.
 
             Animation = _model.GetComponent<Animation>();
+            AnimationList = _model.GetComponent<AnimationList>();
 
             // Automatically play the default animation clip.
             // (Animation.clip), if any.
             if (Animation != null)
+            {
+                AddStaticPoseAnimationClip();
                 Animation.Play();
+            }
+        }
+
+        protected void AddStaticPoseAnimationClip()
+        {
+            Debug.Assert(_model != null);
+            Debug.Assert(Animation != null);
+            Debug.Assert(AnimationList != null);
+
+            var clip = new AnimationClip { name = "Static Pose", legacy = true };
+			var curve = new AnimationCurve();
+			var localPosition = _model.transform.localPosition;
+			curve.AddKey(0, localPosition.x);
+			curve.AddKey(1, localPosition.x);
+			clip.SetCurve("", typeof(Transform), "m_LocalPosition.x", curve);
+
+            Animation.AddClip(clip, clip.name);
+            AnimationList.clipNames.Insert(0, clip.name);
         }
 
         /// <summary>
