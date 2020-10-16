@@ -490,8 +490,9 @@ namespace PigletViewer
 
             const float animationControlsAreaHeight = 75;
 
-            // initialize list of animation clip names and
-            // currently selected clip index
+            // Get a reference to the currently selected animation clip.
+            // We use a value of null to indicate that the special
+            // "Static Pose" clip is currently selected.
 
             AnimationState selectedClip = null;
             if (_dropDownState.selectedIndex != STATIC_POSE_INDEX)
