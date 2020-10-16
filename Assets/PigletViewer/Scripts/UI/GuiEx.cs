@@ -54,9 +54,19 @@ namespace PigletViewer
         /// the GUIStyle for the button that opens/closes
         /// the drop-down list
         /// </param>
-        /// <param name="listStyle">
-        /// the GUIStyle for the box that is drawn
-        /// around the items in the drop-down list
+        /// <param name="listBackgroundStyle">
+        /// The GUIStyle for the box that is drawn
+        /// behind the drop-down list items.
+        /// </param>
+        /// <param name="listForegroundStyle">
+        /// The GUIStyle for a box that is drawn
+        /// on top of the drop-down list items.
+        /// This style should be mostly transparent
+        /// so that the individual list items
+        /// are not hidden. I use this style to draw
+        /// the border around the drop-down list
+        /// after the individual list items have
+        /// been rendered.
         /// </param>
         /// <param name="listItemStyle">
         /// the GUIStyle for the individual items
@@ -71,7 +81,8 @@ namespace PigletViewer
             DropDownState state,
             Texture2D icon,
             GUIStyle buttonStyle,
-            GUIStyle listStyle,
+            GUIStyle listBackgroundStyle,
+            GUIStyle listForegroundStyle,
             GUIStyle listItemStyle)
         {
             // draw drop-down button
@@ -127,11 +138,20 @@ namespace PigletViewer
                 foreach (var item in items)
                     listHeight += listItemStyle.CalcSize(new GUIContent(item)).y;
 
-                // draw individual list items and handle mouse clicks
+                // Draw background for the list box.
+                // Note that we draw the list box border separately
+                // so that it does not get overwritten by the
+                // individual list items.
 
                 const float listOffset = 10;
 
                 var listY = buttonRect.y - listOffset - listHeight;
+                var listRect = new Rect(buttonRect.x, listY, buttonRect.width, listHeight);
+
+                GUI.Box(listRect, "", listBackgroundStyle);
+
+                // draw individual list items and handle mouse clicks
+
                 var y = listY;
 
                 for (var i = 0; i < items.Count; ++i)
@@ -157,10 +177,11 @@ namespace PigletViewer
                     y += itemHeight;
                 }
 
-                // draw border around drop-down list
+                // Draw border around drop-down list.
+                // This needs to be drawn last so that the individual list
+                // items don't overwrite the border.
 
-                var listRect = new Rect(buttonRect.x, listY, buttonRect.width, listHeight);
-                GUI.Box(listRect, "", listStyle);
+                GUI.Box(listRect, "", listForegroundStyle);
             }
 
             return state;

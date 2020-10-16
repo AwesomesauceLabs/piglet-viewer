@@ -64,7 +64,8 @@ namespace PigletViewer
             public GUIStyle DialogText;
             public GUIStyle DialogButton;
             public GUIStyle DropDownButton;
-            public GUIStyle DropDownList;
+            public GUIStyle DropDownListBackground;
+            public GUIStyle DropDownListForeground;
             public GUIStyle DropDownListItem;
             public GUIStyle PlayButton;
         }
@@ -260,8 +261,8 @@ namespace PigletViewer
             Texture2D roundedRectTransparent = Resources.Load<Texture2D>("RoundedRectTransparent");
             Texture2D roundedRectWhite = Resources.Load<Texture2D>("RoundedRectWhite");
             Texture2D roundedRectLightGray = Resources.Load<Texture2D>("RoundedRectLightGray");
-            Texture2D roundedRectDarkGray = Resources.Load<Texture2D>("RoundedRectDarkGray");
             Texture2D roundedRectLightGrayNoBorder = Resources.Load<Texture2D>("RoundedRectLightGrayNoBorder");
+            Texture2D roundedRectDarkGray = Resources.Load<Texture2D>("RoundedRectDarkGray");
 
             _styles = new Styles();
 
@@ -323,13 +324,21 @@ namespace PigletViewer
             _styles.DropDownButton.padding = new RectOffset(15, 15, 11, 11);
             _styles.DropDownButton.fontSize = 20;
 
-            _styles.DropDownList = new GUIStyle(GUI.skin.label);
-            _styles.DropDownList.normal.background = roundedRectTransparent;
-            _styles.DropDownList.border = new RectOffset(10, 10, 10, 10);
-            _styles.DropDownList.alignment = TextAnchor.MiddleLeft;
-            _styles.DropDownList.margin = new RectOffset(15, 15, 15, 15);
-            _styles.DropDownList.padding = new RectOffset(15, 15, 11, 11);
-            _styles.DropDownList.fontSize = 20;
+            _styles.DropDownListBackground = new GUIStyle(GUI.skin.label);
+            _styles.DropDownListBackground.normal.background = roundedRectDarkGray;
+            _styles.DropDownListBackground.border = new RectOffset(10, 10, 10, 10);
+            _styles.DropDownListBackground.alignment = TextAnchor.MiddleLeft;
+            _styles.DropDownListBackground.margin = new RectOffset(15, 15, 15, 15);
+            _styles.DropDownListBackground.padding = new RectOffset(15, 15, 11, 11);
+            _styles.DropDownListBackground.fontSize = 20;
+
+            _styles.DropDownListForeground = new GUIStyle(GUI.skin.label);
+            _styles.DropDownListForeground.normal.background = roundedRectTransparent;
+            _styles.DropDownListForeground.border = new RectOffset(10, 10, 10, 10);
+            _styles.DropDownListForeground.alignment = TextAnchor.MiddleLeft;
+            _styles.DropDownListForeground.margin = new RectOffset(15, 15, 15, 15);
+            _styles.DropDownListForeground.padding = new RectOffset(15, 15, 11, 11);
+            _styles.DropDownListForeground.fontSize = 20;
 
             _styles.DropDownListItem = new GUIStyle(GUI.skin.label);
             _styles.DropDownListItem.hover.background = roundedRectLightGrayNoBorder;
@@ -541,7 +550,8 @@ namespace PigletViewer
                 _dropDownState,
                 _dropDownIcon,
                 _styles.DropDownButton,
-                _styles.DropDownList,
+                _styles.DropDownListBackground,
+                _styles.DropDownListForeground,
                 _styles.DropDownListItem);
 
             // if a new animation clip has been selected, stop the
