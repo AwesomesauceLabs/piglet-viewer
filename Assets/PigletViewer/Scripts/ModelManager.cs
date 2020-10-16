@@ -166,7 +166,7 @@ namespace PigletViewer
             if (_model == null)
                 return;
 
-            Bounds? bounds = BoundsUtil.GetRendererBoundsForHierarchy(_model);
+            Bounds? bounds = HierarchyUtil.GetRendererBoundsForHierarchy(_model);
             if (!bounds.HasValue)
                 return;
 
@@ -194,20 +194,11 @@ namespace PigletViewer
 
             Transform cameraTransform = CameraBehaviour.Instance.transform;
 
-            // Scale model up/down to a standard size, so that the
-            // largest dimension of its bounding box is equal to `DefaultModelSize`.
+            // Scale the model hierarchy so that the longest
+            // dimension of its world-space axis-aligned bounding
+            // box is equal to `DefaultModelSize`.
 
-            Bounds? bounds = BoundsUtil.GetRendererBoundsForHierarchy(_model);
-            if (!bounds.HasValue)
-                return;
-
-            float size = bounds.Value.extents.MaxComponent();
-            if (size < 0.000001f)
-                return;
-
-            Vector3 scale = _model.transform.localScale;
-            float scaleFactor = DefaultModelSize / size;
-            _model.transform.localScale = scale * scaleFactor;
+            HierarchyUtil.Resize(_model, DefaultModelSize);
 
             // Rotate model to face camera.
 
@@ -216,7 +207,7 @@ namespace PigletViewer
 
             // Translate model at standard offset from camera.
 
-            bounds = BoundsUtil.GetRendererBoundsForHierarchy(_model);
+            var bounds = HierarchyUtil.GetRendererBoundsForHierarchy(_model);
             if (!bounds.HasValue)
                 return;
 
