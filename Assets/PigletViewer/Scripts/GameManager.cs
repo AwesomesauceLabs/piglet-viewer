@@ -19,6 +19,14 @@ namespace PigletViewer
     public class GameManager : SingletonBehaviour<GameManager>
     {
         /// <summary>
+        /// Options for glTF import behaviour.
+        /// Currently this just controls whether
+        /// the imported model is automatically
+        /// scaled to a user-specified size.
+        /// </summary>
+        public GltfImportOptions ImportOptions;
+
+        /// <summary>
         /// Handle to the currently running glTF import task.
         /// This task runs in the background and is
         /// incrementally advanced by calling
@@ -32,6 +40,15 @@ namespace PigletViewer
         /// </summary>
         private void Awake()
         {
+            // Set import options so that imported models are
+            // automatically scaled to a standard size.
+
+            ImportOptions = new GltfImportOptions
+            {
+                AutoScale = true,
+                AutoScaleSize = ModelManager.Instance.DefaultModelSize
+            };
+
             // Set up callbacks for logging progress messages during
             // glTF imports. The default behaviour is to render
             // progress messages directly on top of the window using
@@ -64,7 +81,7 @@ namespace PigletViewer
         public void StartImport(byte[] data, string filename)
         {
             Uri uri = new Uri(filename, UriKind.Relative);
-            GltfImportTask importTask = RuntimeGltfImporter.GetImportTask(data);
+            GltfImportTask importTask = RuntimeGltfImporter.GetImportTask(data, ImportOptions);
             StartImport(importTask, uri);
         }
 
@@ -80,7 +97,7 @@ namespace PigletViewer
         public void StartImport(string uriStr)
         {
             Uri uri = new Uri(uriStr);
-            GltfImportTask importTask = RuntimeGltfImporter.GetImportTask(uri);
+            GltfImportTask importTask = RuntimeGltfImporter.GetImportTask(uri, ImportOptions);
             StartImport(importTask, uri);
         }
 

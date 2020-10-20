@@ -194,12 +194,6 @@ namespace PigletViewer
 
             Transform cameraTransform = CameraBehaviour.Instance.transform;
 
-            // Scale the model hierarchy so that the longest
-            // dimension of its world-space axis-aligned bounding
-            // box is equal to `DefaultModelSize`.
-
-            HierarchyUtil.Resize(_model, DefaultModelSize);
-
             // Rotate model to face camera.
 
             _model.transform.up = cameraTransform.up;

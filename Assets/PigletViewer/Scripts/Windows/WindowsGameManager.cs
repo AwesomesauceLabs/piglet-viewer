@@ -71,8 +71,8 @@ namespace PigletViewer
             // --load or --no-load is used
 
             var uri = new Uri(Path.Combine(Application.streamingAssetsPath, "piggleston.glb"));
-
-            GltfImportTask importTask = RuntimeGltfImporter.GetImportTask(uri);
+            var importOptions = GameManager.Instance.ImportOptions;
+            var importTask = RuntimeGltfImporter.GetImportTask(uri, importOptions);
 
             for (int i = 0; i < args.Length; ++i)
             {
@@ -89,7 +89,7 @@ namespace PigletViewer
                     // Specify a model to load at startup,
                     // in place of the default Piglet model.
                     uri = new Uri(args[i + 1]);
-                    importTask = RuntimeGltfImporter.GetImportTask(uri);
+                    importTask = RuntimeGltfImporter.GetImportTask(uri, importOptions);
                 }
                 else if (args[i] == "--no-load")
                 {
