@@ -112,26 +112,7 @@ namespace PigletViewer
             // Automatically play the default animation clip.
             // (Animation.clip), if any.
             if (Animation != null)
-            {
-                AddStaticPoseAnimationClip();
                 Animation.Play();
-            }
-        }
-
-        /// <summary>
-        /// Add a static pose animation clip (a.k.a. bind pose
-        /// or T-pose) for restoring the original pose of a
-        /// model after playing an animation.
-        /// </summary>
-        protected void AddStaticPoseAnimationClip()
-        {
-            Debug.Assert(_model != null);
-            Debug.Assert(Animation != null);
-            Debug.Assert(AnimationList != null);
-
-            var clip = AnimationUtil.CreateStaticPoseClip(_model, true);
-            Animation.AddClip(clip, clip.name);
-            AnimationList.clipNames.Insert(0, clip.name);
         }
 
         /// <summary>
