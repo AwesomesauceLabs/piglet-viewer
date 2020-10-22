@@ -19,12 +19,6 @@ namespace PigletViewer
     public class ModelManager : SingletonBehaviour<ModelManager>
     {
         /// <summary>
-        /// Determines the initial position of a model
-        /// relative to the camera.
-        /// </summary>
-        public Vector3 DefaultModelOffsetFromCamera;
-
-        /// <summary>
         /// Determines the default size of a model when it is first
         /// loaded.  More specifically, this sets the length
         /// of the longest dimension of the model's
@@ -91,13 +85,11 @@ namespace PigletViewer
 
             _model = model;
 
-            // Initialize the transform of the model so that:
-            //
-            // (1) the model is a standard size
-            // (2) the model is a standard distance from the main camera
-            // (3) the model is facing the camera
+            // Reset the camera transform so that it's facing
+            // the model and positioned at a standard
+            // offset from the model.
 
-            InitModelTransformRelativeToCamera();
+            CameraBehaviour.Instance.ResetTransformRelativeToModel();
 
             // Store a reference to the current model's
             // Animation component, which handles storage and
@@ -160,36 +152,5 @@ namespace PigletViewer
             _model.transform.SetParent(null, true);
             Destroy(pivot);
         }
-
-        /// <summary>
-        /// Adjust the root transform of the model when it is
-        /// first loaded, so that every model: (1) has the same
-        /// initial size, (2) has the same initial distance from
-        /// the camera, and (3) is initially rotated to face the
-        /// camera.
-        /// </summary>
-        public void InitModelTransformRelativeToCamera()
-        {
-            if (_model == null)
-                return;
-
-            Transform cameraTransform = CameraBehaviour.Instance.transform;
-
-            // Rotate model to face camera.
-
-            _model.transform.up = cameraTransform.up;
-            _model.transform.forward = cameraTransform.forward;
-
-            // Translate model at standard offset from camera.
-
-            var bounds = HierarchyUtil.GetRendererBoundsForHierarchy(_model);
-            if (!bounds.HasValue)
-                return;
-
-            _model.transform.Translate(cameraTransform.position
-                                       + DefaultModelOffsetFromCamera
-                                       - bounds.Value.center);
-        }
-
     }
 }

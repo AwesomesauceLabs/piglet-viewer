@@ -203,6 +203,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98e0216e46f7ee544aa97b67a1db7ca6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ImportOptions:
+    AutoScale: 0
+    AutoScaleSize: 1
 --- !u!1 &678983080
 GameObject:
   m_ObjectHideFlags: 0
@@ -232,8 +235,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b86daa065addc354b8d5b4ebbf7f2219, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DefaultModelOffsetFromCamera: {x: 0, y: 0, z: 2}
   DefaultModelSize: 1
+  Animation: {fileID: 0}
+  AnimationList: {fileID: 0}
 --- !u!4 &678983082
 Transform:
   m_ObjectHideFlags: 0
@@ -525,3 +529,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70c0768febda04948bc65436e741437e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DefaultOffsetFromModel: {x: 0, y: 0, z: -2}
