@@ -490,7 +490,7 @@ namespace PigletViewer
         public void AnimationControlsOnGui()
         {
             Animation anim = ModelManager.Instance.Animation;
-            var clipNames = ModelManager.Instance.AnimationList.clipNames;
+            var clipNames = ModelManager.Instance.AnimationList.ClipNames;
 
             const float animationControlsAreaHeight = 75;
 
