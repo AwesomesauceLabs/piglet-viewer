@@ -37,16 +37,25 @@ namespace PigletViewer
         public Animation Animation;
 
         /// <summary>
-        /// Stores the names of the imported animation
-        /// clips, in the original order that they appeared
-        /// in the input glTF file. This component is
-        /// used as a workaround for the fact that
-        /// Unity's Animation component does not preserve
-        /// the order of the clips when they are added
-        /// via `AddClip`. For further explanation, see:
-        /// https://answers.unity.com/questions/8245/how-to-select-an-animation-clip-by-index-number.html
+        /// An ordered list of keys used to
+        /// access the animation clips in the Animation
+        /// component. The order of the keys corresponds
+        /// exactly to the order that the animations
+        /// were defined in the glTF file, with the exception
+        /// that the special "Static Pose" clip is inserted
+        /// at index 0.
         /// </summary>
-        public AnimationList AnimationList;
+        public List<string> AnimationClipKeys;
+
+        /// <summary>
+        /// Stores the names of the imported animation
+        /// clips. The order of the names corresponds
+        /// exactly to the order that the animations
+        /// were defined in the glTF file, with the exception
+        /// that the special "Static Pose" clip is inserted
+        /// at index 0.
+        /// </summary>
+        public List<string> AnimationClipNames;
 
         /// <summary>
         /// The root GameObject of the most recently loaded model,
@@ -99,10 +108,21 @@ namespace PigletViewer
             // any valid animations.
 
             Animation = _model.GetComponent<Animation>();
-            AnimationList = _model.GetComponent<AnimationList>();
 
-            // Automatically play the default animation clip.
-            // (Animation.clip), if any.
+            // Build lists of animation clip keys and names for the GUI drop-down menu.
+
+            var list = _model.GetComponent<AnimationList>();
+
+            AnimationClipKeys = new List<string>();
+            foreach(var entry in list.entries)
+                AnimationClipKeys.Add(entry.key);
+
+            AnimationClipNames = new List<string>();
+            foreach(var entry in list.entries)
+                AnimationClipNames.Add(entry.name);
+
+            // Automatically play the default animation clip, if any.
+
             if (Animation != null)
                 Animation.Play();
         }

@@ -490,7 +490,9 @@ namespace PigletViewer
         public void AnimationControlsOnGui()
         {
             Animation anim = ModelManager.Instance.Animation;
-            var clipNames = ModelManager.Instance.AnimationList.ClipNames;
+
+            var clipKeys = ModelManager.Instance.AnimationClipKeys;
+            var clipNames = ModelManager.Instance.AnimationClipNames;
 
             const float animationControlsAreaHeight = 75;
 
@@ -500,10 +502,7 @@ namespace PigletViewer
 
             AnimationState selectedClip = null;
             if (_dropDownState.selectedIndex != STATIC_POSE_INDEX)
-            {
-                var selectedClipName = clipNames[_dropDownState.selectedIndex];
-                selectedClip = anim[selectedClipName];
-            }
+                selectedClip = anim[clipKeys[_dropDownState.selectedIndex]];
 
             // play/pause button
 
@@ -580,19 +579,18 @@ namespace PigletViewer
                 // transform values are assumed to come from the
                 // default static pose.
 
-                anim.Play(clipNames[STATIC_POSE_INDEX]);
+                anim.Play(clipKeys[STATIC_POSE_INDEX]);
                 anim.Sample();
 
                 // start playing the new clip
 
-                var newClipIndex = _dropDownState.selectedIndex;
-                var newClipName = clipNames[newClipIndex];
-                var newClip = anim[newClipName];
+                var newClipKey = clipKeys[_dropDownState.selectedIndex];
+                var newClip = anim[newClipKey];
 
                 newClip.time = 0f;
                 newClip.speed = 1f;
 
-                anim.Play(newClipName);
+                anim.Play(newClipKey);
             }
 
             // timeline slider
