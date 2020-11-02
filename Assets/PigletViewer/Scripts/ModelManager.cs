@@ -109,22 +109,24 @@ namespace PigletViewer
 
             Animation = _model.GetComponent<Animation>();
 
-            // Build lists of animation clip keys and names for the GUI drop-down menu.
-
-            var list = _model.GetComponent<AnimationList>();
-
-            AnimationClipKeys = new List<string>();
-            foreach(var entry in list.entries)
-                AnimationClipKeys.Add(entry.key);
-
-            AnimationClipNames = new List<string>();
-            foreach(var entry in list.entries)
-                AnimationClipNames.Add(entry.name);
-
-            // Automatically play the default animation clip, if any.
-
             if (Animation != null)
+            {
+                // Build lists of animation clip keys and names for the GUI drop-down menu.
+
+                var list = _model.GetComponent<AnimationList>();
+
+                AnimationClipKeys = new List<string>();
+                foreach(var entry in list.entries)
+                    AnimationClipKeys.Add(entry.key);
+
+                AnimationClipNames = new List<string>();
+                foreach(var entry in list.entries)
+                    AnimationClipNames.Add(entry.name);
+
+                // Automatically play the default animation clip, if any.
+
                 Animation.Play();
+            }
         }
 
         /// <summary>
