@@ -46,7 +46,7 @@
                 Note: Unlike normal regular expressions, the "*" operator Android
                 pathPatterns is not greedy, and this makes it awkward
                 to express certain patterns.  For example the pattern
-                ".\\.gltf" will not match the path "my.model.gltf" because the
+                ".*\\.gltf" will not match the path "my.model.gltf" because the
                 leading ".*" will stop consuming characters when it encounters
                 the first period character ("."). The kludge used here is to
                 define separate patterns for different numbers of leading
