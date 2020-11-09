@@ -70,7 +70,10 @@
                 <data android:pathPattern=".*\\..*\\..*\\.glb" />
                 <data android:pathPattern=".*\\..*\\..*\\..*\\.glb" />
 
-                <data android:scheme="file" android:host="*" android:pathPattern=".*\\.glb" android:mimeType="*/*" />
+                <data android:pathPattern=".*\\.zip" />
+                <data android:pathPattern=".*\\..*\\.zip" />
+                <data android:pathPattern=".*\\..*\\..*\\.zip" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.zip" />
 
                 <!--
                 Note: Applications are typically launched with a
