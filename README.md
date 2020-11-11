@@ -106,6 +106,8 @@ This repo includes several sample glTF models under `Assets/StreamingAssets`, wh
 | ["SciFi Gun"](https://sketchfab.com/3d-models/scifi-gun-04a9f3ccb5b14dc38a28b27c1916e18e) | [mrfetch@sketchfab](https://sketchfab.com/mrfetch) |  [CC Attribution License](https://creativecommons.org/licenses/by/4.0/) | `Assets/StreamingAssets/scifi_gun.zip` |
 | ["Skull Salazar"](https://sketchfab.com/3d-models/scifi-gun-04a9f3ccb5b14dc38a28b27c1916e18e) | [jvitorsouzadesign@sketchfab](https://sketchfab.com/jvitorsouzadesign) | [CC Attribution License](https://creativecommons.org/licenses/by/4.0/) | `Assets/StreamingAssets/skull_salazar.zip` |
 | ["Viking Room"](https://sketchfab.com/3d-models/viking-room-a49f1b8e4f5c4ecf9e1fe7d81915ad38) | [nigelgoh@sketchfab](https://sketchfab.com/nigelgoh) | [CC Attribution License](https://creativecommons.org/licenses/by/4.0/) | `Assets/StreamingAssets/viking_room.zip` |
+| ["Morpher Animated Face - Military Cartoon Hartman"](https://sketchfab.com/3d-models/morpher-animated-face-military-cartoon-hartman-538a674c39e24c15965231ab2bdb656a) | [skudgee@sketchfab](https://sketchfab.com/skudgee) | [CC Attribution License](https://creativecommons.org/licenses/by/4.0/) | `Assets/StreamingAssets/cartoon_hartman.zip` |
+| ["Dragon (Celebration)"](https://sketchfab.com/3d-models/dragon-celebration-2d0973f9e6514c0d93ec2230d4807dd2) | [kand8998@sketchfab](https://sketchfab.com/KaitlynAndrus) | [CC Attribution License](https://creativecommons.org/licenses/by/4.0/) | `Assets/StreamingAssets/dragon_celebration.zip` |
 
 # Footnotes
 
