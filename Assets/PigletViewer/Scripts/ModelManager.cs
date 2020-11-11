@@ -116,12 +116,12 @@ namespace PigletViewer
                 var list = _model.GetComponent<AnimationList>();
 
                 AnimationClipKeys = new List<string>();
-                foreach(var entry in list.entries)
-                    AnimationClipKeys.Add(entry.key);
+                foreach(var entry in list.Entries)
+                    AnimationClipKeys.Add(entry.Clip.name);
 
                 AnimationClipNames = new List<string>();
-                foreach(var entry in list.entries)
-                    AnimationClipNames.Add(entry.name);
+                foreach(var entry in list.Entries)
+                    AnimationClipNames.Add(entry.GltfName);
 
                 // Automatically play the default animation clip, if any.
 
