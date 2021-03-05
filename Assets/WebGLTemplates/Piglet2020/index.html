@@ -44,7 +44,7 @@ is released to the public domain under the Creative Commons "CC0" license
         border-width: 1px;
         border-color: lightgray;
         padding: 10px;
-        height: 200px;
+        height: 175px;
       }
       #viewArea {
         flex: 1;
@@ -116,6 +116,17 @@ is released to the public domain under the Creative Commons "CC0" license
         }
       }
 
+      // table styling
+
+      th, td {
+        text-align: left;
+        padding: 0px 10px 0px 0px;
+      }
+
+      th.size, td.size {
+        text-align: right;
+      }
+
     </style>
   </head>
 
@@ -147,42 +158,68 @@ is released to the public domain under the Creative Commons "CC0" license
         </header>
         <p>
           Drag .glb/.zip links onto view area to load.
-          <p>
-            <a href="StreamingAssets/piggleston.glb">Sir Piggleston</a>&trade;
-            by <a href="https://awesomesaucelabs.github.io">Awesomesauce Labs</a>
-            (0.5 MB)
-            <br>
-            <a href="StreamingAssets/viking_room.zip">Viking Room</a>
-            by <a href="https://sketchfab.com/nigelgoh">nigelgoh@sketchfab</a>
-            (1.1 MB)
-            <br>
-            <a href="StreamingAssets/scifi_gun.zip">SciFi Gun</a>
-            by <a href="https://sketchfab.com/mrfetch">mrfetch@sketchfab</a>
-            (2.1 MB)
-            <br>
-            <a href="StreamingAssets/skull_salazar.zip">Skull Salazar</a>
-            by <a href="https://sketchfab.com/jvitorsouzadesign">jvitorsouzadesign@sketchfab</a>
-            (11.7 MB)
-            <br>
-            <a href="StreamingAssets/skull_salazar_etc1s.glb">Skull Salazar (etc1s)</a>
-            by <a href="https://sketchfab.com/jvitorsouzadesign">jvitorsouzadesign@sketchfab</a>
-            (2.3 MB)
-            <br>
-            <a href="StreamingAssets/cartoon_hartman.zip">Hartman (animated)</a>
-            by <a href="https://sketchfab.com/skudgee">skudgee@sketchfab</a>
-            (1.4 MB)
-            <br>
-            <a href="StreamingAssets/dragon_celebration.zip">Dragon (animated)</a>
-            by <a href="https://sketchfab.com/KaitlynAndrus">kand8998@sketchfab</a>
-            (13.0 MB)
-            <br>
-            <a href="StreamingAssets/dragon_celebration_etc1s.glb">Dragon (animated, etc1s)</a>
-            by <a href="https://sketchfab.com/KaitlynAndrus">kand8998@sketchfab</a>
-            (2.5 MB)
-          </p>
-          <p>
-            Models labeled "etc1s" use supercompressed textures in KTX2/ETC1S format. All models except "Sir Piggleston" are published under the <a href="https://creativecommons.org/licenses/by/4.0/">CC Attribution License</a>.
-          </p>
+
+          <table>
+            <tr>
+              <th>Link</th>
+              <th>Author</th>
+              <th class="size">Size</th>
+            </tr>
+            <tr>
+              <td><a href="StreamingAssets/piggleston.glb">Sir Piggleston</a>&trade;</td>
+              <td><a href="https://awesomesaucelabs.github.io">Awesomesauce Labs</a></td>
+              <td class="size">0.5 MB</td>
+            </tr>
+            <tr>
+              <td><a href="StreamingAssets/piggleston_draco.glb">Sir Piggleston [draco]</a>&trade;</td>
+              <td><a href="https://awesomesaucelabs.github.io">Awesomesauce Labs</a></td>
+              <td class="size">0.1 MB</td>
+            </tr>
+            <tr>
+              <td><a href="StreamingAssets/cartoon_hartman.zip">Cartoon Hartman [anim]</a></td>
+              <td><a href="https://sketchfab.com/skudgee">skudgee<wbr>@sketchfab</a></td>
+              <td class="size">1.4 MB</td>
+            </tr>
+            <tr>
+              <td><a href="StreamingAssets/skull_salazar.zip">Skull Salazar</a></td>
+              <td><a href="https://sketchfab.com/jvitorsouzadesign">jvitorsouzadesign<wbr>@sketchfab</a></td>
+              <td class="size">11.7 MB</td>
+            </tr>
+            <tr>
+              <td><a href="StreamingAssets/skull_salazar_etc1s_draco.glb">Skull Salazar [etc1s][draco]</a></td>
+              <td><a href="https://sketchfab.com/jvitorsouzadesign">jvitorsouzadesign<wbr>@sketchfab</a></td>
+              <td class="size">1.4 MB</td>
+            </tr>
+            <tr>
+              <td><a href="StreamingAssets/dragon_celebration.zip">Dragon [anim]</a></td>
+              <td><a href="https://sketchfab.com/KaitlynAndrus">kand8998<wbr>@sketchfab</a></td>
+              <td class="size">13.0 MB</td>
+            </tr>
+            <tr>
+              <td><a href="StreamingAssets/dragon_celebration_etc1s_draco.glb">Dragon [anim][etc1s][draco]</a></td>
+              <td><a href="https://sketchfab.com/KaitlynAndrus">kand8998<wbr>@sketchfab</a></td>
+              <td class="size">2.3 MB</td>
+            </tr>
+          </table> 
+
+          <br>
+          <table>
+            <tr>
+              <td><b>[anim]:</b></td>
+              <td>contains animations</td>
+            </tr>
+            <tr>
+              <td><b>[draco]:</b></td>
+              <td>uses Draco mesh compression</td>
+            </tr>
+            <tr>
+              <td><b>[etc1s]:</b></td>
+              <td>uses supercompressed textures (KTX2/ETC1S format)</td>
+            </tr>
+          </table>
+
+          <br>
+          All models except "Sir Piggleston" are published under the <a href="https://creativecommons.org/licenses/by/4.0/">CC Attribution License</a>.
         </p>
         </p>
         <header>
@@ -194,8 +231,7 @@ is released to the public domain under the Creative Commons "CC0" license
           <h1>Note to Chrome Users</h1>
         </header>
         <p>
-          If you are using Google Chrome and
-          this demo feels sluggish, please
+          If this demo feels sluggish, please
           <a href="https://www.lifewire.com/hardware-acceleration-in-chrome-4125122">
             check that GPU acceleration is enabled in your browser settings</a>.
           Alternatively, you may want to try the demo in Firefox instead.
