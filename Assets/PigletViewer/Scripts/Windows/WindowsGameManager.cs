@@ -5,7 +5,6 @@ using System.IO;
 using B83.Win32;
 using Piglet;
 using UnityEngine;
-using UnityGLTF;
 
 namespace PigletViewer
 {

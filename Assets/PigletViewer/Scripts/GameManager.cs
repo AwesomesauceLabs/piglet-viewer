@@ -2,7 +2,6 @@
 using System.IO;
 using Piglet;
 using UnityEngine;
-using UnityGLTF;
 
 namespace PigletViewer
 {
