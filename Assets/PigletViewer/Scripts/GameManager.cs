@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Piglet;
 using UnityEngine;
+using NDesk.Options;
 
 namespace PigletViewer
 {
@@ -26,12 +28,12 @@ namespace PigletViewer
         public GltfImportOptions ImportOptions;
 
         /// <summary>
-        /// Handle to the currently running glTF import task.
-        /// This task runs in the background and is
-        /// incrementally advanced by calling
+        /// List of queued glTF import tasks.
+        /// Each task runs in the background and is
+        /// executed incrementally by calling
         /// `MoveNext` in `Update`.
         /// </summary>
-        private GltfImportTask _importTask;
+        private List<GltfImportTask> _importTasks;
 
         /// <summary>
         /// Unity callback that is invoked before the first frame update
@@ -39,6 +41,10 @@ namespace PigletViewer
         /// </summary>
         private void Awake()
         {
+            // Create glTF import queue.
+
+            _importTasks = new List<GltfImportTask>();
+
             // Set import options so that imported models are
             // automatically scaled to a standard size.
 
@@ -62,6 +68,21 @@ namespace PigletViewer
             ProgressLog.Instance.ResetLogCallback =
                 Gui.Instance.ResetProgressLog;
 
+            // Parse command-line options using NDesk.Options library.
+
+            var optionSet = new OptionSet
+            {
+                {
+                    "i|import=",
+                    "import glTF file from {URI} (filename or HTTP URL)",
+                    uri => QueueImport(uri)
+                }
+            };
+
+            optionSet.Parse(Environment.GetCommandLineArgs());
+
+            // Add platform-specific behaviours.
+
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
             gameObject.AddComponent<WindowsGameManager>();
 #elif UNITY_ANDROID
@@ -72,48 +93,105 @@ namespace PigletViewer
         }
 
         /// <summary>
-        /// Create a glTF import task, which will be incrementally advanced
-        /// in each call to Update().
-        ///
-        /// This version of StartImport is only used by the WebGL viewer.
+        /// Abort the currently running glTF import (if any) and
+        /// remove any queued glTF imports.
         /// </summary>
-        public void StartImport(byte[] data, string filename)
+        private void AbortImports()
         {
-            Uri uri = new Uri(filename, UriKind.Relative);
-            GltfImportTask importTask = RuntimeGltfImporter.GetImportTask(data, ImportOptions);
-            StartImport(importTask, uri);
+            // Call Abort() on each import task so that:
+            //
+            // (1) Resources are freed for any partially completed glTF imports.
+            // (2) Any user-specified OnAborted callbacks get invoked.
+
+            foreach (var importTask in _importTasks)
+                importTask.Abort();
+
+            _importTasks.Clear();
         }
 
         /// <summary>
-        /// Create a glTF import task, which will be incrementally advanced
-        /// in each call to Update().
+        /// Abort any running/queued glTF imports and start importing
+        /// the given glTF file.
         ///
-        /// Note that the URI argument must be passed in as a string
-        /// rather than a `Uri` object, so that this method
+        /// This version of StartImport is only called by the
+        /// WebGL version of the viewer.
+        /// </summary>
+        /// <param name="data">
+        /// A byte[] containing the raw byte content of a .glb/.zip file.
+        /// </param>
+        /// <param name="filename">
+        /// The name of the .glb/.zip file that `data` was read from.
+        /// The purpose of this argument is just to provide a filename
+        /// to show in the progress log. Note that parameter only
+        /// provides the basename for the file, not the complete file path.
+        /// (For security reasons, the WebGL build is not allowed to know
+        /// the complete path of a user-selected input file.)
+        /// </param>
+        public void StartImport(byte[] data, string filename)
+        {
+            AbortImports();
+            var importTask = RuntimeGltfImporter.GetImportTask(data, ImportOptions);
+            QueueImport(importTask, filename);
+        }
+
+        /// <summary>
+        /// Abort any running/queued glTF imports and start importing
+        /// the given glTF file.
+        ///
+        /// Note that the URI argument is passed in as a string
+        /// rather than a `Uri` object so that this method
         /// can be invoked from javascript.
         /// </summary>
         /// <param name="uriStr">The URI of the input glTF file.</param>
         public void StartImport(string uriStr)
         {
-            Uri uri = new Uri(uriStr);
-            GltfImportTask importTask = RuntimeGltfImporter.GetImportTask(uri, ImportOptions);
-            StartImport(importTask, uri);
+            AbortImports();
+            QueueImport(uriStr);
         }
 
-        public void StartImport(GltfImportTask importTask, Uri uri)
+        /// <summary>
+        /// Queue the given glTF file to be imported after any other
+        /// running/queued glTF imports have completed.
+        /// </summary>
+        /// <param name="uriStr">
+        /// The URI for the input glTF file, which may be either an
+        /// absolute file path or HTTP URL.
+        /// </param>
+        public void QueueImport(string uriStr)
         {
-            ProgressLog.Instance.StartImport();
+            var uri = new Uri(uriStr);
+            var basename = Path.GetFileName(uri.ToString());
+            var importTask = RuntimeGltfImporter.GetImportTask(uri, ImportOptions);
+            QueueImport(importTask, basename);
+        }
 
-            string basename = Path.GetFileName(uri.ToString());
-            string message = String.Format("Loading {0}...", basename);
-            ProgressLog.Instance.AddLineCallback(message);
+        /// <summary>
+        /// Queue the given glTF file to be imported after any other
+        /// running/queued glTF imports have completed.
+        /// </summary>
+        /// <param name="importTask">
+        /// The glTF import task (coroutine) to add to the queue.
+        /// </param>
+        /// <param name="filename">
+        /// The filename to show in the progress log.
+        /// </param>
+        public void QueueImport(GltfImportTask importTask, string filename)
+        {
+            importTask.PushTask(() =>
+            {
+                // Reset the progress log and print the name of the
+                // glTF file we are about to load.
+                ProgressLog.Instance.StartImport();
+                ProgressLog.Instance.AddLineCallback(
+                    String.Format("Loading {0}...", filename));
+            });
 
             importTask.OnProgress += ProgressLog.Instance.OnImportProgress;
             importTask.OnCompleted += OnImportCompleted;
             importTask.OnException += OnImportException;
             importTask.RethrowExceptionAfterCallbacks = false;
 
-            _importTask = importTask;
+            _importTasks.Add(importTask);
         }
 
         /// <summary>
@@ -131,13 +209,11 @@ namespace PigletViewer
 
             ProgressLog.Instance.AddLineCallback(
                 String.Format("Longest Unity thread stall: {0} ms",
-                    _importTask.LongestStepInMilliseconds()));
+                    _importTasks[0].LongestStepInMilliseconds()));
 
             ProgressLog.Instance.AddLineCallback("Success!");
 
             ModelManager.Instance.SetModel(model);
-
-            _importTask = null;
         }
 
         /// <summary>
@@ -159,9 +235,6 @@ namespace PigletViewer
                 Gui.Instance.ShowDialogBox("Failed to Load Model",
                     StringUtil.WrapText(e.Message, 50));
             }
-
-
-            _importTask = null;
         }
 
         /// <summary>
@@ -169,8 +242,9 @@ namespace PigletViewer
         /// </summary>
         public void Update()
         {
-            // advance import job
-            _importTask?.MoveNext();
+            // advance execution of import tasks
+            while (_importTasks.Count > 0 && !_importTasks[0].MoveNext())
+                _importTasks.RemoveAt(0);
         }
 
     }
