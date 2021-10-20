@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Piglet;
 using UnityEngine;
 using NDesk.Options;
@@ -36,6 +37,14 @@ namespace PigletViewer
         private List<GltfImportTask> _importTasks;
 
         /// <summary>
+        /// If true, print a TSV table of profiling data
+        /// to the debug log after each glTF import. This
+        /// option is enabled by the `--profile` command line
+        /// option.
+        /// </summary>
+        private bool _logProfilingData;
+
+        /// <summary>
         /// Unity callback that is invoked before the first frame update
         /// and prior to Start().
         /// </summary>
@@ -44,6 +53,7 @@ namespace PigletViewer
             // Create glTF import queue.
 
             _importTasks = new List<GltfImportTask>();
+            _logProfilingData = false;
 
             // Set import options so that imported models are
             // automatically scaled to a standard size.
@@ -76,6 +86,11 @@ namespace PigletViewer
                     "i|import=",
                     "import glTF file from {URI} (filename or HTTP URL)",
                     uri => QueueImport(uri)
+                },
+                {
+                    "p|profile",
+                    "profile glTF imports and log results in TSV format",
+                    enable => _logProfilingData = enable != null
                 }
             };
 
@@ -200,6 +215,12 @@ namespace PigletViewer
             importTask.OnException += OnImportException;
             importTask.RethrowExceptionAfterCallbacks = false;
 
+            if (_logProfilingData)
+            {
+                importTask.OnCompleted += _ => LogProfilingData(
+                    filename, importTask.ProfilingData);
+            }
+
             _importTasks.Add(importTask);
         }
 
@@ -244,6 +265,30 @@ namespace PigletViewer
                 Gui.Instance.ShowDialogBox("Failed to Load Model",
                     StringUtil.WrapText(e.Message, 50));
             }
+        }
+
+        /// <summary>
+        /// Print profiling data to the debug log as table in TSV format.
+        /// </summary>
+        private void LogProfilingData(string filename,
+            List<GltfImportTask.ProfilingRecord> profilingData)
+        {
+            var builder = new StringBuilder();
+
+            builder.Append("BEGIN_PROFILING_DATA\n");
+
+            builder.Append(string.Format("{0}\t{1}\t{2}\n",
+                "file", "step", "milliseconds"));
+
+            foreach (var profilingRecord in profilingData)
+            {
+                builder.Append(string.Format("{0}\t{1}\t{2}\n",
+                    filename, profilingRecord.TaskType, profilingRecord.Milliseconds));
+            }
+
+            builder.Append("END_PROFILING_DATA\n");
+
+            Debug.Log(builder.ToString());
         }
 
         /// <summary>
