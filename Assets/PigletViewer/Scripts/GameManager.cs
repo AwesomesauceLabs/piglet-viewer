@@ -78,8 +78,43 @@ namespace PigletViewer
             ProgressLog.Instance.ResetLogCallback =
                 Gui.Instance.ResetProgressLog;
 
-            // Parse command-line options using NDesk.Options library.
+            // Parse command line options.
 
+            ParseCommandLineOptions();
+
+            // If no glTF file was specified on the command line,
+            // load the default "Sir Piggleston" model.
+
+            if (_importTasks.Count == 0)
+            {
+                QueueImport(Path.Combine(
+                    Application.streamingAssetsPath, "piggleston.glb"));
+            }
+
+            // Add platform-specific behaviours.
+
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+            gameObject.AddComponent<WindowsGameManager>();
+#elif UNITY_ANDROID
+            gameObject.AddComponent<AndroidGameManager>();
+#elif UNITY_WEBGL
+            gameObject.AddComponent<WebGlGameManager>();
+#endif
+        }
+
+        /// <summary>
+        /// <para>
+        /// Parse command-line options using NDesk.Options library.
+        /// </para>
+        /// <para>
+        /// The user may specify default command-line options
+        /// in a file called `Resources/piglet-viewer-args.txt`,
+        /// and then any options specified on the command line
+        /// will be appended to these.
+        /// </para>
+        /// </summary>
+        private void ParseCommandLineOptions()
+        {
             var optionSet = new OptionSet
             {
                 {
@@ -124,25 +159,6 @@ namespace PigletViewer
             // Parse command-line options and invoke handlers.
 
             optionSet.Parse(args);
-
-            // If no glTF file was specified on the command line,
-            // load the default "Sir Piggleston" model.
-
-            if (_importTasks.Count == 0)
-            {
-                QueueImport(Path.Combine(
-                    Application.streamingAssetsPath, "piggleston.glb"));
-            }
-
-            // Add platform-specific behaviours.
-
-#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-            gameObject.AddComponent<WindowsGameManager>();
-#elif UNITY_ANDROID
-            gameObject.AddComponent<AndroidGameManager>();
-#elif UNITY_WEBGL
-            gameObject.AddComponent<WebGlGameManager>();
-#endif
         }
 
         /// <summary>
