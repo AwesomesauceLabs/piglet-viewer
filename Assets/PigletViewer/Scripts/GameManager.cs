@@ -94,7 +94,36 @@ namespace PigletViewer
                 }
             };
 
-            optionSet.Parse(Environment.GetCommandLineArgs());
+            // Read command-line options.
+            //
+            // First read the default command-line options from
+            // `Resources/piglet-viewer-args.txt`, if that file exists.
+            // This is useful on platforms where invoking the Unity player
+            // with custom command-line options is either inconvenient or
+            // impossible (e.g. Android, WebGL).
+
+            var args = new List<string>();
+
+            var defaultArgs = Resources.Load<TextAsset>("piglet-viewer-args");
+            if (defaultArgs != null)
+                args.AddRange(defaultArgs.text.Split(null));
+
+            // Remove all command-line args before "--" separator.
+            //
+            // Args before "--" are built-in options for the Unity
+            // Editor/Player (e.g. -projectPath), while args after
+            // "--" (if present) are PigletViewer options.
+
+            var pigletViewerArgs = new Queue<string>(Environment.GetCommandLineArgs());
+
+            while (pigletViewerArgs.Count > 0
+                && pigletViewerArgs.Dequeue() != "--") {}
+
+            args.AddRange(pigletViewerArgs);
+
+            // Parse command-line options and invoke handlers.
+
+            optionSet.Parse(args);
 
             // If no glTF file was specified on the command line,
             // load the default "Sir Piggleston" model.
