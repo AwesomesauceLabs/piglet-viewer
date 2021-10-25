@@ -260,11 +260,11 @@ namespace PigletViewer
             importTask.OnException += OnImportException;
             importTask.RethrowExceptionAfterCallbacks = false;
 
-            if (_logProfilingData)
+            importTask.OnCompleted += _ =>
             {
-                importTask.OnCompleted += _ => LogProfilingData(
-                    filename, importTask.ProfilingData);
-            }
+                if (_logProfilingData)
+                    LogProfilingData(filename, importTask.ProfilingData);
+            };
 
             _importTasks.Add(importTask);
         }
