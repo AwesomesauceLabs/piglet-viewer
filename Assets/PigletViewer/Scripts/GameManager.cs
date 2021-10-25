@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -34,7 +35,7 @@ namespace PigletViewer
         /// executed incrementally by calling
         /// `MoveNext` in `Update`.
         /// </summary>
-        private List<GltfImportTask> _importTasks;
+        private List<IEnumerator> _importTasks;
 
         /// <summary>
         /// If true, print a TSV table of profiling data
@@ -52,7 +53,7 @@ namespace PigletViewer
         {
             // Create glTF import queue.
 
-            _importTasks = new List<GltfImportTask>();
+            _importTasks = new List<IEnumerator>();
             _logProfilingData = false;
 
             // Set import options so that imported models are
@@ -172,8 +173,11 @@ namespace PigletViewer
             // (1) Resources are freed for any partially completed glTF imports.
             // (2) Any user-specified OnAborted callbacks get invoked.
 
-            foreach (var importTask in _importTasks)
-                importTask.Abort();
+            foreach (var task in _importTasks)
+            {
+                var importTask = task as GltfImportTask;
+                importTask?.Abort();
+            }
 
             _importTasks.Clear();
         }
@@ -274,6 +278,8 @@ namespace PigletViewer
         /// </summary>
         public void OnImportCompleted(GameObject model)
         {
+            var importTask = _importTasks[0] as GltfImportTask;
+
             Gui.Instance.ResetSpin();
             Gui.Instance.ResetFooterMessage();
             Gui.Instance.ResetAnimationControls();
@@ -284,7 +290,7 @@ namespace PigletViewer
 
             ProgressLog.Instance.AddLineCallback(
                 String.Format("Longest Unity thread stall: {0} ms",
-                    _importTasks[0].LongestStepInMilliseconds()));
+                    importTask.LongestStepInMilliseconds()));
 
             ProgressLog.Instance.AddLineCallback("Success!");
 
