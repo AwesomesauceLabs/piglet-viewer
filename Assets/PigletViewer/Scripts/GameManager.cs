@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using Piglet;
 using UnityEngine;
 using NDesk.Options;
+using Debug = UnityEngine.Debug;
 
 namespace PigletViewer
 {
@@ -127,6 +129,11 @@ namespace PigletViewer
                     "p|profile",
                     "profile glTF imports and log results in TSV format",
                     enable => _logProfilingData = enable != null
+                },
+                {
+                    "s|sleep=",
+                    "sleep for {SECONDS} seconds",
+                    seconds => _importTasks.Add(Sleep(float.Parse(seconds)))
                 }
             };
 
@@ -340,6 +347,33 @@ namespace PigletViewer
             builder.Append("END_PROFILING_DATA\n");
 
             Debug.Log(builder.ToString());
+        }
+
+        /// <summary>
+        /// <para>
+        /// Sleep for the given number of seconds before running the next
+        /// import task.
+        /// </para>
+        /// <para>
+        /// I added this method (and the corresponding --sleep option) so that
+        /// I could prevent Unity player initialization from interfering
+        /// with profiling results (--profile).
+        /// </para>
+        /// </summary>
+        private static IEnumerator Sleep(float seconds)
+        {
+            var origMessage = Gui.Instance.FooterMessage;
+
+            Gui.Instance.FooterMessage = string.Format(
+                "sleeping for {0} seconds...", seconds);
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            while (stopwatch.ElapsedMilliseconds < seconds * 1000)
+                yield return null;
+
+            Gui.Instance.FooterMessage = origMessage;
         }
 
         /// <summary>
