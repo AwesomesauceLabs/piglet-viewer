@@ -19,10 +19,8 @@ namespace PigletViewer
         {
             _intentUri = GetAndroidIntentUri();
 
-            if (string.IsNullOrEmpty(_intentUri))
-                _intentUri = Path.Combine(Application.streamingAssetsPath, "piggleston.glb");
-
-            GameManager.Instance.StartImport(_intentUri);
+            if (!string.IsNullOrEmpty(_intentUri))
+                GameManager.Instance.StartImport(_intentUri);
         }
 
         /// <summary>

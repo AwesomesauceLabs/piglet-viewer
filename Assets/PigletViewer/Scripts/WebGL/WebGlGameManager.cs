@@ -36,10 +36,6 @@ namespace PigletViewer
             ProgressLog.Instance.AddLineCallback = JsLib.AddProgressLogLine;
             ProgressLog.Instance.UpdateLineCallback = JsLib.UpdateProgressLogLine;
             ProgressLog.Instance.ResetLogCallback = JsLib.ResetProgressLog;
-
-            // load default model (Piglet mascot)
-            GameManager.Instance.StartImport(Path.Combine(
-                Application.streamingAssetsPath, "piggleston.glb"));
         }
 
         /// <summary>
