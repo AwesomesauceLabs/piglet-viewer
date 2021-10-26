@@ -239,7 +239,7 @@ namespace PigletViewer
         /// </param>
         public void QueueImport(string uriStr)
         {
-            var uri = new Uri(uriStr);
+            var uri = UriUtil.GetAbsoluteUri(uriStr);
             var basename = Path.GetFileName(uri.ToString());
             var importTask = RuntimeGltfImporter.GetImportTask(uri, ImportOptions);
             QueueImport(importTask, basename);
