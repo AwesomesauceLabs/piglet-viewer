@@ -383,7 +383,21 @@ namespace PigletViewer
         {
             // advance execution of import tasks
             while (_importTasks.Count > 0 && !_importTasks[0].MoveNext())
+            {
                 _importTasks.RemoveAt(0);
+
+                // Magic string that scripts can use to detect when all
+                // command-line actions have completed.
+                //
+                // I use this to facilitate automated profiling of the
+                // PigletViewer WebGL build. Once the "PIGLET_VIEWER_IDLE"
+                // string appears in the Google Chrome log file, I know that
+                // it is safe to extract the profiling data from the log and
+                // kill the Chrome process.
+
+                if (_logProfilingData && _importTasks.Count == 0)
+                    Debug.Log("PIGLET_VIEWER_IDLE");
+            }
         }
 
     }
