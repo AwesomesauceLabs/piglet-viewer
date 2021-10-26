@@ -331,22 +331,16 @@ namespace PigletViewer
         private void LogProfilingData(string filename,
             List<GltfImportTask.ProfilingRecord> profilingData)
         {
-            var builder = new StringBuilder();
-
-            builder.Append("BEGIN_PROFILING_DATA\n");
-
-            builder.Append(string.Format("{0}\t{1}\t{2}\n",
-                "file", "step", "milliseconds"));
+            Debug.Log("[PigletViewer] BEGIN_PROFILING_DATA\n");
+            Debug.LogFormat("[PigletViewer] {0}\t{1}\t{2}\n", "file", "step", "milliseconds");
 
             foreach (var profilingRecord in profilingData)
             {
-                builder.Append(string.Format("{0}\t{1}\t{2}\n",
-                    filename, profilingRecord.TaskType, profilingRecord.Milliseconds));
+                Debug.LogFormat("[PigletViewer] {0}\t{1}\t{2}\n",
+                    filename, profilingRecord.TaskType, profilingRecord.Milliseconds);
             }
 
-            builder.Append("END_PROFILING_DATA\n");
-
-            Debug.Log(builder.ToString());
+            Debug.Log("[PigletViewer] END_PROFILING_DATA\n");
         }
 
         /// <summary>
@@ -396,7 +390,7 @@ namespace PigletViewer
                 // kill the Chrome process.
 
                 if (_logProfilingData && _importTasks.Count == 0)
-                    Debug.Log("PIGLET_VIEWER_IDLE");
+                    Debug.Log("[PigletViewer] IDLE");
             }
         }
 
