@@ -40,12 +40,18 @@ namespace PigletViewer
         private List<IEnumerator> _importTasks;
 
         /// <summary>
-        /// If true, print a TSV table of profiling data
-        /// to the debug log after each glTF import. This
-        /// option is enabled by the `--profile` command line
-        /// option.
+        /// Variables that are controlled by command-line options.
         /// </summary>
-        private bool _logProfilingData;
+        private struct CommandLineOptions
+        {
+            /// <summary>
+            /// If true, print a TSV table of profiling data
+            /// to the debug log after each glTF import.
+            /// </summary>
+            public bool Profile;
+        }
+
+        private CommandLineOptions _options;
 
         /// <summary>
         /// Unity callback that is invoked before the first frame update
@@ -56,7 +62,13 @@ namespace PigletViewer
             // Create glTF import queue.
 
             _importTasks = new List<IEnumerator>();
-            _logProfilingData = false;
+
+            // Command line option defaults.
+
+            _options = new CommandLineOptions
+            {
+                Profile = false
+            };
 
             // Set import options so that imported models are
             // automatically scaled to a standard size.
@@ -128,7 +140,7 @@ namespace PigletViewer
                 {
                     "p|profile",
                     "profile glTF imports and log results in TSV format",
-                    enable => _logProfilingData = enable != null
+                    enable => _options.Profile = enable != null
                 },
                 {
                     "s|sleep=",
@@ -273,7 +285,7 @@ namespace PigletViewer
 
             importTask.OnCompleted += _ =>
             {
-                if (_logProfilingData)
+                if (_options.Profile)
                     LogProfilingData(filename, importTask.ProfilingRecords);
             };
 
@@ -396,7 +408,7 @@ namespace PigletViewer
                 // it is safe to extract the profiling data from the log and
                 // kill the Chrome process.
 
-                if (_logProfilingData && _importTasks.Count == 0)
+                if (_options.Profile && _importTasks.Count == 0)
                     Debug.Log("[PigletViewer] IDLE");
             }
         }
