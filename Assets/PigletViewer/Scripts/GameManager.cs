@@ -274,7 +274,7 @@ namespace PigletViewer
             importTask.OnCompleted += _ =>
             {
                 if (_logProfilingData)
-                    LogProfilingData(filename, importTask.ProfilingData);
+                    LogProfilingData(filename, importTask.ProfilingRecords);
             };
 
             _importTasks.Add(importTask);
@@ -332,12 +332,19 @@ namespace PigletViewer
             List<GltfImportTask.ProfilingRecord> profilingData)
         {
             Debug.Log("[PigletViewer] BEGIN_PROFILING_DATA\n");
-            Debug.LogFormat("[PigletViewer] {0}\t{1}\t{2}\n", "file", "step", "milliseconds");
+            Debug.LogFormat("[PigletViewer] {0}\t{1}\t{2}\t{3}\t{4}\t{5}\n",
+                "file", "step", "move_next_ms", "wallclock_ms",
+                "move_next_calls", "frames");
 
             foreach (var profilingRecord in profilingData)
             {
-                Debug.LogFormat("[PigletViewer] {0}\t{1}\t{2}\n",
-                    filename, profilingRecord.TaskType, profilingRecord.Milliseconds);
+                Debug.LogFormat(
+                    "[PigletViewer] {0}\t{1}\t{2}\t{3}\t{4}\t{5}\n",
+                    filename, profilingRecord.TaskType,
+                    profilingRecord.StopwatchMoveNext.ElapsedMilliseconds,
+                    profilingRecord.StopwatchWallclock.ElapsedMilliseconds,
+                    profilingRecord.MoveNextCalls,
+                    profilingRecord.Frames);
             }
 
             Debug.Log("[PigletViewer] END_PROFILING_DATA\n");
