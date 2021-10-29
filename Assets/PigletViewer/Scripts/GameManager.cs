@@ -49,6 +49,13 @@ namespace PigletViewer
             /// to the debug log after each glTF import.
             /// </summary>
             public bool Profile;
+
+            /// <summary>
+            /// If true, exit the application immediately
+            /// after running all tasks specified on
+            /// the command line (e.g. --import).
+            /// </summary>
+            public bool Quit;
         }
 
         private CommandLineOptions _options;
@@ -141,6 +148,11 @@ namespace PigletViewer
                     "p|profile",
                     "profile glTF imports and log results in TSV format",
                     enable => _options.Profile = enable != null
+                },
+                {
+                    "q|quit",
+                    "exit program after performing all command-line actions",
+                    enable => _options.Quit = enable != null
                 },
                 {
                     "s|sleep=",
@@ -399,17 +411,23 @@ namespace PigletViewer
             {
                 _importTasks.RemoveAt(0);
 
-                // Magic string that scripts can use to detect when all
-                // command-line actions have completed.
-                //
-                // I use this to facilitate automated profiling of the
-                // PigletViewer WebGL build. Once the "PIGLET_VIEWER_IDLE"
-                // string appears in the Google Chrome log file, I know that
-                // it is safe to extract the profiling data from the log and
-                // kill the Chrome process.
+                if (_importTasks.Count == 0)
+                {
+                    // Magic string that scripts can use to detect when all
+                    // command-line actions have completed.
+                    //
+                    // I use this to facilitate automated profiling of the
+                    // PigletViewer WebGL build. Once the "IDLE"
+                    // string appears in the Google Chrome log file, I know that
+                    // it is safe to extract the profiling data from the log and
+                    // kill the Chrome process.
 
-                if (_options.Profile && _importTasks.Count == 0)
-                    Debug.Log("[PigletViewer] IDLE");
+                    if (_options.Profile)
+                        Debug.Log("[PigletViewer] IDLE");
+
+                    if (_options.Quit)
+                        Application.Quit();
+                }
             }
         }
 
