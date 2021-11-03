@@ -7,6 +7,7 @@ using System.Text;
 using Piglet;
 using UnityEngine;
 using NDesk.Options;
+using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
 
 namespace PigletViewer
@@ -102,16 +103,7 @@ namespace PigletViewer
 
             // Parse command line options.
 
-            ParseCommandLineOptions();
-
-            // If no glTF file was specified on the command line,
-            // load the default "Sir Piggleston" model.
-
-            if (_importTasks.Count == 0)
-            {
-                QueueImport(Path.Combine(
-                    Application.streamingAssetsPath, "piggleston.glb"));
-            }
+            _importTasks.Add(ParseCommandLineOptions());
 
             // Add platform-specific behaviours.
 
@@ -135,7 +127,7 @@ namespace PigletViewer
         /// will be appended to these.
         /// </para>
         /// </summary>
-        private void ParseCommandLineOptions()
+        private IEnumerator ParseCommandLineOptions()
         {
             var optionSet = new OptionSet
             {
@@ -161,25 +153,31 @@ namespace PigletViewer
                 }
             };
 
-            // Read command-line options.
-            //
-            // First read the default command-line options from
-            // `Resources/piglet-viewer-args.txt`, if that file exists.
+            // Read default command-line options from
+            // `StreamingAssets/piglet-viewer-args.txt`, if that file exists.
             // This is useful on platforms where invoking the Unity player
             // with custom command-line options is either inconvenient or
             // impossible (e.g. Android, WebGL).
 
             var args = new List<string>();
 
-            var defaultArgs = Resources.Load<TextAsset>("piglet-viewer-args");
-            if (defaultArgs != null)
-                args.AddRange(defaultArgs.text.Split(null));
+            IEnumerable<string> defaultArgs = null;
 
-            // Remove all command-line args before "--" separator.
+            foreach (var result in ReadDefaultCommandLineArgs())
+            {
+                defaultArgs = result;
+                yield return null;
+            }
+
+            if (defaultArgs != null)
+                args.AddRange(defaultArgs);
+
+            // Read options specified on the command-line.
             //
-            // Args before "--" are built-in options for the Unity
-            // Editor/Player (e.g. -projectPath), while args after
-            // "--" (if present) are PigletViewer options.
+            // We remove all command-line args before "--"
+            // separator, because those are built-in options for the Unity
+            // Editor/Player (e.g. -projectPath), whereas the args
+            // after "--" are PigletViewer options.
 
             var pigletViewerArgs = new Queue<string>(Environment.GetCommandLineArgs());
 
@@ -191,6 +189,54 @@ namespace PigletViewer
             // Parse command-line options and invoke handlers.
 
             optionSet.Parse(args);
+
+            // If no glTF file was specified on the command line,
+            // load the default "Sir Piggleston" model.
+
+            if (_importTasks.Count == 0)
+            {
+                QueueImport(Path.Combine(
+                    Application.streamingAssetsPath, "piggleston.glb"));
+            }
+        }
+
+        /// <summary>
+        /// Read default command-line args from
+        /// StreamingAssets/piglet-viewer-args.txt, or
+        /// return null if that file does not exist.
+        /// </summary>
+        private static IEnumerable<IEnumerable<string>> ReadDefaultCommandLineArgs()
+        {
+            var uri = Path.Combine(
+                Application.streamingAssetsPath, "piglet-viewer-args.txt");
+
+            var request = UnityWebRequest.Get(uri);
+            request.SendWebRequest();
+
+            while (!request.isDone)
+                yield return null;
+
+            // Note: The existence of `StreamingAssets/piglet-viewer-args.txt`
+            // to specify default command-line args is optional, so HTTP 404
+            // is not a problem. We return null to indicate that the file/URI
+            // does not exist.
+
+            if (request.responseCode == 404)
+            {
+                yield return null;
+                yield break;
+            }
+
+			if (request.HasError())
+			{
+				throw new Exception(string.Format(
+					"failed to read from {0}: {1}",
+					uri, request.error));
+			}
+
+            // Get the text from the response and split on whitespace.
+
+            yield return request.downloadHandler.text.Split(null);
         }
 
         /// <summary>
