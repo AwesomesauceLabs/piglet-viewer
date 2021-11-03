@@ -137,6 +137,15 @@ namespace PigletViewer
                     uri => QueueImport(uri)
                 },
                 {
+                    "I|import-streaming-asset=",
+                    "import glTF file using path relative to StreamingAssets",
+                    uri =>
+                    {
+                        uri = Path.Combine(Application.streamingAssetsPath, uri);
+                        QueueImport(uri);
+                    }
+                },
+                {
                     "p|profile",
                     "profile glTF imports and log results in TSV format",
                     enable => _options.Profile = enable != null
