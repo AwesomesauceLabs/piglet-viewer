@@ -33,24 +33,16 @@ namespace PigletViewer
         /// towards the model and is positioned at a standard
         /// offset from the model.
         /// </summary>
-        public void ResetTransformRelativeToModel()
+        public void ResetTransformRelativeToModel(GameObject modelCenterPoint)
         {
-            var model = ModelManager.Instance.GetModel();
-            if (model == null)
-                return;
-
             // rotate camera to face model
 
-            transform.up = model.transform.up ;
-            transform.forward = model.transform.forward;
+            transform.up = modelCenterPoint.transform.up ;
+            transform.forward = modelCenterPoint.transform.forward;
 
             // position camera at standard offset from model
 
-            var bounds = HierarchyUtil.GetRendererBoundsForHierarchy(model);
-            if (!bounds.HasValue)
-                return;
-
-            transform.position = bounds.Value.center + DefaultOffsetFromModel;
+            transform.position = modelCenterPoint.transform.position + DefaultOffsetFromModel;
         }
     }
 }

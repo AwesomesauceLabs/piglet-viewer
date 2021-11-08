@@ -66,6 +66,18 @@ namespace PigletViewer
         private GameObject _model;
 
         /// <summary>
+        /// The center point of the model's world-space
+        /// axis-aligned bounding box. Rotating around this
+        /// point rather than the model's local origin generally
+        /// provides a better user experience. In many cases,
+        /// models are not centered about their local origin, and
+        /// so rotating around the local origin (i.e.
+        /// _model.transform.Rotate) can feel awkward and
+        /// produce unexpected results.
+        /// </summary>
+        private GameObject _modelCenterPoint;
+
+        /// <summary>
         /// Unity callback that is invoked once per frame.
         /// </summary>
         void Update()
@@ -94,11 +106,23 @@ namespace PigletViewer
 
             _model = model;
 
+            // Compute the models center point, i.e. the center of its
+            // world-space axis-aligned bounding box. This is used for
+            // rotating the model and setting the initial position of
+            // the camera.
+
+            Bounds? bounds = HierarchyUtil.GetRendererBoundsForHierarchy(_model);
+            if (!bounds.HasValue)
+                return;
+
+            _modelCenterPoint = new GameObject("_modelCenterPoint");
+            _modelCenterPoint.transform.position = bounds.Value.center;
+
             // Reset the camera transform so that it's facing
             // the model and positioned at a standard
             // offset from the model.
 
-            CameraBehaviour.Instance.ResetTransformRelativeToModel();
+            CameraBehaviour.Instance.ResetTransformRelativeToModel(_modelCenterPoint);
 
             // Store a reference to the current model's
             // Animation component, which handles storage and
@@ -159,18 +183,9 @@ namespace PigletViewer
             if (_model == null)
                 return;
 
-            Bounds? bounds = HierarchyUtil.GetRendererBoundsForHierarchy(_model);
-            if (!bounds.HasValue)
-                return;
-
-            GameObject pivot = new GameObject("pivot");
-            pivot.transform.position = bounds.Value.center;
-            _model.transform.SetParent(pivot.transform, true);
-
-            pivot.transform.Rotate(rotation);
-
+            _model.transform.SetParent(_modelCenterPoint.transform, true);
+            _modelCenterPoint.transform.Rotate(rotation, Space.World);
             _model.transform.SetParent(null, true);
-            Destroy(pivot);
         }
     }
 }
