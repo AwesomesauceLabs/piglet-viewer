@@ -376,7 +376,7 @@ namespace PigletViewer
 
             ProgressLog.Instance.AddLineCallback(
                 String.Format("Longest Unity thread stall: {0} ms",
-                    importTask.LongestStepInMilliseconds()));
+                    importTask.LongestMoveNextInMilliseconds));
 
             ProgressLog.Instance.AddLineCallback("Success!");
 
