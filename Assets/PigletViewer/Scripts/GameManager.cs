@@ -466,6 +466,13 @@ namespace PigletViewer
             {
                 _importTasks.RemoveAt(0);
 
+                // Tell Unity to release memory for any assets (e.g. textures)
+                // that are no longer referenced in the scene, i.e. assets
+                // belonging to the previously viewed model. This cleanup happens
+                // in the background.
+
+                Resources.UnloadUnusedAssets();
+
                 if (_importTasks.Count == 0)
                 {
                     // Magic string that scripts can use to detect when all
