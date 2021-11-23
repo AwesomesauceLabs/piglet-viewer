@@ -199,10 +199,10 @@ namespace PigletViewer
 
             optionSet.Parse(args);
 
-            // If no glTF file was specified on the command line,
+            // If no command line options were specified,
             // load the default "Sir Piggleston" model.
 
-            if (_importTasks.Count == 0)
+            if (args.Count == 0)
             {
                 QueueImport(Path.Combine(
                     Application.streamingAssetsPath, "piggleston.glb"));
