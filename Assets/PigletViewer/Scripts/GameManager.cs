@@ -216,8 +216,8 @@ namespace PigletViewer
         /// </summary>
         private static IEnumerable<IEnumerable<string>> ReadDefaultCommandLineArgs()
         {
-            var uri = Path.Combine(
-                Application.streamingAssetsPath, "piglet-viewer-args.txt");
+            var uri = new Uri(Path.Combine(
+                Application.streamingAssetsPath, "piglet-viewer-args.txt"));
 
             var request = UnityWebRequest.Get(uri);
             request.SendWebRequest();
