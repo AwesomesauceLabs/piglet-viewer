@@ -36,6 +36,16 @@ namespace PigletViewer
             ProgressLog.Instance.AddLineCallback = JsLib.AddProgressLogLine;
             ProgressLog.Instance.UpdateLineCallback = JsLib.UpdateProgressLogLine;
             ProgressLog.Instance.ResetLogCallback = JsLib.ResetProgressLog;
+
+            // Set max bone weights per vertex to 4 (default is 2).
+            // This prevents skinned glTF models that use more than 2
+            // bone weights per vertex from exploding.
+
+#if UNITY_2019_2_OR_NEWER
+            QualitySettings.skinWeights = SkinWeights.FourBones;
+#else
+            QualitySettings.blendWeights = BlendWeights.FourBones;
+#endif
         }
 
         /// <summary>
