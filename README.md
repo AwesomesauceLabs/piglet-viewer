@@ -7,6 +7,8 @@
   * [Android Build Instructions](#android-build-instructions)
   * [WebGL Build Instructions](#webgl-build-instructions)
   * [Windows Build Instructions](#windows-build-instructions)
+* [Command Line Options](#command-line-options)
+  * [Specifying Command Line Options for Android and WebGL Builds](#specifying-command-line-options-for-android-and-webgl-builds)
 * [Navigating the Source Code](#navigating-the-source-code)
 * [Licenses and Attributions](#licenses-and-attributions)
 * [Footnotes](#footnotes)
@@ -84,6 +86,87 @@ You can build the Windows version of PigletViewer by the following steps:
 7. Select a location to save the build files and click `OK` to start the build.
 
 Once the build has completed, the PigletViewer application will open on your Windows desktop. To view glTF models in the Windows version of PigletViewer, drag-and-drop `.gltf`/`.glb`/`.zip` files from Windows File Explorer onto the PigletViewer window.
+
+## Command Line Options
+
+PigletViewer can be run with command-line options to automatically
+import glTF file(s) and perform other actions. For example, the
+following command would start the Windows standalone exe, import
+`model1.glb`, sleep for 2 seconds, import `model2.glb`, sleep for 2
+seconds (again), then quit.
+
+```
+PigletViewer.exe -- --import model1.glb --sleep 2 --import model2.glb --sleep 2 --quit
+```
+
+:warning: Notice the bare `--` in the example command above. Options
+that precede the `--` are [standard Unity Standalone Player command
+line
+arguments](https://docs.unity3d.com/Manual/PlayerCommandLineArguments.html),
+whereas options after the `--` are PigletViewer-specific options (as
+listed below).
+
+:warning: Your Windows standalone exe may be named something different
+than `PigletViewer.exe`. The name of the executable is determined by the value of
+`Product Name` under `Edit -> Project Settings... -> Player -> Product Name`
+in the Unity menu.
+
+The full list of the PigletViewer options is:
+
+```
+Usage: PigletViewer.exe <UNITY_OPTIONS> -- <PIGLET_VIEWER_OPTIONS>
+
+Options:
+
+-i, --import=URI                   Import glTF file from URI (file path or HTTP URL)
+-I, --import-streaming-asset=PATH  Import glTF file from PATH, where PATH is relative
+                                   to the StreamingAssets folder. This option is useful
+                                   because the StreamingAssets folder can be located in
+                                   different places depending on the target platform.
+                                   For example, on Android the StreamingAssets
+                                   folder is located inside the .apk file!
+-p, --profile                      Enable performance profiling [disabled]. When
+                                   enabled, this writes some profiling data
+                                   to the Unity log after each glTF import.
+-q, --quit                         Quit application after performing all command line
+                                   actions [disabled].
+-s, --sleep=SECONDS                Sleep for SECONDS seconds. The option is
+                                   order-dependent and can be placed between
+                                   --import options to introduce a delay between
+                                   glTF imports.
+```
+
+:warning: I would love to add a `--help` option that prints the above message on STDOUT, but
+so far I can't figure out how to do it!
+
+### Specifying Command Line Options for Android and WebGL Builds
+
+On some platforms (e.g. Android, WebGL), specifying command line options
+is either awkward or impossible.
+
+On such platforms, you can still use command line options by putting
+them in a file named `StreamingAssets/piglet-viewer-args.txt` inside
+your Unity project.  The options are split on whitespace and can be
+specified across multiple lines.
+
+Here is an example of a valid `StreamingAssets/piglet-viewer-args.txt` file:
+
+```
+--import https://awesomesaucelabs.github.io/piglet-webgl-demo/StreamingAssets/piggleston.glb
+--sleep 2
+--import https://awesomesaucelabs.github.io/piglet-webgl-demo/StreamingAssets/dragon_celebration.zip
+--sleep 2
+--quit
+```
+
+:warning: Currently, PigletViewer does naive splitting on whitespace
+when parsing `StreamingAssets/piglet-viewer-args.txt`, so quoted arguments
+and arguments with spaces are not possible.
+
+It is still possible to use ordinary command line options when there
+is `StreamingAssets/piglet-viewer-args.txt` file in your project.
+Options specified on the command line are appended to the options
+specified in `StreamingAssets/piglet-viewer-args.txt`.
 
 ## Navigating the Source Code
 
