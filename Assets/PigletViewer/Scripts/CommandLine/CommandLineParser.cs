@@ -56,7 +56,7 @@ namespace PigletViewer
                 {
                     "s|sleep=",
                     "sleep for {SECONDS} seconds",
-                    seconds => GameManager.Instance.ImportTasks.Add(
+                    seconds => GameManager.Instance.Tasks.Add(
                         GameManager.Sleep(float.Parse(seconds)))
                 }
             };

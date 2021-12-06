@@ -33,12 +33,21 @@ namespace PigletViewer
         public GltfImportOptions ImportOptions;
 
         /// <summary>
-        /// List of queued glTF import tasks.
+        /// <para>
+        /// List of queued tasks (coroutines) that
+        /// this class will execute. Most of
+        /// these tasks are `GltfImportTask` objects, but
+        /// there are also other types of tasks such as
+        /// parsing command line options or sleeping for
+        /// a specified amount of seconds.
+        /// </para>
+        /// <para>
         /// Each task runs in the background and is
         /// executed incrementally by calling
         /// `MoveNext` in `Update`.
+        /// </para>
         /// </summary>
-        public List<IEnumerator> ImportTasks;
+        public List<IEnumerator> Tasks;
 
         private CommandLineOptions _options;
 
@@ -52,7 +61,7 @@ namespace PigletViewer
 
             // Create glTF import queue.
 
-            ImportTasks = new List<IEnumerator>();
+            Tasks = new List<IEnumerator>();
 
            // Set import options so that imported models are
             // automatically scaled to a standard size.
@@ -79,7 +88,7 @@ namespace PigletViewer
 
             // Parse command line options.
 
-            ImportTasks.Add(CommandLineParser.ParseCommandLineOptions());
+            Tasks.Add(CommandLineParser.ParseCommandLineOptions());
 
             // Add platform-specific behaviours.
 
@@ -103,13 +112,13 @@ namespace PigletViewer
             // (1) Resources are freed for any partially completed glTF imports.
             // (2) Any user-specified OnAborted callbacks get invoked.
 
-            foreach (var task in ImportTasks)
+            foreach (var task in Tasks)
             {
                 var importTask = task as GltfImportTask;
                 importTask?.Abort();
             }
 
-            ImportTasks.Clear();
+            Tasks.Clear();
         }
 
         /// <summary>
@@ -200,7 +209,7 @@ namespace PigletViewer
                     LogProfilingData(filename, importTask.ProfilingRecords);
             };
 
-            ImportTasks.Add(importTask);
+            Tasks.Add(importTask);
         }
 
         /// <summary>
@@ -208,7 +217,7 @@ namespace PigletViewer
         /// </summary>
         public void OnImportCompleted(GameObject model)
         {
-            var importTask = ImportTasks[0] as GltfImportTask;
+            var importTask = Tasks[0] as GltfImportTask;
 
             Gui.Instance.ResetSpin();
             Gui.Instance.ResetFooterMessage();
@@ -306,12 +315,12 @@ namespace PigletViewer
         public void Update()
         {
             // advance execution of import tasks
-            while (ImportTasks.Count > 0 && !ImportTasks[0].MoveNext())
+            while (Tasks.Count > 0 && !Tasks[0].MoveNext())
             {
-                if (ImportTasks[0].Current is CommandLineOptions)
-                    _options = ImportTasks[0].Current as CommandLineOptions;
+                if (Tasks[0].Current is CommandLineOptions)
+                    _options = Tasks[0].Current as CommandLineOptions;
 
-                ImportTasks.RemoveAt(0);
+                Tasks.RemoveAt(0);
 
                 // Tell Unity to release memory for any assets (e.g. textures)
                 // that are no longer referenced in the scene, i.e. assets
@@ -320,7 +329,7 @@ namespace PigletViewer
 
                 Resources.UnloadUnusedAssets();
 
-                if (ImportTasks.Count == 0)
+                if (Tasks.Count == 0)
                 {
                     // Magic string that scripts can use to detect when all
                     // command-line actions have completed.
