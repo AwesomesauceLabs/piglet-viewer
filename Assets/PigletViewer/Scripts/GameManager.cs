@@ -38,26 +38,7 @@ namespace PigletViewer
         /// executed incrementally by calling
         /// `MoveNext` in `Update`.
         /// </summary>
-        private List<IEnumerator> _importTasks;
-
-        /// <summary>
-        /// Variables that are controlled by command-line options.
-        /// </summary>
-        private struct CommandLineOptions
-        {
-            /// <summary>
-            /// If true, print a TSV table of profiling data
-            /// to the debug log after each glTF import.
-            /// </summary>
-            public bool Profile;
-
-            /// <summary>
-            /// If true, exit the application immediately
-            /// after running all tasks specified on
-            /// the command line (e.g. --import).
-            /// </summary>
-            public bool Quit;
-        }
+        public List<IEnumerator> ImportTasks;
 
         private CommandLineOptions _options;
 
@@ -67,18 +48,13 @@ namespace PigletViewer
         /// </summary>
         private void Awake()
         {
+            Console.WriteLine("Console.WriteLine test!");
+
             // Create glTF import queue.
 
-            _importTasks = new List<IEnumerator>();
+            ImportTasks = new List<IEnumerator>();
 
-            // Command line option defaults.
-
-            _options = new CommandLineOptions
-            {
-                Profile = false
-            };
-
-            // Set import options so that imported models are
+           // Set import options so that imported models are
             // automatically scaled to a standard size.
 
             ImportOptions = new GltfImportOptions
@@ -103,7 +79,7 @@ namespace PigletViewer
 
             // Parse command line options.
 
-            _importTasks.Add(ParseCommandLineOptions());
+            ImportTasks.Add(CommandLineParser.ParseCommandLineOptions());
 
             // Add platform-specific behaviours.
 
@@ -117,138 +93,6 @@ namespace PigletViewer
         }
 
         /// <summary>
-        /// <para>
-        /// Parse command-line options using NDesk.Options library.
-        /// </para>
-        /// <para>
-        /// The user may specify default command-line options
-        /// in a file called `Resources/piglet-viewer-args.txt`,
-        /// and then any options specified on the command line
-        /// will be appended to these.
-        /// </para>
-        /// </summary>
-        private IEnumerator ParseCommandLineOptions()
-        {
-            var optionSet = new OptionSet
-            {
-                {
-                    "i|import=",
-                    "import glTF file from {URI} (filename or HTTP URL)",
-                    uri => QueueImport(uri)
-                },
-                {
-                    "I|import-streaming-asset=",
-                    "import glTF file using path relative to StreamingAssets",
-                    uri =>
-                    {
-                        uri = Path.Combine(Application.streamingAssetsPath, uri);
-                        QueueImport(uri);
-                    }
-                },
-                {
-                    "p|profile",
-                    "profile glTF imports and log results in TSV format",
-                    enable => _options.Profile = enable != null
-                },
-                {
-                    "q|quit",
-                    "exit program after performing all command-line actions",
-                    enable => _options.Quit = enable != null
-                },
-                {
-                    "s|sleep=",
-                    "sleep for {SECONDS} seconds",
-                    seconds => _importTasks.Add(Sleep(float.Parse(seconds)))
-                }
-            };
-
-            // Read default command-line options from
-            // `StreamingAssets/piglet-viewer-args.txt`, if that file exists.
-            // This is useful on platforms where invoking the Unity player
-            // with custom command-line options is either inconvenient or
-            // impossible (e.g. Android, WebGL).
-
-            var args = new List<string>();
-
-            IEnumerable<string> defaultArgs = null;
-
-            foreach (var result in ReadDefaultCommandLineArgs())
-            {
-                defaultArgs = result;
-                yield return null;
-            }
-
-            if (defaultArgs != null)
-                args.AddRange(defaultArgs);
-
-            // Read options specified on the command-line.
-            //
-            // We remove all command-line args before "--"
-            // separator, because those are built-in options for the Unity
-            // Editor/Player (e.g. -projectPath), whereas the args
-            // after "--" are PigletViewer options.
-
-            var pigletViewerArgs = new Queue<string>(Environment.GetCommandLineArgs());
-
-            while (pigletViewerArgs.Count > 0
-                && pigletViewerArgs.Dequeue() != "--") {}
-
-            args.AddRange(pigletViewerArgs);
-
-            // Parse command-line options and invoke handlers.
-
-            optionSet.Parse(args);
-
-            // If no command line options were specified,
-            // load the default "Sir Piggleston" model.
-
-            if (args.Count == 0)
-            {
-                QueueImport(Path.Combine(
-                    Application.streamingAssetsPath, "piggleston.glb"));
-            }
-        }
-
-        /// <summary>
-        /// Read default command-line args from
-        /// StreamingAssets/piglet-viewer-args.txt, or
-        /// return null if that file does not exist.
-        /// </summary>
-        private static IEnumerable<IEnumerable<string>> ReadDefaultCommandLineArgs()
-        {
-            var uri = new Uri(Path.Combine(
-                Application.streamingAssetsPath, "piglet-viewer-args.txt"));
-
-            var request = UnityWebRequest.Get(uri);
-            request.SendWebRequest();
-
-            while (!request.isDone)
-                yield return null;
-
-            // Note: The existence of `StreamingAssets/piglet-viewer-args.txt`
-            // to specify default command-line args is optional, so HTTP 404
-            // is not a problem. We return null to indicate that the file/URI
-            // does not exist.
-
-            if (request.responseCode == 404)
-            {
-                yield return null;
-                yield break;
-            }
-
-			if (request.HasError())
-			{
-				throw new Exception(string.Format(
-					"failed to read from {0}: {1}",
-					uri, request.error));
-			}
-
-            // Get the text from the response and split on whitespace.
-
-            yield return request.downloadHandler.text.Split(null);
-        }
-
-        /// <summary>
         /// Abort the currently running glTF import (if any) and
         /// remove any queued glTF imports.
         /// </summary>
@@ -259,13 +103,13 @@ namespace PigletViewer
             // (1) Resources are freed for any partially completed glTF imports.
             // (2) Any user-specified OnAborted callbacks get invoked.
 
-            foreach (var task in _importTasks)
+            foreach (var task in ImportTasks)
             {
                 var importTask = task as GltfImportTask;
                 importTask?.Abort();
             }
 
-            _importTasks.Clear();
+            ImportTasks.Clear();
         }
 
         /// <summary>
@@ -356,7 +200,7 @@ namespace PigletViewer
                     LogProfilingData(filename, importTask.ProfilingRecords);
             };
 
-            _importTasks.Add(importTask);
+            ImportTasks.Add(importTask);
         }
 
         /// <summary>
@@ -364,7 +208,7 @@ namespace PigletViewer
         /// </summary>
         public void OnImportCompleted(GameObject model)
         {
-            var importTask = _importTasks[0] as GltfImportTask;
+            var importTask = ImportTasks[0] as GltfImportTask;
 
             Gui.Instance.ResetSpin();
             Gui.Instance.ResetFooterMessage();
@@ -440,7 +284,7 @@ namespace PigletViewer
         /// with profiling results (--profile).
         /// </para>
         /// </summary>
-        private static IEnumerator Sleep(float seconds)
+        public static IEnumerator Sleep(float seconds)
         {
             var origMessage = Gui.Instance.FooterMessage;
 
@@ -462,9 +306,12 @@ namespace PigletViewer
         public void Update()
         {
             // advance execution of import tasks
-            while (_importTasks.Count > 0 && !_importTasks[0].MoveNext())
+            while (ImportTasks.Count > 0 && !ImportTasks[0].MoveNext())
             {
-                _importTasks.RemoveAt(0);
+                if (ImportTasks[0].Current is CommandLineOptions)
+                    _options = ImportTasks[0].Current as CommandLineOptions;
+
+                ImportTasks.RemoveAt(0);
 
                 // Tell Unity to release memory for any assets (e.g. textures)
                 // that are no longer referenced in the scene, i.e. assets
@@ -473,7 +320,7 @@ namespace PigletViewer
 
                 Resources.UnloadUnusedAssets();
 
-                if (_importTasks.Count == 0)
+                if (ImportTasks.Count == 0)
                 {
                     // Magic string that scripts can use to detect when all
                     // command-line actions have completed.
