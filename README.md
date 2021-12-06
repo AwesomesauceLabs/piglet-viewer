@@ -31,11 +31,11 @@ A live demo for the WebGL version of PigletViewer is available at: [https://awes
 
 To set up the Unity project for PigletViewer, I recommend the following steps:
 
-1. Create a new project using Unity version 2018.4 or newer.
+1. Create a new project using Unity version 2018.4.20f1 or newer.
 2. Purchase and install the [Piglet glTF Importer](https://assetstore.unity.com/packages/slug/173425) asset from the Unity Asset Store.
 3. Download the latest `.unitypackage` for PigletViewer from the [releases page](https://github.com/AwesomesauceLabs/piglet-viewer/releases), then unpack the `.unitypackage` into your project from `Assets -> Import Package -> Custom Package...` in the Unity menu. 
 
-I recommend installing from the `.unitypackage` rather than doing a `git clone` because the project in this repo is tied to Unity version 2018.4, whereas the `.unitypackage` will also work with newer versions of Unity.
+I recommend installing from the `.unitypackage` rather than doing a `git clone` because the project in this repo is tied to Unity version 2018.4.20f1, whereas the `.unitypackage` will also work with newer versions of Unity.
 
 ## Android Build Instructions
 
