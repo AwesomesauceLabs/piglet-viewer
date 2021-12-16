@@ -86,7 +86,10 @@ namespace PigletViewer
             ProgressLog.Instance.ResetLogCallback =
                 Gui.Instance.ResetProgressLog;
 
-            // Parse command line options.
+            // Init options to defaults then
+            // parse command line options (if any).
+
+            _options = new CommandLineOptions();
 
             Tasks.Add(CommandLineParser.ParseCommandLineOptions());
 
