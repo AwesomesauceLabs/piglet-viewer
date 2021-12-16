@@ -253,7 +253,7 @@ namespace PigletViewer
             else
             {
                 Gui.Instance.ShowDialogBox("Failed to Load Model",
-                    StringUtil.WrapText(e.Message, 50));
+                    StringUtil.WrapText(e.ToString(), 50));
             }
         }
 
