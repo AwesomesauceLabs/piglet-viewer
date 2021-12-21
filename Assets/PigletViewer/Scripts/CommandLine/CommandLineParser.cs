@@ -44,6 +44,11 @@ namespace PigletViewer
                     }
                 },
                 {
+                    "P|prompt",
+                    "show 'press any key to continue' prompt",
+                     _ => GameManager.Instance.Tasks.Add(GameManager.Prompt())
+                },
+                {
                     "p|profile",
                     "profile glTF imports and log results in TSV format",
                     enable => options.Profile = enable != null

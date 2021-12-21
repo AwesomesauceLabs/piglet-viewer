@@ -286,6 +286,21 @@ namespace PigletViewer
         }
 
         /// <summary>
+        /// Pause at "press any key to continue" prompt before starting
+        /// the next task (e.g. loading the next model).
+        /// </summary>
+        public static IEnumerator Prompt()
+        {
+            var oldMessage = Gui.Instance.FooterMessage;
+            Gui.Instance.FooterMessage = "press any key to continue";
+
+            while (!Input.anyKey)
+                yield return null;
+
+            Gui.Instance.FooterMessage = oldMessage;
+        }
+
+        /// <summary>
         /// <para>
         /// Sleep for the given number of seconds before running the next
         /// import task.
