@@ -1,8 +1,13 @@
-﻿using Piglet;
+﻿using System;
+using Piglet;
 using UnityEditor;
+using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.Rendering;
+
+#if URP_PACKAGE_IS_INSTALLED
 using UnityEngine.Rendering.Universal;
+#endif
 
 namespace PigletViewer
 {
@@ -14,6 +19,49 @@ namespace PigletViewer
     {
         private const string URP_RENDERER_ASSET_PATH = "Assets/UniversalRenderPipeline_Renderer.asset";
         private const string URP_PIPELINE_ASSET_PATH = "Assets/UniversalRenderPipeline.asset";
+
+        /// <summary>
+        /// Install the Universal Rendering Pipeline and add the
+        /// scripting define `URP_PACKAGE_IS_INSTALLED`.
+        /// </summary>
+        public static void InstallURPPackageAndQuit()
+        {
+            var request = Client.Add("com.unity.render-pipelines.universal");
+
+            void OnUpdate()
+            {
+                if (!request.IsCompleted)
+                    return;
+
+                EditorApplication.update -= OnUpdate;
+
+                if (request.Status == StatusCode.Success)
+                {
+                    Debug.Log("Installed: " + request.Result.packageId);
+
+                    PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone,
+                        "URP_PACKAGE_IS_INSTALLED");
+
+                    PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.WebGL,
+                        "URP_PACKAGE_IS_INSTALLED");
+
+                    PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android,
+                        "URP_PACKAGE_IS_INSTALLED");
+
+                    EditorApplication.Exit(0);
+                }
+                else
+                {
+                    if (request.Status >= StatusCode.Failure)
+                        Debug.LogError(request.Error.message);
+
+                    EditorApplication.Exit(1);
+                }
+
+            }
+
+            EditorApplication.update += OnUpdate;
+        }
 
         /// <summary>
         /// <para>
@@ -37,7 +85,7 @@ namespace PigletViewer
         [MenuItem("PigletViewer/Switch Project to URP", true)]
         public static bool IsSwitchToURPEnabled()
         {
-#if UNITY_2019_3_OR_NEWER
+#if URP_PACKAGE_IS_INSTALLED
             return true;
 #else
             return false;
@@ -57,7 +105,7 @@ namespace PigletViewer
         [MenuItem("PigletViewer/Switch Project to URP")]
         public static void SwitchProjectToURP()
         {
-#if UNITY_2019_3_OR_NEWER
+#if URP_PACKAGE_IS_INSTALLED
 
             // Create default URP render pipeline asset (if it doesn't already exist).
 
