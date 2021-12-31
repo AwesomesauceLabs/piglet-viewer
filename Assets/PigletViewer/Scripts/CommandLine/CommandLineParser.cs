@@ -30,6 +30,11 @@ namespace PigletViewer
             var optionSet = new OptionSet
             {
                 {
+                    "b|button=",
+                    "show button with {LABEL} and continue when user clicks it",
+                     label => GameManager.Instance.Tasks.Add(GameManager.ShowPromptButton(label))
+                },
+                {
                     "i|import=",
                     "import glTF file from {URI} (filename or HTTP URL)",
                     uri => GameManager.Instance.QueueImport(uri)
@@ -42,11 +47,6 @@ namespace PigletViewer
                         uri = Path.Combine(Application.streamingAssetsPath, uri);
                         GameManager.Instance.QueueImport(uri);
                     }
-                },
-                {
-                    "P|prompt",
-                    "show 'press any key to continue' prompt",
-                     _ => GameManager.Instance.Tasks.Add(GameManager.Prompt())
                 },
                 {
                     "p|profile",

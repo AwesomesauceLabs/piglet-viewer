@@ -286,18 +286,13 @@ namespace PigletViewer
         }
 
         /// <summary>
-        /// Pause at "press any key to continue" prompt before starting
-        /// the next task (e.g. loading the next model).
+        /// Show a prompt button and pause execution of
+        /// any queued import tasks until the user clicks it.
         /// </summary>
-        public static IEnumerator Prompt()
+        public static IEnumerator ShowPromptButton(string label)
         {
-            var oldMessage = Gui.Instance.FooterMessage;
-            Gui.Instance.FooterMessage = "press any key to continue";
-
-            while (!Input.anyKey)
-                yield return null;
-
-            Gui.Instance.FooterMessage = oldMessage;
+            Gui.Instance.PromptButtonText = label;
+            yield return null;
         }
 
         /// <summary>
@@ -332,6 +327,10 @@ namespace PigletViewer
         /// </summary>
         public void Update()
         {
+            // pause execution of tasks until user clicks prompt button
+            if (!string.IsNullOrEmpty(Gui.Instance.PromptButtonText))
+                return;
+
             // advance execution of import tasks
             while (Tasks.Count > 0 && !Tasks[0].MoveNext())
             {

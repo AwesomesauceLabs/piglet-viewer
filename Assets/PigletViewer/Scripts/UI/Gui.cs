@@ -44,6 +44,14 @@ namespace PigletViewer
         public string DefaultFooterMessage;
 
         /// <summary>
+        /// Whenever this is set to a non-empty string, a prompt button
+        /// is shown to the user at the bottom of the window.
+        /// As soon as the user clicks the button, the string is reset
+        /// to null and the button disappears.
+        /// </summary>
+        public string PromptButtonText;
+
+        /// <summary>
         /// "Piglet" in fancy writing.
         /// </summary>
         private Texture2D _titleImage;
@@ -67,6 +75,7 @@ namespace PigletViewer
             public GUIStyle DropDownListForeground;
             public GUIStyle DropDownListItem;
             public GUIStyle PlayButton;
+            public GUIStyle PromptButton;
         }
 
         /// <summary>
@@ -359,6 +368,15 @@ namespace PigletViewer
             _styles.PlayButton.padding = new RectOffset(15, 15, 11, 11);
             _styles.PlayButton.fontSize = 20;
 
+            _styles.PromptButton = new GUIStyle(GUI.skin.button);
+            _styles.PromptButton.normal.background = roundedRectWhite;
+            _styles.PromptButton.hover.background = roundedRectDarkGray;
+            _styles.PromptButton.active.background = roundedRectDarkGray;
+            _styles.PromptButton.border = new RectOffset(10, 10, 10, 10);
+            _styles.PromptButton.margin = new RectOffset(15, 15, 15, 15);
+            _styles.PromptButton.padding = new RectOffset(30, 30, 11, 11);
+            _styles.PromptButton.alignment = TextAnchor.MiddleCenter;
+            _styles.PromptButton.fontSize = 18;
         }
 
         /// <summary>
@@ -397,6 +415,31 @@ namespace PigletViewer
 
             GUILayout.EndArea();
 #endif
+
+            // If PromptButtonText is set, show a button that
+            // prompts the user to continue. This is useful
+            // when viewing several models in sequence.
+
+            if (!string.IsNullOrEmpty(PromptButtonText))
+            {
+                const int buttonOffset = 155;
+
+                var buttonSize = _styles.PromptButton.CalcSize(
+                    new GUIContent(PromptButtonText));
+
+                var buttonRect = new Rect(
+                    (Screen.width - buttonSize.x) / 2,
+                    Screen.height - buttonOffset,
+                    buttonSize.x,
+                    buttonSize.y);
+
+                if (Input.GetKeyDown(KeyCode.Return)
+                    || Input.GetKeyDown(KeyCode.Space)
+                    || GUI.Button(buttonRect, PromptButtonText, _styles.PromptButton))
+                {
+                    PromptButtonText = null;
+                }
+            }
 
             // Display help message along bottom of window,
             // e.g. "drag .gltf/.glb/.zip onto window to view".
