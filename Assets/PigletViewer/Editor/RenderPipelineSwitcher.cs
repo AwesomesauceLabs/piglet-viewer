@@ -108,7 +108,21 @@ namespace PigletViewer
 #if URP_PACKAGE_IS_INSTALLED
 
             // Create default URP render pipeline asset (if it doesn't already exist).
+            //
+            // The #if/#else is needed here because Unity renamed `ForwardRendererData`
+            // to `UniversalRendererData` in Unity 2021.2.
 
+#if UNITY_2021_2_OR_NEWER
+            UniversalRendererData rendererData = null;
+
+            if (!AssetPathUtil.Exists(URP_RENDERER_ASSET_PATH))
+            {
+                rendererData = ScriptableObject.CreateInstance<UniversalRendererData>();
+                AssetDatabase.CreateAsset(rendererData, URP_RENDERER_ASSET_PATH);
+                // reload asset so that object reference is "backed" by asset file
+                rendererData = AssetDatabase.LoadAssetAtPath<UniversalRendererData>(URP_RENDERER_ASSET_PATH);
+            }
+#else
             ForwardRendererData rendererData = null;
 
             if (!AssetPathUtil.Exists(URP_RENDERER_ASSET_PATH))
@@ -118,6 +132,7 @@ namespace PigletViewer
                 // reload asset so that object reference is "backed" by asset file
                 rendererData = AssetDatabase.LoadAssetAtPath<ForwardRendererData>(URP_RENDERER_ASSET_PATH);
             }
+#endif
 
             RenderPipelineAsset renderPipeline = null;
 
