@@ -15,20 +15,14 @@ namespace PigletViewer
     public class WindowsGameManager : MonoBehaviour
     {
         /// <summary>
-        /// Drag-and-drop implementation for Unity player on Windows.
-        /// </summary>
-        UnityDragAndDropHook _dragAndDropHook;
-
-        /// <summary>
         /// Unity callback that is invoked before the first frame update.
         /// Here we initialize drag-and-drop, parse command line arguments,
         /// and start the initial glTF model import (if any).
         /// </summary>
         void Start()
         {
-            _dragAndDropHook = new UnityDragAndDropHook();
-            _dragAndDropHook.InstallHook();
-            _dragAndDropHook.OnDroppedFiles += OnDropFiles;
+            UnityDragAndDropHook.InstallHook();
+            UnityDragAndDropHook.OnDroppedFiles += OnDropFiles;
 
             Gui.Instance.DefaultFooterMessage
                 = "drag .gltf/.glb/.zip onto window to view";
@@ -62,7 +56,7 @@ namespace PigletViewer
         /// </summary>
         void OnDestroy()
         {
-            _dragAndDropHook.UninstallHook();
+            UnityDragAndDropHook.UninstallHook();
         }
 
         /// <summary>
