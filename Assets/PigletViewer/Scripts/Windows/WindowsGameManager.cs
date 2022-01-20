@@ -1,9 +1,6 @@
 ﻿#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-using System;
 using System.Collections.Generic;
-using System.IO;
 using B83.Win32;
-using Piglet;
 using UnityEngine;
 
 namespace PigletViewer
