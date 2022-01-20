@@ -1,5 +1,4 @@
-﻿#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-/* * * * *
+﻿/* * * * *
  * This is a collection of Win API helpers. Mainly dealing with window message hooks
  * and file drag&drop support for Windows standalone Unity applications.
  *
@@ -491,4 +490,3 @@ namespace B83.Win32
 #endif
     }
 }
-#endif

@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+﻿#if UNITY_STANDALONE_WIN && !UNITY_EDITOR_WIN
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;

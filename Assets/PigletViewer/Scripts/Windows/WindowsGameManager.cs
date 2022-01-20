@@ -1,7 +1,12 @@
-﻿#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+﻿using UnityEngine;
+
+// Note: UnityDragAndDropHook only works correctly
+// in Windows standalone builds. See the README at:
+// https://github.com/Bunny83/UnityWindowsFileDrag-Drop
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR_WIN
 using System.Collections.Generic;
 using B83.Win32;
-using UnityEngine;
+#endif
 
 namespace PigletViewer
 {
@@ -18,8 +23,13 @@ namespace PigletViewer
         /// </summary>
         void Start()
         {
+            // Drag-and-drop code that only works correctly
+            // in Windows standalone builds. See the README at:
+            // https://github.com/Bunny83/UnityWindowsFileDrag-Drop
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR_WIN
             UnityDragAndDropHook.InstallHook();
             UnityDragAndDropHook.OnDroppedFiles += OnDropFiles;
+#endif
 
             Gui.Instance.DefaultFooterMessage
                 = "drag .gltf/.glb/.zip onto window to view";
@@ -43,6 +53,10 @@ namespace PigletViewer
             Application.runInBackground = true;
         }
 
+        // Drag-and-drop code that only works correctly
+        // in Windows standalone builds. See the README at:
+        // https://github.com/Bunny83/UnityWindowsFileDrag-Drop
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR_WIN
         /// <summary>
         /// Unity callback that is invoked when this MonoBehaviour is destroyed
         /// (e.g. exiting Play mode).
@@ -64,7 +78,6 @@ namespace PigletViewer
         {
             GameManager.Instance.StartImport(paths[0]);
         }
+#endif
     }
 }
-
-#endif

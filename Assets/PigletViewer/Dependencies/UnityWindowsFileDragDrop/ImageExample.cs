@@ -1,3 +1,4 @@
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR_WIN
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
@@ -98,3 +99,4 @@ public class ImageExample : MonoBehaviour
         GUILayout.EndHorizontal();
     }
 }
+#endif
