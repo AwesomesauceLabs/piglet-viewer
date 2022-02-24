@@ -468,9 +468,10 @@ namespace PigletViewer
         public void SpinControlsOnGui()
         {
             // We don't show the "Spin X" / "Spin Y" sliders
-            // on Android because they are tiny and difficult to
+            // on Android/iOS because they are tiny and difficult to
             // interact with.
-            if (Application.platform == RuntimePlatform.Android)
+            if (Application.platform == RuntimePlatform.Android
+                || Application.platform == RuntimePlatform.IPhonePlayer)
                 return;
 
             const float labelWidth = 100;
