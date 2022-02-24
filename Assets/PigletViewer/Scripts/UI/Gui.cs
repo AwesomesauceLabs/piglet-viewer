@@ -631,18 +631,18 @@ namespace PigletViewer
             GUILayout.BeginVertical();
             GUILayout.FlexibleSpace();
 
-            const float buttonWidth = 300;
-            var buttonHeight = _styles.DropDownButton.CalcSize(
+            const float dropdownWidth = 300;
+            var dropdownHeight = _styles.DropDownButton.CalcSize(
                 new GUIContent("Dummy Text")).y;
 
-            var buttonRect = GUILayoutUtility.GetRect(
+            var dropdownRect = GUILayoutUtility.GetRect(
                 new GUIContent(""), _styles.DropDownButton,
-                GUILayout.Width(buttonWidth), GUILayout.Height(buttonHeight));
+                GUILayout.Width(dropdownWidth), GUILayout.Height(dropdownHeight));
 
             var prevSelectedIndex = _dropDownState.selectedIndex;
 
             _dropDownState = GuiEx.DropDownMenu(
-                buttonRect,
+                dropdownRect,
                 clipNames,
                 _dropDownState,
                 _dropDownIcon,
