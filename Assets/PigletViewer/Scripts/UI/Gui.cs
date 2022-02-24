@@ -416,46 +416,64 @@ namespace PigletViewer
             GUILayout.EndArea();
 #endif
 
+            GUILayout.BeginArea(new Rect(
+                _screenEdgePadding, _screenEdgePadding,
+                Screen.width - 2 * _screenEdgePadding,
+                Screen.height - 2 * _screenEdgePadding));
+
+            GUILayout.BeginVertical();
+            GUILayout.FlexibleSpace();
+
             // If PromptButtonText is set, show a button that
             // prompts the user to continue. This is useful
             // when viewing several models in sequence.
 
             if (!string.IsNullOrEmpty(PromptButtonText))
             {
-                const int buttonOffset = 155;
-
                 var buttonSize = _styles.PromptButton.CalcSize(
                     new GUIContent(PromptButtonText));
 
-                var buttonRect = new Rect(
-                    (Screen.width - buttonSize.x) / 2,
-                    Screen.height - buttonOffset,
-                    buttonSize.x,
-                    buttonSize.y);
+                GUILayout.BeginHorizontal();
+                GUILayout.FlexibleSpace();
 
                 if (Input.GetKeyDown(KeyCode.Return)
                     || Input.GetKeyDown(KeyCode.Space)
-                    || GUI.Button(buttonRect, PromptButtonText, _styles.PromptButton))
+                    || GUILayout.Button(PromptButtonText,
+                           _styles.PromptButton,
+                           GUILayout.Width(buttonSize.x),
+                           GUILayout.Height(buttonSize.y)))
                 {
                     PromptButtonText = null;
                 }
+
+                GUILayout.FlexibleSpace();
+                GUILayout.EndHorizontal();
+
             }
 
             // Display help message along bottom of window,
             // e.g. "drag .gltf/.glb/.zip onto window to view".
 
-            float footerMessageOffset = 150;
+            if (!string.IsNullOrEmpty(FooterMessage))
+            {
+                var messageSize = _styles.FooterText.CalcSize(
+                    new GUIContent(FooterMessage));
 
-            Rect footerMessageRect = new Rect(
-                0, Screen.height - footerMessageOffset,
-                Screen.width, footerMessageOffset);
-
-            GUI.Label(footerMessageRect, FooterMessage, _styles.FooterText);
+                GUILayout.BeginHorizontal();
+                GUILayout.FlexibleSpace();
+                GUILayout.Label(FooterMessage, _styles.FooterText,
+                    GUILayout.Width(messageSize.x), GUILayout.Height(messageSize.y));
+                GUILayout.FlexibleSpace();
+                GUILayout.EndHorizontal();
+            }
 
             if (ModelManager.Instance.Animation != null)
                 AnimationControlsOnGui();
             else if (ModelManager.Instance.GetModel() != null)
                 SpinControlsOnGui();
+
+            GUILayout.EndVertical();
+            GUILayout.EndArea();
 
             DialogBoxOnGui();
         }
@@ -476,15 +494,11 @@ namespace PigletViewer
 
             const float labelWidth = 100;
             const float sliderWidth = 100;
-            const float sliderAreaHeight = 50;
 
-            GUILayout.BeginArea(new Rect(
-                0,
-                Screen.height - sliderAreaHeight,
-                Screen.width,
-                sliderAreaHeight));
+            var sliderAreaHeight =
+                _styles.SliderLabel.CalcSize(new GUIContent("Spin X")).y;
 
-            GUILayout.BeginHorizontal();
+            GUILayout.BeginHorizontal(GUILayout.Height(sliderAreaHeight));
 
             GUILayout.FlexibleSpace();
 
@@ -519,8 +533,6 @@ namespace PigletViewer
             GUILayout.FlexibleSpace();
 
             GUILayout.EndHorizontal();
-
-            GUILayout.EndArea();
         }
 
         /// <summary>
@@ -539,6 +551,8 @@ namespace PigletViewer
 
             const float animationControlsAreaHeight = 75;
 
+            GUILayout.BeginHorizontal(GUILayout.Height(animationControlsAreaHeight));
+
             // Get a reference to the currently selected animation clip.
             // We use a value of null to indicate that the special
             // "Static Pose" clip is currently selected.
@@ -549,14 +563,14 @@ namespace PigletViewer
 
             // play/pause button
 
+            GUILayout.BeginVertical();
+            GUILayout.FlexibleSpace();
+
             const float playButtonSize = 50;
 
-            var playButtonRect = new Rect(
-                _screenEdgePadding,
-                Screen.height - animationControlsAreaHeight
-                    + (animationControlsAreaHeight - playButtonSize) / 2,
-                playButtonSize,
-                playButtonSize);
+            var playButtonRect = GUILayoutUtility.GetRect(
+                new GUIContent(""), _styles.PlayButton,
+                GUILayout.Width(playButtonSize), GUILayout.Height(playButtonSize));
 
             if (GUI.Button(playButtonRect, "", _styles.PlayButton) && selectedClip != null)
                 selectedClip.speed = selectedClip.speed == 0f ? 1f : 0f;
@@ -577,17 +591,21 @@ namespace PigletViewer
 
             GUI.color = origColor;
 
+            GUILayout.FlexibleSpace();
+            GUILayout.EndVertical();
+            
             // drop-down menu for selecting animation clip
+
+            GUILayout.BeginVertical();
+            GUILayout.FlexibleSpace();
 
             const float buttonWidth = 300;
             var buttonHeight = _styles.DropDownButton.CalcSize(
                 new GUIContent("Dummy Text")).y;
 
-            var buttonRect = new Rect(
-                Screen.width - _screenEdgePadding - buttonWidth,
-                Screen.height - animationControlsAreaHeight
-                    + (animationControlsAreaHeight - buttonHeight) / 2,
-                buttonWidth, buttonHeight);
+            var buttonRect = GUILayoutUtility.GetRect(
+                new GUIContent(""), _styles.DropDownButton,
+                GUILayout.Width(buttonWidth), GUILayout.Height(buttonHeight));
 
             var prevSelectedIndex = _dropDownState.selectedIndex;
 
@@ -636,20 +654,13 @@ namespace PigletViewer
                 anim.Play(newClipKey);
             }
 
+            GUILayout.FlexibleSpace();
+            GUILayout.EndVertical();
+            
             // timeline slider
 
-            const float sliderMargin = 20;
-            const float sliderHeight = 10;
-
-            var sliderX1 = playButtonRect.x + playButtonRect.width + sliderMargin;
-            var sliderX2 = buttonRect.x - sliderMargin;
-
-            var sliderRect = new Rect(
-                sliderX1,
-                Screen.height - animationControlsAreaHeight
-                    + (animationControlsAreaHeight - sliderHeight) / 2,
-                sliderX2 - sliderX1,
-                sliderHeight);
+            GUILayout.BeginVertical();
+            GUILayout.FlexibleSpace();
 
             var time = 0f;
             var length = 0f;
@@ -660,7 +671,8 @@ namespace PigletViewer
             }
 
             var prevTime = time;
-            time = GUI.HorizontalSlider(sliderRect, time, 0f, length);
+
+            time = GUILayout.HorizontalSlider(time, 0f, length);
 
             // if the user clicked on the slider, set the time to
             // the clicked location and pause playback
@@ -669,6 +681,11 @@ namespace PigletViewer
                 selectedClip.time = time;
                 selectedClip.speed = 0f;
             }
+
+            GUILayout.FlexibleSpace();
+            GUILayout.EndVertical();
+            
+            GUILayout.EndHorizontal();
         }
 
         /// <summary>
