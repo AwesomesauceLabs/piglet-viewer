@@ -593,7 +593,39 @@ namespace PigletViewer
 
             GUILayout.FlexibleSpace();
             GUILayout.EndVertical();
-            
+
+            // timeline slider
+
+            GUILayout.FlexibleSpace();
+
+            GUILayout.BeginVertical();
+            GUILayout.FlexibleSpace();
+
+            var time = 0f;
+            var length = 0f;
+            if (selectedClip != null)
+            {
+                length = selectedClip.length;
+                time = selectedClip.time % length;
+            }
+
+            var prevTime = time;
+
+            time = GUILayout.HorizontalSlider(time, 0f, length);
+
+            // if the user clicked on the slider, set the time to
+            // the clicked location and pause playback
+            if (selectedClip != null && time != prevTime)
+            {
+                selectedClip.time = time;
+                selectedClip.speed = 0f;
+            }
+
+            GUILayout.FlexibleSpace();
+            GUILayout.EndVertical();
+
+            GUILayout.FlexibleSpace();
+
             // drop-down menu for selecting animation clip
 
             GUILayout.BeginVertical();
@@ -656,35 +688,7 @@ namespace PigletViewer
 
             GUILayout.FlexibleSpace();
             GUILayout.EndVertical();
-            
-            // timeline slider
 
-            GUILayout.BeginVertical();
-            GUILayout.FlexibleSpace();
-
-            var time = 0f;
-            var length = 0f;
-            if (selectedClip != null)
-            {
-                length = selectedClip.length;
-                time = selectedClip.time % length;
-            }
-
-            var prevTime = time;
-
-            time = GUILayout.HorizontalSlider(time, 0f, length);
-
-            // if the user clicked on the slider, set the time to
-            // the clicked location and pause playback
-            if (selectedClip != null && time != prevTime)
-            {
-                selectedClip.time = time;
-                selectedClip.speed = 0f;
-            }
-
-            GUILayout.FlexibleSpace();
-            GUILayout.EndVertical();
-            
             GUILayout.EndHorizontal();
         }
 
