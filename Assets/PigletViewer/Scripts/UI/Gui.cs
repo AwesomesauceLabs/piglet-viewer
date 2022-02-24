@@ -550,6 +550,8 @@ namespace PigletViewer
             var clipNames = ModelManager.Instance.AnimationClipNames;
 
             const float animationControlsAreaHeight = 75;
+            const float playButtonSize = 50;
+            const float dropdownWidth = 300;
 
             GUILayout.BeginHorizontal(GUILayout.Height(animationControlsAreaHeight));
 
@@ -565,8 +567,6 @@ namespace PigletViewer
 
             GUILayout.BeginVertical();
             GUILayout.FlexibleSpace();
-
-            const float playButtonSize = 50;
 
             var playButtonRect = GUILayoutUtility.GetRect(
                 new GUIContent(""), _styles.PlayButton,
@@ -609,9 +609,22 @@ namespace PigletViewer
                 time = selectedClip.time % length;
             }
 
-            var prevTime = time;
+            // Workaround: GUI.LayoutSlider does not expand
+            // its width to fill the available space, so we must manually
+            // calculate the available width here. I'm pretty sure this is a
+            // bug, since other GUI elements (e.g. GUILayout.Label)
+            // are capable of automatically expanding their width.
 
-            time = GUILayout.HorizontalSlider(time, 0f, length);
+            var sliderWidth = Screen.width
+                - playButtonSize
+                - _styles.PlayButton.margin.right
+                - dropdownWidth
+                - _styles.DropDownButton.margin.left
+                - _screenEdgePadding * 2;
+
+            var prevTime = time;
+            time = GUILayout.HorizontalSlider(time, 0f, length,
+                GUILayout.Width(sliderWidth));
 
             // if the user clicked on the slider, set the time to
             // the clicked location and pause playback
@@ -631,7 +644,6 @@ namespace PigletViewer
             GUILayout.BeginVertical();
             GUILayout.FlexibleSpace();
 
-            const float dropdownWidth = 300;
             var dropdownHeight = _styles.DropDownButton.CalcSize(
                 new GUIContent("Dummy Text")).y;
 
