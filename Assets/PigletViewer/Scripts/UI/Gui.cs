@@ -109,10 +109,9 @@ namespace PigletViewer
         private Texture2D _pauseIcon;
 
         /// <summary>
-        /// Width of padding between screen edges and
-        /// UI text/controls.
+        /// Space between screen edges and UI text/controls.
         /// </summary>
-        private float _screenEdgePadding;
+        private RectOffset _screenMargin;
 
         /// <summary>
         /// The list of progress messages generated for the
@@ -147,14 +146,13 @@ namespace PigletViewer
         public Gui()
         {
             _styles = null;
-            _screenEdgePadding = 25;
-
             Reset();
         }
 
         public void Start()
         {
             _titleImage = Resources.Load<Texture2D>("PigletTitle");
+            _screenMargin = new RectOffset(30, 30, 30, 0);
         }
 
         /// <summary>
@@ -391,10 +389,19 @@ namespace PigletViewer
             // Draw title image ("Piglet" in fancy writing).
 
             var titleRect = new Rect(
-                (Screen.width - _titleImage.width) / 2.0f, 30,
+                (Screen.width - _titleImage.width) / 2.0f,
+                _screenMargin.top,
                 _titleImage.width, _titleImage.height);
 
             GUI.DrawTexture(titleRect, _titleImage);
+
+            // Screen area that defines the outer boundary for
+            // all GUI text/controls.
+
+            var screenArea = new Rect(
+                _screenMargin.left, _screenMargin.top,
+                Screen.width - _screenMargin.left - _screenMargin.right,
+                Screen.height - _screenMargin.top - _screenMargin.bottom);
 
             // In the WebGL build, the import log is shown
             // in the left panel as part of the main web
@@ -404,10 +411,7 @@ namespace PigletViewer
             // of the window, in the upper left hand corner.
 
 #if !UNITY_WEBGL || UNITY_EDITOR
-            GUILayout.BeginArea(new Rect(
-                _screenEdgePadding, _screenEdgePadding,
-                Screen.width - 2 * _screenEdgePadding,
-                Screen.height - 2 * _screenEdgePadding));
+            GUILayout.BeginArea(screenArea);
 
             // progress log messages
             foreach (var line in _progressLog)
@@ -416,10 +420,7 @@ namespace PigletViewer
             GUILayout.EndArea();
 #endif
 
-            GUILayout.BeginArea(new Rect(
-                _screenEdgePadding, _screenEdgePadding,
-                Screen.width - 2 * _screenEdgePadding,
-                Screen.height - 2 * _screenEdgePadding));
+            GUILayout.BeginArea(screenArea);
 
             GUILayout.BeginVertical();
             GUILayout.FlexibleSpace();
@@ -616,11 +617,12 @@ namespace PigletViewer
             // are capable of automatically expanding their width.
 
             var sliderWidth = Screen.width
+                - _screenMargin.left
                 - playButtonSize
                 - _styles.PlayButton.margin.right
-                - dropdownWidth
                 - _styles.DropDownButton.margin.left
-                - _screenEdgePadding * 2;
+                - dropdownWidth
+                - _screenMargin.right;
 
             var prevTime = time;
             time = GUILayout.HorizontalSlider(time, 0f, length,
