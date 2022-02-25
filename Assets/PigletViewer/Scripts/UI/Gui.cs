@@ -378,6 +378,57 @@ namespace PigletViewer
         }
 
         /// <summary>
+        /// <para>
+        /// Update screen margins on iOS, according to the current
+        /// orientation of the device (i.e. portrait or landscape).
+        /// </para>
+        /// <para>
+        /// On most platforms we use fixed screen margins,
+        /// but on iPhones our UI is partially overlaid by:
+        /// (1) the panel that contains the microphone
+        /// and front-facing camera, and (2) the O/S-drawn handle
+        /// widget at the bottom of the screen, which is used for
+        /// closing apps. These two elements will
+        /// obscure graphics rendered along the edge of the
+        /// screen and make any GUI elements non-interactable, so
+        /// we need to add extra margins along those edges of the screen.
+        /// However, the edges of the screen that are affected
+        /// (left, right, top, or bottom) depend on the current
+        /// orientation of the device, and so we need to
+        /// invoke this method in every frame to check the orientation
+        /// and update the margins.
+        /// </para>
+        /// </summary>
+        protected void UpdateScreenMarginsOnIOS()
+        {
+            if (Application.platform != RuntimePlatform.IPhonePlayer)
+                return;
+
+            switch (Screen.orientation)
+            {
+                // Device is in portrait orientation with home button on bottom.
+                case ScreenOrientation.Portrait:
+                    _screenMargin = new RectOffset(30, 30, 125, 75);
+                    break;
+
+                // Device is in portrait orientation with home button on top.
+                case ScreenOrientation.PortraitUpsideDown:
+                    _screenMargin = new RectOffset(30, 30, 75, 125);
+                    break;
+
+                // Device is in landscape orientation with home button on right side.
+                case ScreenOrientation.LandscapeLeft:
+                    _screenMargin = new RectOffset(125, 125, 30, 75);
+                    break;
+
+                // Device is in landscape orientation with home button on left side.
+                case ScreenOrientation.LandscapeRight:
+                    _screenMargin = new RectOffset(125, 125, 30, 75);
+                    break;
+            }
+        }
+
+        /// <summary>
         /// Render the GUI for the viewer (e.g. progress log,
         /// "Spin X"/"Spin Y" sliders).
         /// </summary>
@@ -397,6 +448,8 @@ namespace PigletViewer
 
             // Screen area that defines the outer boundary for
             // all GUI text/controls.
+
+            UpdateScreenMarginsOnIOS();
 
             var screenArea = new Rect(
                 _screenMargin.left, _screenMargin.top,
