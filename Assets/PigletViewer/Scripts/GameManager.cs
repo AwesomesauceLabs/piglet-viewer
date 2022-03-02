@@ -103,6 +103,8 @@ namespace PigletViewer
             gameObject.AddComponent<WindowsGameManager>();
 #elif UNITY_ANDROID
             gameObject.AddComponent<AndroidGameManager>();
+#elif UNITY_IOS
+            gameObject.AddComponent<iOSGameManager>();
 #elif UNITY_WEBGL
             gameObject.AddComponent<WebGlGameManager>();
 #endif
