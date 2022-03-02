@@ -49,6 +49,10 @@ namespace PigletViewer
         /// </summary>
         public List<IEnumerator> Tasks;
 
+        /// <summary>
+        /// Options set by the command-line and/or
+        /// `StreamingAssets/piglet-viewer-args.txt`.
+        /// </summary>
         private CommandLineOptions _options;
 
         /// <summary>
