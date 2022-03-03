@@ -62,7 +62,6 @@ namespace PigletViewer
         /// </summary>
         private class Styles
         {
-            public GUIStyle Title;
             public GUIStyle Text;
             public GUIStyle SliderLabel;
             public GUIStyle FooterText;
@@ -271,13 +270,6 @@ namespace PigletViewer
             Texture2D roundedRectDarkGray = Resources.Load<Texture2D>("RoundedRectDarkGray");
 
             _styles = new Styles();
-
-            _styles.Title = new GUIStyle(GUI.skin.label);
-            _styles.Title.alignment = TextAnchor.MiddleLeft;
-            _styles.Title.margin = new RectOffset(
-                _styles.Title.margin.left, 0, 20, 20);
-            _styles.Title.fontSize = 24;
-            _styles.Title.fontStyle = FontStyle.Bold;
 
             _styles.Text = new GUIStyle(GUI.skin.label);
             _styles.Text.alignment = TextAnchor.MiddleLeft;
