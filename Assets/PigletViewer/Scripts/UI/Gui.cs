@@ -125,6 +125,38 @@ namespace PigletViewer
         private Styles _styles;
 
         /// <summary>
+        /// Returns a floating point constant used to scale font sizes
+        /// and GUI controls for the current platform and screen DPI.
+        /// </summary>
+        public static float ScaleFactor
+        {
+            get
+            {
+                // Compute the scale factor based on screen DPI (dots per inch).
+                //
+                // Note 1: 96 is a magic number here because I calibrated
+                // the original sizes of the fonts and GUI controls using
+                // a 96 DPI screen.
+                //
+                // Note 2: In older versions of Unity, `Screen.dpi` returns 0 in WebGL builds.
+                // Fall back to a DPI of 96 in these cases. For a more accurate solution, see:
+                // https://forum.unity.com/threads/webgl-and-screen-dpi.369539/#post-6170491
+
+                var dpi = Screen.dpi > 0 ? Screen.dpi : 96.0f;
+                var scaleFactor = dpi / 96.0f;
+
+                // Scale down the physical size of text and GUI controls on Android/iOS,
+                // since screen real estate is precious on those platforms.
+
+                if (Application.platform == RuntimePlatform.Android
+                    || Application.platform == RuntimePlatform.IPhonePlayer)
+                    scaleFactor *= 0.4f;
+
+                return scaleFactor;
+            }
+        }
+
+        /// <summary>
         /// Specifies the title and body text for a dialog box.
         /// This is used to show error messages to the
         /// user.
@@ -151,7 +183,7 @@ namespace PigletViewer
         public void Start()
         {
             _titleImage = Resources.Load<Texture2D>("PigletTitle");
-            _screenMargin = new RectOffset(30, 30, 30, 0);
+            _screenMargin = ScaleRectOffset(30, 30, 30, 15);
         }
 
         /// <summary>
@@ -251,6 +283,31 @@ namespace PigletViewer
         }
 
         /// <summary>
+        /// Multiply the given integer by the UI scaling factor,
+        /// which is used to scale font sizes and GUI controls based
+        /// on the current platform and screen DPI.
+        /// </summary>
+        protected static int ScaleInt(int value)
+        {
+            return (int)Math.Round(value * ScaleFactor);
+        }
+
+        /// <summary>
+        /// Create a scaled RectOffset by multiplying the given
+        /// left/right/top/bottom sizes by the UI scaling factor.
+        /// (The UI scaling factor is used to scale font sizes and
+        /// GUI controls based on the current platform and screen DPI.)
+        /// </summary>
+       protected static RectOffset ScaleRectOffset(int left, int right, int top, int bottom)
+        {
+            return new RectOffset(
+                ScaleInt(left),
+                ScaleInt(right),
+                ScaleInt(top),
+                ScaleInt(bottom));
+        }
+
+        /// <summary>
         /// Initialize GUIStyles used to render the GUI
         /// (e.g. font sizes, text alignment).
         /// </summary>
@@ -274,17 +331,18 @@ namespace PigletViewer
             _styles.Text = new GUIStyle(GUI.skin.label);
             _styles.Text.alignment = TextAnchor.MiddleLeft;
             _styles.Text.fontStyle = FontStyle.Normal;
-            _styles.Text.padding = new RectOffset(0, 0, 0, 0);
-            _styles.Text.fontSize = 18;
+            _styles.Text.padding = ScaleRectOffset(0, 0, 0, 0);
+            _styles.Text.fontSize = ScaleInt(16);
 
             _styles.SliderLabel = new GUIStyle(GUI.skin.label);
             _styles.SliderLabel.alignment = TextAnchor.MiddleCenter;
-            _styles.SliderLabel.fontSize = 24;
+            _styles.SliderLabel.fontSize = ScaleInt(24);
 
             _styles.FooterText = new GUIStyle(GUI.skin.label);
             _styles.FooterText.alignment = TextAnchor.MiddleCenter;
             _styles.FooterText.fontStyle = FontStyle.Italic;
-            _styles.FooterText.fontSize = 24;
+            _styles.FooterText.margin = ScaleRectOffset(15, 15, 15, 15);
+            _styles.FooterText.fontSize = ScaleInt(24);
 
             _styles.DialogBox = new GUIStyle(GUI.skin.window);
             _styles.DialogBox.normal.background = roundedRectLightGray;
@@ -294,33 +352,33 @@ namespace PigletViewer
             _styles.DialogHeading.normal.background = roundedRectDarkGray;
             _styles.DialogHeading.border = new RectOffset(10, 10, 10, 10);
             _styles.DialogHeading.alignment = TextAnchor.MiddleLeft;
-            _styles.DialogHeading.margin = new RectOffset(15, 15, 15, 15);
-            _styles.DialogHeading.padding = new RectOffset(15, 15, 11, 11);
-            _styles.DialogHeading.fontSize = 24;
+            _styles.DialogHeading.margin = ScaleRectOffset(15, 15, 15, 15);
+            _styles.DialogHeading.padding = ScaleRectOffset(15, 15, 11, 11);
+            _styles.DialogHeading.fontSize = ScaleInt(24);
 
             _styles.DialogText = new GUIStyle(GUI.skin.label);
             _styles.DialogText.alignment = TextAnchor.MiddleLeft;
-            _styles.DialogText.margin = new RectOffset(15, 15, 15, 15);
-            _styles.DialogText.padding = new RectOffset(10, 10, 0, 0);
-            _styles.DialogText.fontSize = 20;
+            _styles.DialogText.margin = ScaleRectOffset(15, 15, 15, 15);
+            _styles.DialogText.padding = ScaleRectOffset(10, 10, 0, 0);
+            _styles.DialogText.fontSize = ScaleInt(20);
 
             _styles.DialogButton = new GUIStyle(GUI.skin.button);
             _styles.DialogButton.normal.background = roundedRectDarkGray;
             _styles.DialogButton.hover.background = roundedRectWhite;
             _styles.DialogButton.active.background = roundedRectWhite;
             _styles.DialogButton.border = new RectOffset(10, 10, 10, 10);
-            _styles.DialogButton.margin = new RectOffset(15, 15, 15, 15);
-            _styles.DialogButton.padding = new RectOffset(30, 30, 11, 11);
+            _styles.DialogButton.margin = ScaleRectOffset(15, 15, 15, 15);
+            _styles.DialogButton.padding = ScaleRectOffset(30, 30, 11, 11);
             _styles.DialogButton.alignment = TextAnchor.MiddleCenter;
-            _styles.DialogButton.fontSize = 18;
+            _styles.DialogButton.fontSize = ScaleInt(18);
 
             _styles.DropDownButton = new GUIStyle(GUI.skin.label);
             _styles.DropDownButton.normal.background = roundedRectLightGray;
             _styles.DropDownButton.border = new RectOffset(10, 10, 10, 10);
             _styles.DropDownButton.alignment = TextAnchor.MiddleLeft;
-            _styles.DropDownButton.margin = new RectOffset(15, 15, 15, 15);
-            _styles.DropDownButton.padding = new RectOffset(15, 15, 11, 11);
-            _styles.DropDownButton.fontSize = 20;
+            _styles.DropDownButton.margin = ScaleRectOffset(15, 15, 15, 15);
+            _styles.DropDownButton.padding = ScaleRectOffset(15, 15, 11, 11);
+            _styles.DropDownButton.fontSize = ScaleInt(20);
             _styles.DropDownButton.clipping = TextClipping.Clip;
             _styles.DropDownButton.wordWrap = false;
 
@@ -328,25 +386,25 @@ namespace PigletViewer
             _styles.DropDownListBackground.normal.background = roundedRectDarkGray;
             _styles.DropDownListBackground.border = new RectOffset(10, 10, 10, 10);
             _styles.DropDownListBackground.alignment = TextAnchor.MiddleLeft;
-            _styles.DropDownListBackground.margin = new RectOffset(15, 15, 15, 15);
-            _styles.DropDownListBackground.padding = new RectOffset(15, 15, 11, 11);
-            _styles.DropDownListBackground.fontSize = 20;
+            _styles.DropDownListBackground.margin = ScaleRectOffset(15, 15, 15, 15);
+            _styles.DropDownListBackground.padding = ScaleRectOffset(15, 15, 11, 11);
+            _styles.DropDownListBackground.fontSize = ScaleInt(20);
 
             _styles.DropDownListForeground = new GUIStyle(GUI.skin.label);
             _styles.DropDownListForeground.normal.background = roundedRectTransparent;
-            _styles.DropDownListForeground.border = new RectOffset(10, 10, 10, 10);
+            _styles.DropDownListForeground.border = ScaleRectOffset(10, 10, 10, 10);
             _styles.DropDownListForeground.alignment = TextAnchor.MiddleLeft;
-            _styles.DropDownListForeground.margin = new RectOffset(15, 15, 15, 15);
-            _styles.DropDownListForeground.padding = new RectOffset(15, 15, 11, 11);
-            _styles.DropDownListForeground.fontSize = 20;
+            _styles.DropDownListForeground.margin = ScaleRectOffset(15, 15, 15, 15);
+            _styles.DropDownListForeground.padding = ScaleRectOffset(15, 15, 11, 11);
+            _styles.DropDownListForeground.fontSize = ScaleInt(20);
 
             _styles.DropDownListItem = new GUIStyle(GUI.skin.label);
             _styles.DropDownListItem.hover.background = roundedRectLightGrayNoBorder;
             _styles.DropDownListItem.border = new RectOffset(10, 10, 10, 10);
             _styles.DropDownListItem.alignment = TextAnchor.MiddleLeft;
-            _styles.DropDownListItem.margin = new RectOffset(15, 15, 15, 15);
-            _styles.DropDownListItem.padding = new RectOffset(15, 15, 11, 11);
-            _styles.DropDownListItem.fontSize = 20;
+            _styles.DropDownListItem.margin = ScaleRectOffset(15, 15, 15, 15);
+            _styles.DropDownListItem.padding = ScaleRectOffset(15, 15, 11, 11);
+            _styles.DropDownListItem.fontSize = ScaleInt(20);
             _styles.DropDownListItem.clipping = TextClipping.Clip;
             _styles.DropDownListItem.wordWrap = false;
 
@@ -354,19 +412,19 @@ namespace PigletViewer
             _styles.PlayButton.normal.background = roundedRectLightGray;
             _styles.PlayButton.border = new RectOffset(10, 10, 10, 10);
             _styles.PlayButton.alignment = TextAnchor.MiddleLeft;
-            _styles.PlayButton.margin = new RectOffset(15, 15, 15, 15);
-            _styles.PlayButton.padding = new RectOffset(15, 15, 11, 11);
-            _styles.PlayButton.fontSize = 20;
+            _styles.PlayButton.margin = ScaleRectOffset(15, 15, 15, 15);
+            _styles.PlayButton.padding = ScaleRectOffset(15, 15, 11, 11);
+            _styles.PlayButton.fontSize = ScaleInt(20);
 
             _styles.PromptButton = new GUIStyle(GUI.skin.button);
             _styles.PromptButton.normal.background = roundedRectWhite;
             _styles.PromptButton.hover.background = roundedRectDarkGray;
             _styles.PromptButton.active.background = roundedRectDarkGray;
             _styles.PromptButton.border = new RectOffset(10, 10, 10, 10);
-            _styles.PromptButton.margin = new RectOffset(15, 15, 15, 15);
-            _styles.PromptButton.padding = new RectOffset(30, 30, 11, 11);
+            _styles.PromptButton.margin = ScaleRectOffset(15, 15, 15, 15);
+            _styles.PromptButton.padding = ScaleRectOffset(30, 30, 11, 11);
             _styles.PromptButton.alignment = TextAnchor.MiddleCenter;
-            _styles.PromptButton.fontSize = 18;
+            _styles.PromptButton.fontSize = ScaleInt(18);
         }
 
         /// <summary>
@@ -538,8 +596,8 @@ namespace PigletViewer
                 || Application.platform == RuntimePlatform.IPhonePlayer)
                 return;
 
-            const float labelWidth = 100;
-            const float sliderWidth = 100;
+            float labelWidth = ScaleInt(100);
+            float sliderWidth = ScaleInt(100);
 
             var sliderAreaHeight =
                 _styles.SliderLabel.CalcSize(new GUIContent("Spin X")).y;
@@ -595,9 +653,10 @@ namespace PigletViewer
             var clipKeys = ModelManager.Instance.AnimationClipKeys;
             var clipNames = ModelManager.Instance.AnimationClipNames;
 
-            const float animationControlsAreaHeight = 75;
-            const float playButtonSize = 50;
-            const float dropdownWidth = 300;
+            var animationControlsAreaHeight = _styles.DropDownButton.CalcSize(
+                new GUIContent("Dummy Text")).y;
+
+            var dropdownWidth = ScaleInt(300);
 
             GUILayout.BeginHorizontal(GUILayout.Height(animationControlsAreaHeight));
 
@@ -616,7 +675,8 @@ namespace PigletViewer
 
             var playButtonRect = GUILayoutUtility.GetRect(
                 new GUIContent(""), _styles.PlayButton,
-                GUILayout.Width(playButtonSize), GUILayout.Height(playButtonSize));
+                GUILayout.Width(animationControlsAreaHeight),
+                GUILayout.Height(animationControlsAreaHeight));
 
             if (GUI.Button(playButtonRect, "", _styles.PlayButton) && selectedClip != null)
                 selectedClip.speed = selectedClip.speed == 0f ? 1f : 0f;
@@ -624,7 +684,8 @@ namespace PigletViewer
             var origColor = GUI.color;
             GUI.color = selectedClip != null ? Color.black : Color.gray;
 
-            const float playIconMargin = 10;
+            float playIconMargin = ScaleInt(10);
+
             var playIconRect = new Rect(
                 playButtonRect.x + playIconMargin,
                 playButtonRect.y + playIconMargin,
@@ -663,7 +724,7 @@ namespace PigletViewer
 
             var sliderWidth = Screen.width
                 - _screenMargin.left
-                - playButtonSize
+                - animationControlsAreaHeight
                 - _styles.PlayButton.margin.right
                 - _styles.DropDownButton.margin.left
                 - dropdownWidth
@@ -691,12 +752,10 @@ namespace PigletViewer
             GUILayout.BeginVertical();
             GUILayout.FlexibleSpace();
 
-            var dropdownHeight = _styles.DropDownButton.CalcSize(
-                new GUIContent("Dummy Text")).y;
-
             var dropdownRect = GUILayoutUtility.GetRect(
                 new GUIContent(""), _styles.DropDownButton,
-                GUILayout.Width(dropdownWidth), GUILayout.Height(dropdownHeight));
+                GUILayout.Width(dropdownWidth),
+                GUILayout.Height(animationControlsAreaHeight));
 
             var prevSelectedIndex = _dropDownState.selectedIndex;
 
