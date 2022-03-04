@@ -48,6 +48,9 @@ namespace PigletViewer
                     PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android,
                         "URP_PACKAGE_IS_INSTALLED");
 
+                    PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.iOS,
+                        "URP_PACKAGE_IS_INSTALLED");
+
                     EditorApplication.Exit(0);
                 }
                 else
