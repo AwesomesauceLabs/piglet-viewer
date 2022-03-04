@@ -14,6 +14,9 @@ namespace PigletViewer
         {
             PlayerSettings.colorSpace = ColorSpace.Linear;
 
+            // Note: We do not need to call `SetUseDefaultGraphicsAPIs` for
+            // iOS, since Metal is the only choice.
+
             PlayerSettings.SetUseDefaultGraphicsAPIs(BuildTarget.StandaloneWindows, true);
             PlayerSettings.SetUseDefaultGraphicsAPIs(BuildTarget.StandaloneWindows64, true);
             PlayerSettings.SetUseDefaultGraphicsAPIs(BuildTarget.StandaloneOSX, true);
@@ -38,6 +41,9 @@ namespace PigletViewer
             PlayerSettings.colorSpace = ColorSpace.Gamma;
 
             // Enable "Auto Graphics API" on all platforms.
+            //
+            // Note: We do not need to call `SetUseDefaultGraphicsAPIs` for
+            // iOS, since Metal is the only choice.
 
             PlayerSettings.SetUseDefaultGraphicsAPIs(BuildTarget.StandaloneWindows, true);
             PlayerSettings.SetUseDefaultGraphicsAPIs(BuildTarget.StandaloneWindows64, true);
