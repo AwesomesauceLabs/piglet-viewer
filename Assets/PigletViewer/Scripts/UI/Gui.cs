@@ -336,13 +336,13 @@ namespace PigletViewer
 
             _styles.SliderLabel = new GUIStyle(GUI.skin.label);
             _styles.SliderLabel.alignment = TextAnchor.MiddleCenter;
-            _styles.SliderLabel.fontSize = ScaleInt(24);
+            _styles.SliderLabel.fontSize = ScaleInt(20);
 
             _styles.FooterText = new GUIStyle(GUI.skin.label);
             _styles.FooterText.alignment = TextAnchor.MiddleCenter;
             _styles.FooterText.fontStyle = FontStyle.Italic;
             _styles.FooterText.margin = ScaleRectOffset(15, 15, 15, 15);
-            _styles.FooterText.fontSize = ScaleInt(24);
+            _styles.FooterText.fontSize = ScaleInt(22);
 
             _styles.DialogBox = new GUIStyle(GUI.skin.window);
             _styles.DialogBox.normal.background = roundedRectLightGray;
@@ -354,13 +354,13 @@ namespace PigletViewer
             _styles.DialogHeading.alignment = TextAnchor.MiddleLeft;
             _styles.DialogHeading.margin = ScaleRectOffset(15, 15, 15, 15);
             _styles.DialogHeading.padding = ScaleRectOffset(15, 15, 11, 11);
-            _styles.DialogHeading.fontSize = ScaleInt(24);
+            _styles.DialogHeading.fontSize = ScaleInt(20);
 
             _styles.DialogText = new GUIStyle(GUI.skin.label);
             _styles.DialogText.alignment = TextAnchor.MiddleLeft;
             _styles.DialogText.margin = ScaleRectOffset(15, 15, 15, 15);
             _styles.DialogText.padding = ScaleRectOffset(10, 10, 0, 0);
-            _styles.DialogText.fontSize = ScaleInt(20);
+            _styles.DialogText.fontSize = ScaleInt(18);
 
             _styles.DialogButton = new GUIStyle(GUI.skin.button);
             _styles.DialogButton.normal.background = roundedRectDarkGray;
@@ -370,7 +370,7 @@ namespace PigletViewer
             _styles.DialogButton.margin = ScaleRectOffset(15, 15, 15, 15);
             _styles.DialogButton.padding = ScaleRectOffset(30, 30, 11, 11);
             _styles.DialogButton.alignment = TextAnchor.MiddleCenter;
-            _styles.DialogButton.fontSize = ScaleInt(18);
+            _styles.DialogButton.fontSize = ScaleInt(16);
 
             _styles.DropDownButton = new GUIStyle(GUI.skin.label);
             _styles.DropDownButton.normal.background = roundedRectLightGray;
