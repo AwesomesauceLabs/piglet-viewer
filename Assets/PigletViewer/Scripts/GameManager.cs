@@ -99,15 +99,26 @@ namespace PigletViewer
 
             // Add platform-specific behaviours.
 
-#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-            gameObject.AddComponent<WindowsGameManager>();
-#elif UNITY_ANDROID
-            gameObject.AddComponent<AndroidGameManager>();
-#elif UNITY_IOS
-            gameObject.AddComponent<iOSGameManager>();
-#elif UNITY_WEBGL
-            gameObject.AddComponent<WebGlGameManager>();
+            switch (Application.platform)
+            {
+                case RuntimePlatform.WindowsPlayer:
+                    gameObject.AddComponent<WindowsGameManager>();
+                    break;
+
+                case RuntimePlatform.Android:
+                    gameObject.AddComponent<AndroidGameManager>();
+                    break;
+
+                case RuntimePlatform.IPhonePlayer:
+                    gameObject.AddComponent<iOSGameManager>();
+                    break;
+
+#if UNITY_WEBGL
+                case RuntimePlatform.WebGLPlayer:
+                    gameObject.AddComponent<WebGlGameManager>();
+                    break;
 #endif
+            }
         }
 
         /// <summary>
