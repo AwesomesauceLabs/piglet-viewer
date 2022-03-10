@@ -1,3 +1,4 @@
+#if UNITY_IOS
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -209,3 +210,4 @@ namespace PigletViewer
         }
     }
 }
+#endif
