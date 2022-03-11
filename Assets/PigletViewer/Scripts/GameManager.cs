@@ -127,6 +127,16 @@ namespace PigletViewer
         /// </summary>
         private void AbortImports()
         {
+            // Reset command line options and cancel the active prompt
+            // button (if any).
+            //
+            // These actions ensure that a sequence of glTF imports specified
+            // via the command line can be interrupted via a user
+            // action (e.g. dragging-and-dropping a glTF onto the view area).
+
+            _options = new CommandLineOptions();
+            Gui.Instance.PromptButtonText = null;
+
             // Call Abort() on each import task so that:
             //
             // (1) Resources are freed for any partially completed glTF imports.
