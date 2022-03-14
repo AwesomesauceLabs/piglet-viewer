@@ -1,4 +1,7 @@
-﻿using UnityEditor;
+﻿#if UNITY_ANDROID
+using System.IO;
+using UnityEditor;
+using UnityEditor.Android;
 using UnityEngine;
 
 namespace PigletViewer
@@ -31,6 +34,28 @@ namespace PigletViewer
             PlayerSettings.SetApplicationIdentifier(
                 BuildTargetGroup.Android, "com.awesomesauce.piglet");
 
+            // Set the path to the Android NDK.
+            //
+            // Unity has a longstanding bug where it does not automatically
+            // the Android NDK path, even when the Android NDK is installed
+            // via Unity Hub. If we don't set the Android NDK path, command
+            // line Android builds will fail with an error message
+            // that says "unable to find Android NDK".
+            //
+            // An additional wrinkle is that Unity Hub installs the Android NDK
+            // in different locations on Windows and MacOS.
+
+            var appPath = EditorApplication.applicationPath;
+            var appFolder = Path.GetDirectoryName(appPath);
+
+            var ndkPath = Application.platform == RuntimePlatform.OSXEditor
+                ? $"{appFolder}/PlaybackEngines/AndroidPlayer/NDK"
+                : $"{appFolder}/Data/PlaybackEngines/AndroidPlayer/NDK";
+
+            EditorPrefs.SetString("AndroidNdkRootR16b", ndkPath);
+            EditorPrefs.SetString("AndroidNdkRoot", ndkPath);
+            AndroidExternalToolsSettings.ndkRootPath = ndkPath;
+
             // Run the build.
 
             var buildOptions = new BuildPlayerOptions
@@ -46,3 +71,4 @@ namespace PigletViewer
         }
     }
 }
+#endif
