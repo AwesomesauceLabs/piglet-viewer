@@ -10,7 +10,7 @@ namespace PigletViewer
         /// Method to run an automated macOS build from the command line.
         /// The build output is a macOS app bundle located at
         /// `build/macos.app` under the project root, and the output executable
-        /// is `build/macos.app/Contents/MacOS/piglet-viewer`.
+        /// is `build/macos.app/Contents/MacOS/PigletViewer`.
         /// </para>
         /// <para>
         /// To run the build from the command line, switch to the
@@ -29,7 +29,7 @@ namespace PigletViewer
             // Configure the name of the output executable in
             // `build/macos.app/Contents/MacOS`.
 
-            PlayerSettings.productName = "piglet-viewer";
+            PlayerSettings.productName = "PigletViewer";
 
             // Run the build. (Generates macOS app bundle in `build/macos.app`
             // under project root).

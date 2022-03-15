@@ -12,7 +12,7 @@ namespace PigletViewer
         /// <para>
         /// Method to run an automated Android build from the command line.
         /// The build output is an Android .apk file located at
-        /// `build/piglet-viewer.apk' under the project root.
+        /// `build/PigletViewer.apk' under the project root.
         /// </para>
         /// <para>
         /// To run the build from the command line, switch to the
@@ -26,7 +26,7 @@ namespace PigletViewer
         [MenuItem("PigletViewer/Build/Android")]
         public static void Build()
         {
-            const string buildPath = "build/piglet-viewer.apk";
+            const string buildPath = "build/PigletViewer.apk";
 
             // Android builds will error out until you change
             // the package name from the default value.
