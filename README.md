@@ -52,21 +52,29 @@ I recommend installing from the `.unitypackage` rather than doing a `git clone` 
 
 ## Android Build Instructions
 
-Before you can build Android apps in Unity, you will need to install the **Android Build Support** module for Unity, the Android Software Development Kit (SDK), the Android Native Development Kit (NDK), and a Java Development Kit (e.g. OpenJDK). Unity Hub can download and install all of this software for you in a few simple steps. See [Android environment setup]( https://docs.unity3d.com/Manual/android-sdksetup.html) for further details.
+Before you can build Android apps with Unity, you will first need to
+install **Android Build Support** via Unity Hub. See [Android
+environment
+setup](https://docs.unity3d.com/Manual/android-sdksetup.html) from the
+Unity documentation for instructions.
 
-Once you have completed the basic setup for Android development, you can build the PigletViewer app by the following steps:
+You will also need to enable **USB debugging** on your Android
+phone/tablet. See [Configure on-device developer
+options](https://developer.android.com/studio/debug/dev-options) from
+the Android documentation for instructions.
 
-1. Double-click `Assets/PigletViewer/Scenes/MainScene.unity` to open the PigletViewer scene.
+Once you have completed the above steps, you can build and run PigletViewer on Android using the following steps: 
+
+1. Double-click `Assets/PigletViewer/Scenes/MainScene.unity` to make it the current scene.
 2. Click `File -> Build Settings...` in the Unity menu.
-3. Click `Android` on the left side of the `Build Settings` dialog. If there is a `Build` button in the bottom right corner, then Android is already the active build target. If not, click `Switch Platform` to make Android the active build target.
-4. Click `Add Open Scenes` in the top right corner to add the current scene to the build.
-5. Ensure that you have enabled [developer options](https://developer.android.com/studio/debug/dev-options) on your Android device, then connect your Android device to your computer with a USB cable.
-6. Click the `Build and Run` button in the bottom right corner.
-7. Select a location to save the `.apk` file and click `OK` to start the build.
+3. Click `Android` on the left sidebar of the `Build Settings` dialog.
+4. Change the active build target to `Android` by clicking `Switch Platform`. The `Switch Platform` button will be grayed out if `Android` is already the active build target.
+5. Click `Build and Run`.
+6. Select a location for the output `.apk` file and click `OK` to start the build.
 
-The app will automatically open on your Android phone/tablet once the build has completed, although you may have to wake/unlock your Android device before you see it.
+Unity will automatically upload and run the `.apk` file on your Android phone/tablet once the build has completed. (You may need to wake/unlock your Android device before the PigletViewer app will start.)
 
-You can open different glTF models on Android by opening `.glb` files in a file browser app<sup>[3](#footnote3)</sup>.
+You can open glTF files in the PigletViewer app by opening `.glb`/`.zip` files from a file browser app and choosing PigletViewer as the target application<sup>[3](#footnote3)</sup>.
 
 ## WebGL Build Instructions
 
