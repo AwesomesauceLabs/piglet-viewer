@@ -2,6 +2,7 @@
 
 * [Description](#description)
 * [Live Demo](#live-demo)
+* [Known Issues](#known-issues)
 * [Build Instructions](#build-instructions)
   * [Unity Project Setup](#unity-project-setup)
   * [Android Build Instructions](#android-build-instructions)
@@ -26,6 +27,16 @@ PigletViewer is provided as an example application for customers of the [Piglet 
 # Live Demo
 
 A live demo for the WebGL version of PigletViewer is available at: [https://awesomesaucelabs.github.io/piglet-webgl-demo/](https://awesomesaucelabs.github.io/piglet-webgl-demo/). I have tested the demo in Firefox and Google Chrome<sup>[2](#footnote2)</sup>, on Windows 10 64-bit.
+
+# Known Issues
+
+**Drag-and-drop functionality does not work on MacOS or Linux**. The
+ability to drag-and-drop .gltf/.glb/.zip files into the PigletViewer
+window only works on Windows, because I implemented that feature using
+[UnityWindowsFileDragAndDrop](https://github.com/Bunny83/UnityWindowsFileDrag-Drop). On
+MacOS or Linux, you will instead need to use the `--import` option
+(see [command line options](#command-line-options)) to choose which
+glTF file(s) are loaded on application startup.
 
 # Build Instructions
 
