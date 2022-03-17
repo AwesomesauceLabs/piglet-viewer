@@ -78,19 +78,19 @@ You can open glTF files in the PigletViewer app by opening `.glb`/`.zip` files f
 
 ## WebGL Build Instructions
 
-Before you can build WebGL apps, you will need to install the **WebGL Build Support** module for Unity. Unity Hub can download and install this module for you in a few simple steps. See [Adding modules to the Unity Editor]( https://docs.unity3d.com/Manual/GettingStartedAddingEditorComponents.html) for details.
+Before you can build WebGL apps with Unity, you will need to install **WebGL Build Support** via Unity Hub. See [Add modules](https://docs.unity3d.com/hub/manual/AddModules.html) from the Unity Hub documentation for instructions.
 
-Once you have installed WebGL Build Support, you can build the WebGL version of PigletViewer by the following steps:
+Once you have installed WebGL Build Support, you can build and run PigletViewer in a web browser using the following steps:
 
-1. Change the active WebGL Template under `Edit => Project Settings... => Player => WebGL settings tab => Resolution and Presentation => WebGL Template`. If you are using Unity 2018 or Unity 2019, use the `Piglet2018` template.  If you are using Unity 2020 or newer, use the `Piglet2020` template<sup>[4](#footnote4)</sup>.
-2. Double-click `Assets/PigletViewer/Scenes/MainScene.unity` to open the PigletViewer scene.
+1. Select the appropriate WebGL Template under `Edit => Project Settings... => Player => WebGL settings tab => Resolution and Presentation => WebGL Template`. For Unity 2018 or Unity 2019, use the `Piglet2018` template. For Unity 2020 or newer, use the `Piglet2020` template<sup>[4](#footnote4)</sup>.
+2. Double-click `Assets/PigletViewer/Scenes/MainScene.unity` to make it the current scene.
 3. Click `File => Build Settings...` in the Unity menu.
-4. Click `WebGL` on the left side of the `Build Settings` dialog. If there is a `Build` button in the bottom right corner, then WebGL is already the active build target. If not, click `Switch Platform` to make WebGL the active build target.
-5. Click `Add Open Scenes` in the top right corner to add the current scene to the build.
+4. Click `WebGL` on the left sidebar of the `Build Settings` dialog.
+5. Change the active build target to `WebGL` by clicking `Switch Platform`. The `Switch Platform` button will be grayed out if `WebGL` is already the active build target.
 6. Click `Build and Run` in the bottom right corner.
 7. Select an output directory for the WebGL build and click `OK`.
 
-Once the build has completed, Unity will open the WebGL version of PigletViewer in your default web browser.
+Once the build has completed, PigletViewer will open in your default web browser.
 
 ## Standalone Build Instructions (Windows/Mac/Linux)
 
