@@ -5,9 +5,9 @@
 * [Known Issues](#known-issues)
 * [Build Instructions](#build-instructions)
   * [Unity Project Setup](#unity-project-setup)
+  * [Standalone Build Instructions (Windows/Mac/Linux)](#standalone-build-instructions-windowsmaclinux)
   * [Android Build Instructions](#android-build-instructions)
   * [WebGL Build Instructions](#webgl-build-instructions)
-  * [Standalone Build Instructions (Windows/Mac/Linux)](#standalone-build-instructions-windowsmaclinux)
 * [Command Line Options](#command-line-options)
   * [Specifying Command Line Options for Android and WebGL Builds](#specifying-command-line-options-for-android-and-webgl-builds)
 * [Navigating the Source Code](#navigating-the-source-code)
@@ -50,6 +50,19 @@ To set up the Unity project for PigletViewer, I recommend the following steps:
 
 I recommend installing from the `.unitypackage` rather than doing a `git clone` because the project in this repo is tied to Unity version 2018.4.20f1, whereas the `.unitypackage` will also work with newer versions of Unity.
 
+## Standalone Build Instructions (Windows/Mac/Linux)
+
+You can build PigletViewer for Windows/Mac/Linux using the following steps:
+
+1. Double-click `Assets/PigletViewer/Scenes/MainScene.unity` to make it the current scene.
+2. Click `File -> Build Settings...` in the Unity menu.
+3. Click `PC, Mac & Linux Standalone` on the left sidebar of the `Build Settings` dialog.
+4. Change the active build target to `PC, Mac & Linux Standalone` by clicking `Switch Platform`. The `Switch Platform` button will be grayed out if `PC, Mac & Linux Standalone` is already the active build target.
+5. Click `Build And Run`.
+6. Select a location for the output files and click `OK` to start the build.
+
+Once the build has completed, PigletViewer will open on your Windows/Mac/Linux desktop. If you are using Windows, you can drag-and-drop `.gltf`/`.glb`/`.zip` files onto the PigletViewer window to view them. If you are using Mac or Linux, you will instead need to launch PigletViewer from the command line and use the `--import` option to specify which glTF file(s) to load at startup (see [command line options](#command-line-options)). 
+
 ## Android Build Instructions
 
 Before you can build Android apps with Unity, you will first need to
@@ -91,19 +104,6 @@ Once you have installed WebGL Build Support, you can build and run PigletViewer 
 7. Select an output directory for the WebGL build and click `OK`.
 
 Once the build has completed, PigletViewer will open in your default web browser.
-
-## Standalone Build Instructions (Windows/Mac/Linux)
-
-You can build PigletViewer for Windows/Mac/Linux using the following steps:
-
-1. Double-click `Assets/PigletViewer/Scenes/MainScene.unity` to make it the current scene.
-2. Click `File -> Build Settings...` in the Unity menu.
-3. Click `PC, Mac & Linux Standalone` on the left sidebar of the `Build Settings` dialog.
-4. Change the active build target to `PC, Mac & Linux Standalone` by clicking `Switch Platform`. The `Switch Platform` button will be grayed out if `PC, Mac & Linux Standalone` is already the active build target.
-5. Click `Build And Run`.
-6. Select a location for the output files and click `OK` to start the build.
-
-Once the build has completed, PigletViewer will open on your Windows/Mac/Linux desktop. If you are using Windows, you can drag-and-drop `.gltf`/`.glb`/`.zip` files onto the PigletViewer window to view them. If you are using Mac or Linux, you will instead need to launch PigletViewer from the command line and use the `--import` option to specify which glTF file(s) to load at startup (see [command line options](#command-line-options)). 
 
 ## Command Line Options
 
