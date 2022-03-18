@@ -17,7 +17,7 @@
 
 # Description
 
-![PigletViewer Demo GIF](scifi-gun.gif)
+![PigletViewer Demo ](images/scifi-gun.gif)
 <br>
 *Viewing ["SciFi Gun"](https://sketchfab.com/3d-models/scifi-gun-04a9f3ccb5b14dc38a28b27c1916e18e) by [mrfetch@sketchfab](https://sketchfab.com/mrfetch) in the [live PigletViewer demo](https://awesomesaucelabs.github.io/piglet-webgl-demo/).*
 
@@ -109,7 +109,7 @@ Once you have obtained a Mac computer and bought an Apple Developer subscription
 
 Next you need configure iOS app-signing in Unity, as depicted in the screenshot below.
 
-![Unity iOS Settings Screenshot](ios-signing.jpg)
+![Unity iOS Settings Screenshot](images/ios-signing.jpg)
 <br>
 *Screenshot of Unity settings for signing iOS apps.*
 
@@ -136,7 +136,7 @@ Once the app is installed on your iPhone/iPad, you can open a `.glb` or `.zip` f
 1. Sharing the file from your Mac to your iPhone/iPad using [AirDrop](https://support.apple.com/en-us/HT204144), **OR**
 2. Dragging-and-dropping the file onto the PigletViewer app in Finder, which can be found by clicking `iPhone`/`iPad` in the left sidebar and then selecting the `Files` tab (see screenshot below).
 
-![Finder drag-and-drop screenshot](finder.jpg)
+![Finder drag-and-drop screenshot](images/finder.jpg)
 <br>
 *Dragging-and-dropping a glTF file onto the PigletViewer iOS app in Finder.*
 
