@@ -10,7 +10,7 @@
   * [iOS Build Instructions](#ios-build-instructions)
   * [WebGL Build Instructions](#webgl-build-instructions)
 * [Command Line Options](#command-line-options)
-  * [Specifying Command Line Options for Android and WebGL Builds](#specifying-command-line-options-for-android-and-webgl-builds)
+  * [Using Command Line Options on Android/iOS/WebGL](#using-command-line-options-on-androidioswebgl)
 * [Navigating the Source Code](#navigating-the-source-code)
 * [Licenses and Attributions](#licenses-and-attributions)
 * [Footnotes](#footnotes)
@@ -21,7 +21,7 @@
 <br>
 *Viewing ["SciFi Gun"](https://sketchfab.com/3d-models/scifi-gun-04a9f3ccb5b14dc38a28b27c1916e18e) by [mrfetch@sketchfab](https://sketchfab.com/mrfetch) in the [live PigletViewer demo](https://awesomesaucelabs.github.io/piglet-webgl-demo/).*
 
-PigletViewer is a Unity application which uses the [Piglet glTF Importer](https://assetstore.unity.com/packages/slug/173425) to load and view 3D models from glTF files (`.gltf`, `.glb`, or `.zip`)<sup>[1](#footnote1)</sup>. It is designed to run on multiple platforms and currently supports builds for Android, WebGL, and Windows (see [Build Instructions](#build-instructions)).
+PigletViewer is a Unity application which uses the [Piglet glTF Importer](https://assetstore.unity.com/packages/slug/173425) to load and view 3D models from glTF files (`.gltf`, `.glb`, or `.zip`)<sup>[1](#footnote1)</sup>. It is designed to run on multiple platforms and currently supports builds for Windows, macOS, Android, iOS, and WebGL (see [Build Instructions](#build-instructions)).
 
 PigletViewer is provided as an example application for customers of the [Piglet glTF Importer](https://assetstore.unity.com/packages/slug/173425). As such, building the application requires purchasing and installing Piglet from the Unity Asset Store. For new users of Piglet, I recommend watching the [Runtime Import Tutorial video](https://youtu.be/f66wmgSTPI0) and/or reading the [Runtime Import Tutorial section of the manual](https://awesomesaucelabs.github.io/piglet-manual/#runtime-import-tutorial) before exploring the PigletViewer code, as the tutorial provides a much quicker and simpler introduction to the API.
 
@@ -209,15 +209,14 @@ Options:
 :warning: I would love to add a `--help` option that prints the above message on STDOUT, but
 so far I can't figure out how to do it!
 
-### Specifying Command Line Options for Android and WebGL Builds
+### Using Command Line Options on Android/iOS/WebGL
 
-On some platforms (e.g. Android, WebGL), specifying command line options
-is either awkward or impossible.
-
-On such platforms, you can still use command line options by putting
-them in a file named `StreamingAssets/piglet-viewer-args.txt` inside
-your Unity project.  The options are split on whitespace and can be
-specified across multiple lines.
+On Android/iOS/WebGL, specifying command line options is either
+awkward or impossible. On these platforms, you can still use command
+line options by putting them in a file named
+`StreamingAssets/piglet-viewer-args.txt` inside your Unity project.
+The options are split on whitespace and can be specified across
+multiple lines.
 
 Here is an example of a valid `StreamingAssets/piglet-viewer-args.txt` file:
 
@@ -233,14 +232,15 @@ Here is an example of a valid `StreamingAssets/piglet-viewer-args.txt` file:
 when parsing `StreamingAssets/piglet-viewer-args.txt`, so quoted arguments
 and arguments with spaces are not possible.
 
-It is still possible to use ordinary command line options when there
-is `StreamingAssets/piglet-viewer-args.txt` file in your project.
+On platforms that support it (e.g. Windows, macOS), it is still
+possible to use ordinary command line options when there is
+`StreamingAssets/piglet-viewer-args.txt` file in your project.
 Options specified on the command line are appended to the options
 specified in `StreamingAssets/piglet-viewer-args.txt`.
 
 ## Navigating the Source Code
 
-The best starting point for understanding the PigletViewer code is the `GameManager` class in [`Assets/PigletViewer/Scripts/GameManager.cs`](Assets/PigletViewer/Scripts/GameManager.cs). This class is responsible for starting glTF import tasks and for setting up callbacks that track import progress, handle import errors, and handle successful completion of a glTF import. `GameManager` also handles running scripts that implement platform-specific behaviour, namely `AndroidGameManager`, `WebGlGameManager`, and `WindowsGameManager`.  Depending on the target platform of your game/application, it may be useful to look at those classes as well.
+The best starting point for understanding the PigletViewer code is the `GameManager` class in [`Assets/PigletViewer/Scripts/GameManager.cs`](Assets/PigletViewer/Scripts/GameManager.cs). This class is responsible for starting glTF import tasks and for setting up callbacks that track import progress, handle import errors, and handle successful completion of a glTF import. `GameManager` also handles running scripts that implement platform-specific behaviour (e.g. `WindowsGameManager`). Depending on the target platform of your game/application, it may be useful to look at those classes as well.
 
 # Licenses and Attributions
 
