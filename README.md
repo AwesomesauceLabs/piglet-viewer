@@ -7,6 +7,7 @@
   * [Unity Project Setup](#unity-project-setup)
   * [Standalone Build Instructions (Windows/Mac/Linux)](#standalone-build-instructions-windowsmaclinux)
   * [Android Build Instructions](#android-build-instructions)
+  * [iOS Build Instructions](#ios-build-instructions)
   * [WebGL Build Instructions](#webgl-build-instructions)
 * [Command Line Options](#command-line-options)
   * [Specifying Command Line Options for Android and WebGL Builds](#specifying-command-line-options-for-android-and-webgl-builds)
@@ -88,6 +89,56 @@ Once you have completed the above steps, you can build and run PigletViewer on A
 Unity will automatically upload and run the `.apk` file on your Android phone/tablet once the build has completed. (You may need to wake/unlock your Android device before the PigletViewer app will start.)
 
 You can open glTF files in the PigletViewer app by opening `.glb`/`.zip` files from a file browser app and choosing PigletViewer as the target application<sup>[3](#footnote3)</sup>.
+
+## iOS Build Instructions
+
+In comparison to other platforms (e.g. Windows, Android), building for iOS has a lot of additional steps and requirements. Most importantly:
+
+1. You need to run the Unity build on a Mac computer (e.g. MacBook, Mac Mini). If you don't already own a Mac computer, you may be able to avoid purchasing one by using [Unity Cloud Build](https://unity.com/features/cloud-build) for iOS builds, but I've never tried that myself.
+2. You need to join the [Apple Developer Program](https://developer.apple.com/programs/enroll/). As of March 2022, an Apple Developer membership costs $119.00 USD/year.
+
+Even if you use Unity Cloud Build for iOS builds, you will still need to pay the yearly Apple Developer fee in order to generate the required iOS app-signing certificate, as described below.
+
+Once you have obtained a Mac computer and bought an Apple Developer subscription, the next steps are:
+
+1. Install Unity on your Mac computer using Unity Hub, and add the **iOS Build Support** module during the installation. (See [Add modules](https://docs.unity3d.com/hub/manual/AddModules.html) from the Unity Hub documentation for instructions.)
+2. Install [Xcode](https://developer.apple.com/xcode/) on your Mac computer using the Apple App Store.
+3. Create an iOS app-signing certificate using the Apple Developer website, by following the steps described in [Building for iOS](https://docs.unity3d.com/Manual/UnityCloudBuildiOS.html) from the Unity documentation. Although the instructions refer to Unity Cloud Build, the same steps must be followed to perform iOS builds on your local Mac machine.
+
+*Whew*. Generating those certificate files was long and confusing process, wasn't it? Don't worry, you're almost done now.
+
+Next you need configure iOS app-signing in Unity, as depicted in the screenshot below.
+
+![Unity iOS Settings Screenshot](ios-signing.jpg)
+<br>
+*Screenshot of Unity settings for signing iOS apps.*
+
+In detail:
+
+1. Select `Edit -> Project Settings... -> Player -> iOS tab -> Other Settings -> Identification` from the Unity menu.
+2. Set `Bundle Identifier` to a name that matches the certificate from the Apple Developer website, as shown under `Certificates, IDs & Profiles -> Identifiers`. For example, for my own Apple Developer account, I have a certificate named "awesomesauce" that is associated with the pattern "com.awesomesauce.*".  So "com.awesomesauce.piglet" would be a valid value for the `Bundle Identifier` field.
+3. Set `Signing Team ID` to your Apple Developer team ID. This is the alphanumeric ID shown in the top right corner of your Apple Developer account page, after you select `Certificates, IDs & Profiles`. A hypothetical example is "AB123C45DE".
+4. Enable the `Automatically Sign` checkbox.
+
+Finally (!), you can build and run PigletViewer on your iOS device using the following steps:
+
+1. Double-click `Assets/PigletViewer/Scenes/MainScene.unity` to make it the current scene.
+2. Click `File -> Build Settings...` in the Unity menu.
+3. Click `iOS` on the left sidebar of the `Build Settings` dialog.
+4. Change the active build target to `iOS` by clicking `Switch Platform`. The `Switch Platform` button will be grayed out if `iOS` is already the active build target.
+5. Click `Build and Run`.
+6. Select a location for the output `.app` folder and click `OK` to start the build.
+
+Xcode will automatically upload and run the app on your iPhone/iPad once the build has completed. If you have installed your Apple Developer certificate correctly (see [Building for iOS](https://docs.unity3d.com/Manual/UnityCloudBuildiOS.html)), Xcode will prompt for your Mac login password to sign the app. You may also need to wake/unlock your iPhone/iPad before the PigletViewer app will start running.
+
+Once the app is installed on your iPhone/iPad, you can open a `.glb` or `.zip` file in the app by either:
+
+1. Sharing the file from your Mac to your iPhone/iPad using [AirDrop](https://support.apple.com/en-us/HT204144), **OR**
+2. Dragging-and-dropping the file onto the PigletViewer app in Finder, which can be found by clicking `iPhone`/`iPad` in the left sidebar and then selecting the `Files` tab (see screenshot below).
+
+![Finder drag-and-drop screenshot](finder.jpg)
+<br>
+*Dragging-and-dropping a glTF file onto the PigletViewer iOS app in Finder.*
 
 ## WebGL Build Instructions
 
