@@ -47,6 +47,10 @@ namespace PigletViewer
         {
             const string buildPath = "build/ios";
 
+            // Configure the name of the app on iPhone/iPad home screen.
+
+            PlayerSettings.productName = "PigletViewer";
+
             // Parse command line options using NDesk.Options library.
 
             var commandLineOptions = new OptionSet()
