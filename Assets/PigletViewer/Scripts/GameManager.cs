@@ -219,7 +219,10 @@ namespace PigletViewer
         /// </param>
         public void QueueImport(GltfImportTask importTask, string filename)
         {
-            importTask.PushTask(() =>
+            if (_options.Profile)
+                importTask.ProfilingEnabled = true;
+
+            importTask.PushTask("ResetProgressLog", () =>
             {
                 // Reset the progress log and print the name of the
                 // glTF file we are about to load.
@@ -234,7 +237,13 @@ namespace PigletViewer
             importTask.RethrowExceptionAfterCallbacks = false;
 
             if (_options.Profile)
-                importTask.OnCompleted += _ => { LogProfilingData(filename); };
+            {
+                importTask.OnCompleted += _ =>
+                {
+                    LogProfilingData(filename);
+                    SimpleProfiler.Instance.Reset();
+                };
+            }
 
             Tasks.Add(importTask);
         }
@@ -285,28 +294,32 @@ namespace PigletViewer
         }
 
         /// <summary>
-        /// Print profiling data to the debug log as table in TSV format.
+        /// Print profiling data to the debug log in TSV format.
         /// </summary>
-        private void LogProfilingData(string filename,
-            List<GltfImportTask.ProfilingRecord> profilingData)
+        private void LogProfilingData(string filename)
         {
-            Debug.Log("[PigletViewer] BEGIN_PROFILING_DATA\n");
-            Debug.LogFormat("[PigletViewer] {0}\t{1}\t{2}\t{3}\t{4}\t{5}\n",
-                "file", "step", "move_next_ms", "wallclock_ms",
-                "move_next_calls", "frames");
+            // Temporarily disable stack traces after each
+            // Debug.Log() message, to make it easier to
+            // extract the profiling data from the Unity log.
 
-            foreach (var profilingRecord in profilingData)
+            var origStackTraceSetting = Application.GetStackTraceLogType(LogType.Log);
+            Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
+
+            Debug.Log("[PigletViewer] BEGIN_PROFILING_DATA");
+            Debug.Log($"FILE\t{filename}");
+
+            foreach (var entry in SimpleProfiler.Instance.Results)
             {
-                Debug.LogFormat(
-                    "[PigletViewer] {0}\t{1}\t{2}\t{3}\t{4}\t{5}\n",
-                    filename, profilingRecord.TaskType,
-                    profilingRecord.StopwatchMoveNext.ElapsedMilliseconds,
-                    profilingRecord.StopwatchWallclock.ElapsedMilliseconds,
-                    profilingRecord.MoveNextCalls,
-                    profilingRecord.Frames);
+                var sampleName = entry.Key;
+                var hist = entry.Value;
+
+                Debug.Log($"HIST\t{sampleName}\t{hist.Min}\t{hist.Max}\t{hist.Sum}");
+                Debug.Log(hist);
             }
 
             Debug.Log("[PigletViewer] END_PROFILING_DATA\n");
+
+            Application.SetStackTraceLogType(LogType.Log, origStackTraceSetting);
         }
 
         /// <summary>
@@ -373,7 +386,7 @@ namespace PigletViewer
                     // command-line actions have completed.
                     //
                     // I use this to facilitate automated profiling of the
-                    // PigletViewer WebGL build. Once the "IDLE"
+                    // PigletViewer WebGL build. Once the "[PigletViewer] IDLE"
                     // string appears in the Google Chrome log file, I know that
                     // it is safe to extract the profiling data from the log and
                     // kill the Chrome process.
