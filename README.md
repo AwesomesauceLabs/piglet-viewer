@@ -195,6 +195,7 @@ Options:
                                    different places depending on the target platform.
                                    For example, on Android the StreamingAssets
                                    folder is located inside the .apk file!
+-m, --log-message=MESSAGE          Print message to Unity log
 -p, --profile                      Enable performance profiling [disabled]. When
                                    enabled, this writes some profiling data
                                    to the Unity log after each glTF import.

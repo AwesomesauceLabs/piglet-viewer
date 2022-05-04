@@ -55,6 +55,12 @@ namespace PigletViewer
                     }
                 },
                 {
+                    "m|log-message=",
+                    "print a message to the Unity log",
+                    message =>  GameManager.Instance.Tasks.Add(
+                        GameManager.LogMessage(message))
+                },
+                {
                     "p|profile",
                     "profile glTF imports and log results in TSV format",
                     enable => options.Profile = enable != null

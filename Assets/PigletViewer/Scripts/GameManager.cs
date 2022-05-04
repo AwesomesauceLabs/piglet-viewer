@@ -360,6 +360,15 @@ namespace PigletViewer
         }
 
         /// <summary>
+        /// Print a message to the Unity log.
+        /// </summary>
+        public static IEnumerator LogMessage(string message)
+        {
+            Debug.Log(message);
+            yield return null;
+        }
+
+        /// <summary>
         /// Unity callback that is invoked once per frame.
         /// </summary>
         public void Update()
@@ -382,17 +391,6 @@ namespace PigletViewer
 
                 if (Tasks.Count == 0)
                 {
-                    // Magic string that scripts can use to detect when all
-                    // command-line actions have completed.
-                    //
-                    // I use this to facilitate automated profiling of the
-                    // PigletViewer WebGL build. Once the "[PigletViewer] IDLE"
-                    // string appears in the Google Chrome log file, I know that
-                    // it is safe to extract the profiling data from the log and
-                    // kill the Chrome process.
-
-                    Debug.Log("[PigletViewer] IDLE");
-
                     if (_options.Quit)
                         Application.Quit();
                 }
