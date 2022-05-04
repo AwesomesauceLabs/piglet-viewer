@@ -95,7 +95,7 @@ namespace PigletViewer
 
             _options = new CommandLineOptions();
 
-            Tasks.Add(CommandLineParser.ParseCommandLineOptions());
+            Tasks.Add(CommandLineParser.ParseCommandLineOptions(_options));
 
             // Add platform-specific behaviours.
 
@@ -233,11 +233,8 @@ namespace PigletViewer
             importTask.OnException += OnImportException;
             importTask.RethrowExceptionAfterCallbacks = false;
 
-            importTask.OnCompleted += _ =>
-            {
-                if (_options.Profile)
-                    LogProfilingData(filename, importTask.ProfilingRecords);
-            };
+            if (_options.Profile)
+                importTask.OnCompleted += _ => { LogProfilingData(filename); };
 
             Tasks.Add(importTask);
         }
@@ -361,9 +358,6 @@ namespace PigletViewer
             // advance execution of import tasks
             while (Tasks.Count > 0 && !Tasks[0].MoveNext())
             {
-                if (Tasks[0].Current is CommandLineOptions)
-                    _options = Tasks[0].Current as CommandLineOptions;
-
                 Tasks.RemoveAt(0);
 
                 // Tell Unity to release memory for any assets (e.g. textures)
@@ -384,8 +378,7 @@ namespace PigletViewer
                     // it is safe to extract the profiling data from the log and
                     // kill the Chrome process.
 
-                    if (_options.Profile)
-                        Debug.Log("[PigletViewer] IDLE");
+                    Debug.Log("[PigletViewer] IDLE");
 
                     if (_options.Quit)
                         Application.Quit();

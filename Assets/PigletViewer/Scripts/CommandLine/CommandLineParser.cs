@@ -23,10 +23,16 @@ namespace PigletViewer
         /// will be appended to these.
         /// </para>
         /// </summary>
-        public static IEnumerator<CommandLineOptions> ParseCommandLineOptions()
+        /// <param name="options">
+        /// Class that holds the state of the command-line options
+        /// as they parsed. Note: This parameter is effectively a
+        /// `ref` parameter, but we cannot annotate as such
+        /// because coroutines are not allowed to have `ref` parameters.
+        /// For further explanation, see:
+        /// https://stackoverflow.com/questions/999020/why-cant-iterator-methods-take-either-ref-or-out-parameters
+        /// </param>
+        public static IEnumerator ParseCommandLineOptions(CommandLineOptions options)
         {
-            var options = new CommandLineOptions();
-
             var optionSet = new OptionSet
             {
                 {
@@ -111,8 +117,6 @@ namespace PigletViewer
                 GameManager.Instance.QueueImport(Path.Combine(
                     Application.streamingAssetsPath, "piggleston.glb"));
             }
-
-            yield return options;
         }
 
         /// <summary>
