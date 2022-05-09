@@ -7,6 +7,7 @@ using System.Text;
 using Piglet;
 using UnityEngine;
 using NDesk.Options;
+using UnityEditor;
 using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
 
@@ -24,14 +25,6 @@ namespace PigletViewer
     /// </summary>
     public class GameManager : SingletonBehaviour<GameManager>
     {
-        /// <summary>
-        /// Options for glTF import behaviour.
-        /// Currently this just controls whether
-        /// the imported model is automatically
-        /// scaled to a user-specified size.
-        /// </summary>
-        public GltfImportOptions ImportOptions;
-
         /// <summary>
         /// <para>
         /// List of queued tasks (coroutines) that
@@ -66,15 +59,6 @@ namespace PigletViewer
             // Create glTF import queue.
 
             Tasks = new List<IEnumerator>();
-
-           // Set import options so that imported models are
-            // automatically scaled to a standard size.
-
-            ImportOptions = new GltfImportOptions
-            {
-                AutoScale = true,
-                AutoScaleSize = ModelManager.Instance.DefaultModelSize
-            };
 
             // Set up callbacks for logging progress messages during
             // glTF imports. The default behaviour is to render
@@ -152,6 +136,29 @@ namespace PigletViewer
         }
 
         /// <summary>
+        /// <para>
+        /// Return a GltfImportOptions object that represents the current
+        /// settings of the command-line options (e.g. `--mipmaps`).
+        /// </para>
+        /// <para>
+        /// Note: We must create an independent instance of `GltfImportOptions`
+        /// for each glTF import because the command-line options (e.g.
+        /// `--mipmaps`) may be enabled/disabled any number of times
+        /// throughout the command line, and thus may be configured differently
+        /// for different glTF imports.
+        /// </para>
+        /// </summary>
+        private GltfImportOptions GetGltfImportOptions()
+        {
+            return new GltfImportOptions
+            {
+               AutoScale = true,
+               AutoScaleSize = ModelManager.Instance.DefaultModelSize,
+               CreateMipmaps = _options.Mipmaps
+            };
+        }
+
+        /// <summary>
         /// Abort any running/queued glTF imports and start importing
         /// the given glTF file.
         ///
@@ -172,7 +179,7 @@ namespace PigletViewer
         public void StartImport(byte[] data, string filename)
         {
             AbortImports();
-            var importTask = RuntimeGltfImporter.GetImportTask(data, ImportOptions);
+            var importTask = RuntimeGltfImporter.GetImportTask(data, GetGltfImportOptions());
             QueueImport(importTask, filename);
         }
 
@@ -203,7 +210,7 @@ namespace PigletViewer
         {
             var uri = UriUtil.GetAbsoluteUri(uriStr);
             var basename = Path.GetFileName(uri.ToString());
-            var importTask = RuntimeGltfImporter.GetImportTask(uri, ImportOptions);
+            var importTask = RuntimeGltfImporter.GetImportTask(uri, GetGltfImportOptions());
             QueueImport(importTask, basename);
         }
 

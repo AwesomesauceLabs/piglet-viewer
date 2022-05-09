@@ -3,6 +3,11 @@
     public class CommandLineOptions
     {
         /// <summary>
+        /// Create mipmaps during texture loading.
+        /// </summary>
+        public bool Mipmaps;
+
+        /// <summary>
         /// If true, print a TSV table of profiling data
         /// to the debug log after each glTF import.
         /// </summary>

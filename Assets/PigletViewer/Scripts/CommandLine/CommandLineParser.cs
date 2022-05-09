@@ -61,6 +61,11 @@ namespace PigletViewer
                         GameManager.LogMessage(message))
                 },
                 {
+                    "M|mipmaps",
+                    "create mipmaps during texture loading",
+                    enable => options.Mipmaps = enable != null
+                },
+                {
                     "p|profile",
                     "profile glTF imports and log results in TSV format",
                     enable => options.Profile = enable != null
