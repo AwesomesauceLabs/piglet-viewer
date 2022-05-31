@@ -41,6 +41,11 @@ namespace PigletViewer
                      label => GameManager.Instance.Tasks.Add(GameManager.ShowPromptButton(label))
                 },
                 {
+                    "e|ensure-quaternion-continuity",
+                    "call AnimationClip.EnsureQuaternionContinuity() after loading each animation clip",
+                    enable => options.EnsureQuaternionContinuity = enable != null
+                },
+                {
                     "i|import=",
                     "import glTF file from {URI} (filename or HTTP URL)",
                     uri => GameManager.Instance.QueueImport(uri)

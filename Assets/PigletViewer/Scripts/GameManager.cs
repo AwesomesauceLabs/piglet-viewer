@@ -154,7 +154,8 @@ namespace PigletViewer
             {
                AutoScale = true,
                AutoScaleSize = ModelManager.Instance.DefaultModelSize,
-               CreateMipmaps = _options.Mipmaps
+               CreateMipmaps = _options.Mipmaps,
+               EnsureQuaternionContinuity = _options.EnsureQuaternionContinuity
             };
         }
 

@@ -188,6 +188,8 @@ Usage: PigletViewer.exe <UNITY_OPTIONS> -- <PIGLET_VIEWER_OPTIONS>
 Options:
 
 -b, --button=LABEL                 Show button with LABEL and continue when user clicks it
+-e, --ensure-quaternion-continuity Call AnimationClip.EnsureQuaternionContinuity() after
+                                   importing each animation clip.
 -i, --import=URI                   Import glTF file from URI (file path or HTTP URL)
 -I, --import-streaming-asset=PATH  Import glTF file from PATH, where PATH is relative
                                    to the StreamingAssets folder. This option is useful
