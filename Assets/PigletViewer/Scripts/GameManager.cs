@@ -9,6 +9,7 @@ using UnityEngine;
 using NDesk.Options;
 using UnityEditor;
 using UnityEngine.Networking;
+using UnityEngine.Profiling;
 using Debug = UnityEngine.Debug;
 
 namespace PigletViewer
@@ -230,6 +231,9 @@ namespace PigletViewer
             if (_options.Profile)
                 importTask.ProfilingEnabled = true;
 
+            importTask.PushTask("enable Profiler",
+                () => { Profiler.enabled = true; });
+
             importTask.PushTask("ResetProgressLog", () =>
             {
                 // Reset the progress log and print the name of the
@@ -243,6 +247,8 @@ namespace PigletViewer
             importTask.OnCompleted += OnImportCompleted;
             importTask.OnException += OnImportException;
             importTask.RethrowExceptionAfterCallbacks = false;
+
+            importTask.OnCompleted += _ => { Profiler.enabled = false; };
 
             if (_options.Profile)
             {
